@@ -70,8 +70,11 @@ doSerotiny <- function(burnedPixelCohortData, postFirePixelCohortData,
     specieseco_current <- speciesEcoregion[year <= round(currentTime)]
     specieseco_current <- specieseco_current[year == max(specieseco_current$year),
                                              .(ecoregionGroup, speciesCode, establishprob)]
-    serotinyPixelCohortData <- serotinyPixelCohortData[specieseco_current, on = c("ecoregionGroup", "speciesCode"), nomatch = 0]
-    #serotinyPixelCohortData <- setkey(serotinyPixelCohortData, ecoregionGroup, speciesCode)[specieseco_current, nomatch = 0]  ## join table to add probs
+    serotinyPixelCohortData <- serotinyPixelCohortData[specieseco_current,
+                                                       on = c("ecoregionGroup", "speciesCode"),
+                                                       nomatch = 0]
+    # serotinyPixelCohortData <- setkey(serotinyPixelCohortData, ecoregionGroup, speciesCode)[
+    #   specieseco_current, nomatch = 0]  ## join table to add probs
     serotinyPixelCohortData <- serotinyPixelCohortData[runif(nrow(serotinyPixelCohortData), 0, 1) %<<% establishprob][, establishprob := NULL]
 
     ## only need one cohort per spp per pixel survives/establishes
@@ -79,14 +82,16 @@ doSerotiny <- function(burnedPixelCohortData, postFirePixelCohortData,
 
     if (NROW(serotinyPixelCohortData)) {
       ## rm age
-      serotinyPixelCohortData <- serotinyPixelCohortData[,.(pixelGroup, ecoregionGroup, speciesCode, pixelIndex)] #
+      serotinyPixelCohortData <- serotinyPixelCohortData[, .(pixelGroup, ecoregionGroup,
+                                                             speciesCode, pixelIndex)]
       serotinyPixelCohortData[, type := "serotiny"]
       if (calibrate) {
-        serotinyRegenSummary <- serotinyPixelCohortData[,.(numberOfRegen = length(pixelIndex)), by = speciesCode]
-        serotinyRegenSummary <- serotinyRegenSummary[,.(year = currentTime, regenMode = "Serotiny",
-                                                        speciesCode, numberOfRegen)]
-        serotinyRegenSummary <- setkey(serotinyRegenSummary, speciesCode)[species[,.(species, speciesCode)],
-                                                                          nomatch = 0]
+        serotinyRegenSummary <- serotinyPixelCohortData[, .(numberOfRegen = length(pixelIndex)),
+                                                        by = speciesCode]
+        serotinyRegenSummary <- serotinyRegenSummary[, .(year = currentTime, regenMode = "Serotiny",
+                                                         speciesCode, numberOfRegen)]
+        serotinyRegenSummary <- setkey(serotinyRegenSummary, speciesCode)[
+          species[, .(species, speciesCode)], nomatch = 0]
         serotinyRegenSummary[, ':='(speciesCode = species, species = NULL)]
         setnames(serotinyRegenSummary, "speciesCode", "species")
         postFireRegenSummary <- rbindlist(list(postFireRegenSummary, serotinyRegenSummary))
