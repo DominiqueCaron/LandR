@@ -50,7 +50,7 @@ test_that("leading species transitions plots look good", {
   if (interactive()) {
     transition_ggs <- plotVegTransitions(transitions_df)
 
-    lapply(seq_along(transition_ggs), function(i) {
+    lapply(names(transition_ggs), function(i) {
       ggsave(file.path(outputDir, "figures", paste0("transition_vegTypeMap_", i, ".png")),
              transition_ggs[[i]], width = 12, height = 6)
     })
@@ -88,7 +88,7 @@ test_that("leading species transitions plots look good", {
   if (interactive()) {
     transition_ggs2 <- plotVegTransitions(transitions_df)
 
-    lapply(seq_along(transition_ggs2), function(i) {
+    lapply(names(transition_ggs2), function(i) {
       ggsave(file.path(outputDir, "figures", paste0("transition_conifdecid_", er, ".png")), gg,
              width = 12, height = 6)
     })
