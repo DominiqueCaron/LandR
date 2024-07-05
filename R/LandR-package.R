@@ -21,7 +21,7 @@
 #' @importFrom crayon blue cyan green magenta red
 #' @importFrom data.table as.data.table copy data.table fread is.data.table last melt rbindlist
 #' @importFrom data.table set setattr setcolorder setDT setDTthreads setkey setkeyv setnames setorderv
-#' @importFrom fpCompare %==% %>>% %<<%
+#' @importFrom fpCompare %==% %>>% %<<% %<=%
 #' @importFrom ggplot2 aes coord_equal coord_sf element_blank element_text facet_wrap
 #' @importFrom ggplot2 geom_bar geom_hline geom_line geom_point labs geom_raster geom_ribbon geom_sf
 #' @importFrom ggplot2 ggplot ggtitle guide_legend guides labs

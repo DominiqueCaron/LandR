@@ -63,7 +63,7 @@ doSerotiny <- function(burnedPixelCohortData, postFirePixelCohortData,
     serotinyPixelCohortData <- serotinyPixelCohortData[species[, .(speciesCode, shadetolerance)],
                                                        nomatch = 0, on = "speciesCode"]
     serotinyPixelCohortData <- assignLightProb(sufficientLight, serotinyPixelCohortData)
-    serotinyPixelCohortData <- serotinyPixelCohortData[lightProb %>>% runif(nrow(serotinyPixelCohortData))]  ## subset survivors
+    serotinyPixelCohortData <- serotinyPixelCohortData[runif(nrow(serotinyPixelCohortData)) %<=% lightProb]  ## subset survivors
     set(serotinyPixelCohortData, NULL, c("shadetolerance", "siteShade", "lightProb"), NULL)   ## clean table again
 
     ## get establishment probs and subset species that establish with runif
@@ -75,7 +75,7 @@ doSerotiny <- function(burnedPixelCohortData, postFirePixelCohortData,
                                                        nomatch = 0]
     # serotinyPixelCohortData <- setkey(serotinyPixelCohortData, ecoregionGroup, speciesCode)[
     #   specieseco_current, nomatch = 0]  ## join table to add probs
-    serotinyPixelCohortData <- serotinyPixelCohortData[runif(nrow(serotinyPixelCohortData), 0, 1) %<<% establishprob][, establishprob := NULL]
+    serotinyPixelCohortData <- serotinyPixelCohortData[runif(nrow(serotinyPixelCohortData)) %<=% establishprob][, establishprob := NULL]
 
     ## only need one cohort per spp per pixel survives/establishes
     serotinyPixelCohortData <- unique(serotinyPixelCohortData, by = c("pixelIndex", "speciesCode"))
