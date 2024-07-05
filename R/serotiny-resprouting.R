@@ -49,7 +49,8 @@ doSerotiny <- function(burnedPixelCohortData, postFirePixelCohortData,
     set(serotinyPixelCohortData, NULL, "sexualmature", NULL)
 
     ## select the pixels that have potential serotiny regeneration and assess them
-    serotinyPixelTable <- treedFirePixelTableSinceLastDisp[pixelGroup %in% unique(serotinyPixelCohortData$pixelGroup)]
+    serotinyPixelTable <- treedFirePixelTableSinceLastDisp[
+      pixelGroup %in% unique(serotinyPixelCohortData$pixelGroup)]
 
     ## from now on the regeneration process is assessed for each potential pixel
     #setkey(serotinyPixelTable, pixelGroup)
@@ -57,13 +58,12 @@ doSerotiny <- function(burnedPixelCohortData, postFirePixelCohortData,
     serotinyPixelCohortData <- serotinyPixelTable[serotinyPixelCohortData, allow.cartesian = TRUE,
                                                   nomatch = 0, on = "pixelGroup"] ## join table to add pixels
 
-    ## light check: add shade tolerance to table and set shade to 0 (100% mortality.)
-    ## the get survival probs and subset survivors with runif
+    ## light check: add shade tolerance to table and set shade to 0 (100% mortality).
+    ## then get survival probs and subset survivors with runif
     serotinyPixelCohortData <- serotinyPixelCohortData[species[, .(speciesCode, shadetolerance)],
                                                        nomatch = 0, on = "speciesCode"]
-    serotinyPixelCohortData <- assignLightProb(sufficientLight = sufficientLight,
-                                               serotinyPixelCohortData)
-    serotinyPixelCohortData <- serotinyPixelCohortData[lightProb %>>% runif(nrow(serotinyPixelCohortData), 0, 1)]  ## subset survivors
+    serotinyPixelCohortData <- assignLightProb(sufficientLight, serotinyPixelCohortData)
+    serotinyPixelCohortData <- serotinyPixelCohortData[lightProb %>>% runif(nrow(serotinyPixelCohortData))]  ## subset survivors
     set(serotinyPixelCohortData, NULL, c("shadetolerance", "siteShade", "lightProb"), NULL)   ## clean table again
 
     ## get establishment probs and subset species that establish with runif

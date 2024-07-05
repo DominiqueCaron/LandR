@@ -13,8 +13,9 @@ utils::globalVariables(c(
 #'
 #' @param interpolate Logical. Activates interpolation of probabilities of establishment between
 #'   any two values of shade tolerance in the sufficient light table, allowing species shade tolerance
-#'   trait values to take any decimal value between 1 and 5 (inclusively). If false, species shade tolerances
-#'   can only take integer values between 1 and 5  (inclusively).
+#'   trait values to take any decimal value between 1 and 5 (inclusively).
+#'   If FALSE, species shade tolerances can only take integer values between 1 and 5  (inclusively).
+#'
 #' @template doAssertion
 #'
 #' @return  `newCohortData` with a `lightProb` column
@@ -30,10 +31,9 @@ assignLightProb <- function(sufficientLight, newCohortData, interpolate = TRUE,
     stopifnot(is(sufficientLight, "data.frame"))
   }
 
-  ## for each line, get the survival probability from sufficientLight table note
-  ## that sufficentLight is a table of survival probs for each tolerance level
-  ## (row) by and shade level (column) siteShade + 2 is necessary to skip the
-  ## first column
+  ## for each line, get the survival probability from sufficientLight table.
+  ## note that sufficentLight is a table of survival probs for each tolerance level (row)
+  ## by shade level (column) siteShade + 2 is necessary to skip the first column
   if (interpolate) {
     ## calculate floors/ceilings of shade tolerance and corresponding probs.
     tempDT <- newCohortData[, list(shadetolerance = shadetolerance,
@@ -49,11 +49,12 @@ assignLightProb <- function(sufficientLight, newCohortData, interpolate = TRUE,
     newCohortData[, lightProb := tempDT$lightProb]
   } else {
     ## are there any decimals in shade tolerance trait values?
-    if (!all(newCohortData$shadetolerance == round(newCohortData$shadetolerance)))
+    if (!all(newCohortData$shadetolerance == round(newCohortData$shadetolerance))) {
       stop(paste("Species shade tolerance values (in sim$species) have decimals,",
                  "but interpolation of germination probabilities between",
                  "shade tolerance categories in sim$sufficientLight is FALSE.\n",
                  "Set 'interpolate = TRUE', or provide integer shadetolerance values."))
+    }
 
     newCohortData[, lightProb := sufficientLight[cbind(shadetolerance, siteShade + 2)]]
   }
