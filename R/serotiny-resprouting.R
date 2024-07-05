@@ -123,7 +123,8 @@ doSerotiny <- function(burnedPixelCohortData, postFirePixelCohortData,
 #' @template species
 #' @template sufficientLight
 #' @param currentTime integer. The current simulation time obtained with `time(sim)`
-#' @param treedFirePixelTableSinceLastDisp a vector of pixels that burnt and were forested in the previous time step.
+#' @param treedFirePixelTableSinceLastDisp a vector of pixels that burnt and were forested
+#'        in the previous time step.
 #' @template calibrate
 #'
 #' @return  A list of objects:
@@ -144,9 +145,8 @@ doResprouting <- function(burnedPixelCohortData, postFirePixelCohortData,
   ## make a table of pixels where resprouting occurs.
   if (is.null(serotinyPixel)) {
     resproutingPixelTable <- setkey(treedFirePixelTableSinceLastDisp, pixelGroup)
-    # availableToResprout <- burnedPixelCohortData[0,]
-    availableToResprout <- copy(burnedPixelCohortData)    ## Ceres - fix
-
+    # availableToResprout <- burnedPixelCohortData[0, ]
+    availableToResprout <- copy(burnedPixelCohortData) ## Ceres - fix
   } else {
     ## Replacing here -- Eliot -- This was removing entire pixels that had successful serotiny
     ## -- now only species-pixel combos are removed.
@@ -154,7 +154,7 @@ doResprouting <- function(burnedPixelCohortData, postFirePixelCohortData,
     ## species that are resprouters.
     full <- treedFirePixelTableSinceLastDisp[unique(burnedPixelCohortData,
                                                     by = c("pixelGroup", "speciesCode")),
-                                             on = "pixelGroup", allow.cartesian = TRUE] #
+                                             on = "pixelGroup", allow.cartesian = TRUE]
 
     ## anti join to remove species-pixels that had successful serotiny/survivors
     ## Ceres: i don't know if I agree with this...
@@ -181,8 +181,8 @@ doResprouting <- function(burnedPixelCohortData, postFirePixelCohortData,
 
     ## light check: add shade tolerance to table and set shade to 0 (100% mortality.)
     ## the get survival probs and subset survivors with runif
-    resproutingPixelCohortData <- resproutingPixelCohortData[species[, .(speciesCode, shadetolerance)],
-                                                             nomatch = 0, on = "speciesCode"]
+    resproutingPixelCohortData <- resproutingPixelCohortData[
+      species[, .(speciesCode, shadetolerance)], nomatch = 0, on = "speciesCode"]
     # resproutingPixelCohortData[,siteShade := 0]    ## no longer part of resprouting
     # resproutingPixelCohortData <- setkey(resproutingPixelCohortData, speciesCode)[species[,.(speciesCode, shadetolerance)],
     #                                                     nomatch = 0][, siteShade := 0]
@@ -200,11 +200,12 @@ doResprouting <- function(burnedPixelCohortData, postFirePixelCohortData,
       resproutingPixelCohortData <- resproutingPixelCohortData[,.(pixelGroup, ecoregionGroup, speciesCode, pixelIndex)]
       resproutingPixelCohortData[, type := "resprouting"]
       if (calibrate) {
-        resproutRegenSummary <- resproutingPixelCohortData[,.(numberOfRegen = length(pixelIndex)), by = speciesCode]
-        resproutRegenSummary <- resproutRegenSummary[,.(year = currentTime, regenMode = "Resprout",
-                                                        speciesCode, numberOfRegen)]
-        resproutRegenSummary <- setkey(resproutRegenSummary, speciesCode)[species[,.(species, speciesCode)],
-                                                                          nomatch = 0]
+        resproutRegenSummary <- resproutingPixelCohortData[
+          , .(numberOfRegen = length(pixelIndex)), by = speciesCode]
+        resproutRegenSummary <- resproutRegenSummary[, .(year = currentTime, regenMode = "Resprout",
+                                                         speciesCode, numberOfRegen)]
+        resproutRegenSummary <- setkey(resproutRegenSummary, speciesCode)[
+          species[, .(species, speciesCode)], nomatch = 0]
         resproutRegenSummary[,':='(speciesCode = species, species = NULL)]
         setnames(resproutRegenSummary, "speciesCode", "species")
         postFireRegenSummary <- rbindlist(list(postFireRegenSummary, resproutRegenSummary))
