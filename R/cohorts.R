@@ -183,19 +183,6 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
                    cohortDefinitionCols = cohortDefinitionCols,
                    doAssertion = doAssertion, verbose = verbose)
 
-  if (doAssertion) {
-    maxPixelGroupFromCohortData <- max(outs$cohortData$pixelGroup)
-    maxPixelGroup <- as.integer(maxFn(outs$pixelGroupMap))
-    test1 <- (!identical(maxPixelGroup, maxPixelGroupFromCohortData))
-    if (test1) {
-      stop(
-        "The sim$pixelGroupMap and cohortData have unmatching pixelGroup.",
-        " They must be matching.",
-        " If this occurs, please contact the module developers"
-      )
-    }
-  }
-
   if (verbose > 0) {
     nPixForest <- sum(!is.na(outs$pixelGroupMap[]))
     nPixGrps <- length(unique(outs$cohortData$pixelGroup))
@@ -1790,19 +1777,6 @@ updateCohortDataPostHarvest <- function(newPixelCohortData, cohortData, pixelGro
   assertCohortData(outs$cohortData, outs$pixelGroupMap,
                    cohortDefinitionCols = cohortDefinitionCols,
                    doAssertion = doAssertion, verbose = verbose)
-
-  if (doAssertion) {
-    maxPixelGroupFromCohortData <- max(outs$cohortData$pixelGroup)
-    maxPixelGroup <- as.integer(maxFn(outs$pixelGroupMap))
-    test1 <- (!identical(maxPixelGroup, maxPixelGroupFromCohortData))
-    if (test1) {
-      stop(
-        "The sim$pixelGroupMap and cohortData have unmatching pixelGroup.",
-        " They must be matching.",
-        " If this occurs, please contact the module developers"
-      )
-    }
-  }
 
   if (verbose > 0) {
     nPixForest <- sum(!is.na(outs$pixelGroupMap[]))
