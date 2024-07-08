@@ -77,9 +77,9 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   }
 
   if (all(zeroOnPixelGroupMap)) {
-    # Deal with pixels on the map that have no pixelGroup -- these are burned
-    # pixels --> the entirely newly regenerated pixels do not require a
-    # re-pixelGroupMaping  -- can just add to existing pixelGroup values
+    ## Deal with pixels on the map that have no pixelGroup -- these are burned
+    ## pixels --> the entirely newly regenerated pixels do not require a
+    ## re-pixelGroupMaping  -- can just add to existing pixelGroup values
     if (verbose > 0) {
       message(crayon::green(
         "  Regenerating only burnt pixels with no survivors (i.e. resprouting & serotiny)"
@@ -93,21 +93,20 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
     )] # ,
     # successionTimestep = successionTimestep)
 
-    # Remove the duplicated pixels within pixelGroup (i.e., 2+ species in the same pixel)
+    ## Remove the duplicated pixels within pixelGroup (i.e., 2+ species in the same pixel)
     pixelsToChange <- unique(newPixelCohortData[, c("pixelIndex", "pixelGroup")],
                              by = c("pixelIndex")
     )
   } else {
-    # This is for situations where there are some empty pixels being filled,
-    #   and some occupied pixels getting infilling. This requires a wholesale
-    #   re-pixelGroup
+    ## This is for situations where there are some empty pixels being filled,
+    ## and some occupied pixels getting infilling. This requires a wholesale re-pixelGroup
     if (verbose > 0) {
       message(crayon::green("  Regenerating open and pixels with B (likely after seed dispersal, or partial mortality following disturbance)"))
     }
 
     pixelIndex <- which(pixelGroupMap[] %in% cohortData$pixelGroup)
 
-    # remove unnecessary columns before making cohortDataLong
+    ## remove unnecessary columns before making cohortDataLong
     suppressWarnings(set(cohortData, j = "prevMortality", value = NULL))
     suppressWarnings(set(newPixelCohortData, j = "year", value = NULL))
 
@@ -126,18 +125,18 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
     cd <- cohorts[, c("pixelIndex", columnsForPG), with = FALSE]
     cohorts[, pixelGroup := generatePixelGroups(cd, maxPixelGroup = 0L, columns = columnsForPG)]
 
-    # Bring to pixelGroup level -- this will squash the data.table
+    ## Bring to pixelGroup level -- this will squash the data.table
     if (is.null(cohorts[["sumB"]])) {
       cohorts[, sumB := sum(B, na.rm = TRUE), by = pixelGroup]
     }
-    # Old way that does not preserve additional 'unknown' columns in cohortData
+    ## Old way that does not preserve additional 'unknown' columns in cohortData
     # allCohortData <- cohorts[ , .(ecoregionGroup = ecoregionGroup[1],
     #                               mortality = mortality[1],
     #                               aNPPAct = aNPPAct[1],
     #                               sumB = sumB[1]),
     #                           by = uniqueCohortDefinition]
 
-    # newer way that will potentially conflict with LandR.CS due to differing aNPP
+    ## newer way that will potentially conflict with LandR.CS due to differing aNPP
     colsToSubset <- setdiff(colnames(cohortData), c("pixelIndex"))
     allCohortData <- cohorts[!duplicated(cohorts[, .(pixelGroup, speciesCode, ecoregionGroup, age)]),
                              ..colsToSubset]
@@ -146,11 +145,11 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
     cohortData <- allCohortData[!theNewOnes]
     newPixelCohortData <- allCohortData[theNewOnes]
 
-    # Remove the duplicated pixels within pixelGroup (i.e., 2+ species in the same pixel)
+    ## Remove the duplicated pixels within pixelGroup (i.e., 2+ species in the same pixel)
     pixelsToChange <- unique(cohorts[, c("pixelIndex", "pixelGroup")], by = c("pixelIndex"))
   }
 
-  # update pixelGroupMap
+  ## update pixelGroupMap
   pixelGroupMap[pixelsToChange$pixelIndex] <- pixelsToChange$pixelGroup
 
   if (doAssertion) {
@@ -162,15 +161,15 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   ## give B in pixels that have serotiny/resprouting
   # newPixelCohortData[, sumB := sum(B, na.rm = TRUE), by = pixelGroup]
 
-  ##########################################################
-  # Add new cohorts and rm missing cohorts (i.e., those pixelGroups that are gone)
-  ##########################################################
-  cohortData <- .initiateNewCohorts(newPixelCohortData, cohortData,
-                                    pixelGroupMap,
-                                    currentTime = currentTime,
-                                    speciesEcoregion = speciesEcoregion,
-                                    successionTimestep = successionTimestep,
-                                    initialB = initialB
+  ## Add new cohorts and rm missing cohorts (i.e., those pixelGroups that are gone) -----------
+  cohortData <- .initiateNewCohorts(
+    newPixelCohortData,
+    cohortData,
+    pixelGroupMap,
+    currentTime = currentTime,
+    speciesEcoregion = speciesEcoregion,
+    successionTimestep = successionTimestep,
+    initialB = initialB
   )
 
   outs <- rmMissingCohorts(cohortData, pixelGroupMap, cohortDefinitionCols = cohortDefinitionCols)
@@ -1759,18 +1758,13 @@ updateCohortDataPostHarvest <- function(newPixelCohortData, cohortData, pixelGro
     }
   }
 
-
-  ##########################################################
-  # Add new cohorts and rm missing cohorts (i.e., those pixelGroups that are gone)
-  ##########################################################
-
+  ## Add new cohorts and rm missing cohorts (i.e., those pixelGroups that are gone) -----------
   cohortData <- plantNewCohorts(newPixelCohortData, cohortData,
                                 pixelGroupMap,
                                 currentTime = currentTime,
                                 successionTimestep = successionTimestep,
                                 initialB = initialB,
-                                trackPlanting = trackPlanting
-  )
+                                trackPlanting = trackPlanting)
 
   outs <- rmMissingCohorts(cohortData, pixelGroupMap, cohortDefinitionCols = cohortDefinitionCols)
 
