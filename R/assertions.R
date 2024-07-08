@@ -255,14 +255,13 @@ assertCohortData <- function(cohortData, pixelGroupMap, maxExpectedNumDiverge = 
     if (!isTRUE("pixelGroup" %in% names(cohortData))) {
       stop("cohortData must have pixelGroup")
     }
+
     a <- sort(unique(na.omit(as.vector(pixelGroupMap[]))))
     b <- sort(unique(na.omit(cohortData$pixelGroup)))
     ## test1 and test2 can be 1 because there could be pixelGroup of 0, which is OK to not match
     test1 <- sum(!a %in% b)
     test2 <- sum(!b %in% a)
 
-    cohortDataN <- cohortData[, .N, by = cohortDefinitionCols]
-    test3 <- which(cohortDataN$N != 1)
     if (test1 > maxExpectedNumDiverge || test2 > maxExpectedNumDiverge) {
       if (nchar(message) > 0) message(message)
       if (verbose) {
@@ -271,11 +270,31 @@ assertCohortData <- function(cohortData, pixelGroupMap, maxExpectedNumDiverge = 
         if (test2 > maxExpectedNumDiverge) message("test2 is ", test2,
                                                    " -- too many pixelGroups in cohortData")
       }
-      stop("The sim$pixelGroupMap and cohortData have unmatching pixelGroup.",
-           " They must be matching. Please contact the module developers")
+      stop(
+        "pixelGroup in 'pixelGroupMap' and 'cohortData' objects are mismatched.",
+        " Please contact the module developers."
+      )
     }
-    if (length(test3) != 0)
+
+    maxPixelGroupFromCohortData <- max(cohortData$pixelGroup)
+    maxPixelGroup <- as.integer(maxFn(pixelGroupMap))
+    test3 <- (!identical(maxPixelGroup, maxPixelGroupFromCohortData))
+    if (test3) {
+      if (verbose) {
+        message("test3 is ", test3,
+                " -- max(cohortData$pixelGroup) != max(pixelGroup) from pixelGroupMap")
+      }
+      stop(
+        "pixelGroup in 'pixelGroupMap' and 'cohortData' objects are mismatched.",
+        " Please contact the module developers."
+      )
+    }
+
+    cohortDataN <- cohortData[, .N, by = cohortDefinitionCols]
+    test4 <- which(cohortDataN$N != 1)
+    if (length(test4) != 0) {
       stop("There are duplicate, identical cohorts: ", print(cohortDataN[test3]))
+    }
 
     if (verbose > 1) {
       message(crayon::green("  -- assertion passed using assertCohortData --"))
