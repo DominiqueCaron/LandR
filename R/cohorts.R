@@ -373,9 +373,13 @@ rmMissingCohorts <- function(cohortData, pixelGroupMap,
                    cohortDefinitionCols = cohortDefinitionCols,
                    doAssertion = doAssertion)
 
-  if (NROW(unique(cohortData[pixelGroup == 67724]$ecoregionGroup)) > 1) {
-    browser()
-    stop() ## TODO: need meaningful error message; shouldn't have >1 ecoregionGroup per pixelGroup
+  if (isTRUE(doAssertion)) {
+    for (pg in unique(cohortData$pixelGroup)) {
+      if (NROW(unique(cohortData[pixelGroup == pg]$ecoregionGroup)) > 1) {
+        browser()
+        stop("there should not be >1 ecoregionGroup per pixelGroup")
+      }
+    }
   }
 
   return(list(
