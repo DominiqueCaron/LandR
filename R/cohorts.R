@@ -358,14 +358,7 @@ rmMissingCohorts <- function(cohortData, pixelGroupMap,
                    cohortDefinitionCols = cohortDefinitionCols,
                    doAssertion = doAssertion)
 
-  if (isTRUE(doAssertion)) {
-    for (pg in unique(cohortData$pixelGroup)) {
-      if (NROW(unique(cohortData[pixelGroup == pg]$ecoregionGroup)) > 1) {
-        browser()
-        stop("there should not be >1 ecoregionGroup per pixelGroup")
-      }
-    }
-  }
+  assertCohortDataERG(cohortData, doAssertion = doAssertion)
 
   return(list(
     cohortData = cohortData,

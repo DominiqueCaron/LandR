@@ -8,6 +8,7 @@
 \alias{assertERGs}
 \alias{assertColumns}
 \alias{assertCohortData}
+\alias{assertCohortDataERG}
 \alias{assertPixelCohortData}
 \alias{assertSpeciesPlotLabels}
 \alias{assertFireToleranceDif}
@@ -70,6 +71,11 @@ assertCohortData(
   doAssertion = getOption("LandR.assertions", TRUE),
   verbose = getOption("LandR.verbose", TRUE),
   cohortDefinitionCols = c("pixelGroup", "age", "speciesCode")
+)
+
+assertCohortDataERG(
+  cohortData,
+  doAssertion = getOption("LandR.assertions", TRUE)
 )
 
 assertPixelCohortData(

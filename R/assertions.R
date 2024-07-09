@@ -302,6 +302,23 @@ assertCohortData <- function(cohortData, pixelGroupMap, maxExpectedNumDiverge = 
   }
 }
 
+#' - `assertCohortDataERG`: test that `cohortData` contains exactly one `ecoregionGroup` per
+#'   `pixelGroup`;
+#'
+#' @export
+#' @rdname assertions
+assertCohortDataERG <- function(cohortData, doAssertion = getOption("LandR.assertions", TRUE)) {
+  if (isTRUE(doAssertion)) {
+    ## TODO: there is likely a better/faster, more data.table way of doing this
+    for (pg in unique(cohortData$pixelGroup)) {
+      if (NROW(unique(cohortData[pixelGroup == pg]$ecoregionGroup)) > 1) {
+        browser()
+        stop("there should only be one ecoregionGroup per pixelGroup in cohortData")
+      }
+    }
+  }
+}
+
 #' - `assertPixelCohortData`: test that `pixelGroupMap` and `pixelCohortData` match `pixelIndex`;
 #'
 #' This is the full `pixelCohortData`, not the collapsed one.
