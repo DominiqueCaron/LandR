@@ -177,14 +177,14 @@ assertERGs <- function(ecoregionMap, cohortData, speciesEcoregion, minRelativeB,
     if (!test4) {
       message(str(erg, 1))
       stop("speciesEcoregion, cohortData, and ecoregionMap should all have exactly the same",
-           "\n  ecoregionGroups. They do not. This needs to be fixed before proceeding.")
+           " ecoregionGroups. They do not. This needs to be fixed before proceeding.")
     }
 
     ## only necessary to check this one if the first doesn't fail.
     if (!test3) {
       message(str(erg, 1))
       stop("speciesEcoregion, cohortData, and ecoregionMap should all have exactly the same",
-           "\n  ecoregionGroup levels. They do not. This needs to be fixed before proceeding.")
+           " ecoregionGroup levels. They do not. This needs to be fixed before proceeding.")
     }
   }
 }

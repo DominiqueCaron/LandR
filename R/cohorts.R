@@ -305,8 +305,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
                                                mortality = 0L, aNPPAct = 0L)]
 
   if (getOption("LandR.assertions")) {
-    if (isTRUE(NROW(unique(newPixelCohortData,
-                           by = cohortDefinitionCols)) != NROW(newPixelCohortData))) {
+    if (NROW(unique(newPixelCohortData, by = cohortDefinitionCols)) != NROW(newPixelCohortData)) {
       stop("Duplicated new cohorts in a pixelGroup. Please debug LandR:::.initiateNewCohorts")
     }
   }
