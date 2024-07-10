@@ -8,7 +8,7 @@ prepInputsLCC(
   year = 2010,
   destinationPath = asPath("."),
   method = c("ngb", "near"),
-  filename2 = NULL,
+  writeTo = NULL,
   ...
 )
 }
@@ -26,7 +26,7 @@ search for the file before attempting to download. Default for that option is
 \item{method}{passed to \link[terra:intersect]{terra::intersect} or \link[raster:intersect]{raster::intersect},
 and \link[reproducible:prepInputs]{reproducible::prepInputs}}
 
-\item{filename2}{passed to \link[reproducible:prepInputs]{reproducible::prepInputs}}
+\item{writeTo}{passed to \link[reproducible:prepInputs]{reproducible::prepInputs}}
 
 \item{...}{Arguments passed to \code{terra::mask} (for \code{maskTo}), \code{terra::project} (for \code{projectTo})
 or \code{terra::writeRaster} (for \code{writeTo}) and not used for \code{cropTo}, as well \code{postProcess}'s

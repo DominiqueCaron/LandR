@@ -351,7 +351,7 @@ makePixelGroupMap <- function(pixelCohortData, rasterToMatch) {
 #' @param maskWithRTM passed to [reproducible::prepInputs()] of stand age map
 #' @param method passed to [reproducible::prepInputs()] of stand age map
 #' @param datatype passed to [reproducible::prepInputs()] of stand age map
-#' @param filename2 passed to [reproducible::prepInputs()] of stand age map
+#' @param writeTo passed to [reproducible::prepInputs()] of stand age map
 #' @param firePerimeters fire raster layer fire year values.
 #' @param fireURL url to download fire polygons used to update age map. If NULL or NA age
 #'   imputation is bypassed. Requires passing `rasterToMatch`. Only used if `firePerimeters`
@@ -412,7 +412,7 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
                                   method = "bilinear",
                                   datatype = "INT2U",
                                   destinationPath = NULL,
-                                  filename2 = NULL,
+                                  writeTo = NULL,
                                   firePerimeters = NULL,
                                   fireURL = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/",
                                                    "fire_poly/current_version/NFDB_poly.zip"),
@@ -420,6 +420,11 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
                                   fireField = "YEAR",
                                   rasterToMatch = NULL,
                                   startTime) {
+
+  dots <- list(...)
+  if (is.null(writeTo) && !is.null(dots$filename2)) {
+    writeTo <- dots$filename2
+  }
 
   if (is.null(ageURL)) {
     ageURL <- paste0("https://ftp.maps.canada.ca/pub/nrcan_rncan/Forests_Foret/",
@@ -444,7 +449,7 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
     maskWithRTM = maskWithRTM,
     method = method,
     datatype = datatype,
-    filename2 = filename2,
+    writeTo = writeTo,
     destinationPath = destinationPath,
     url = ageURL,
     fun = ageFun,
@@ -477,8 +482,7 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 
 #' Create `rawBiomassMap`
 #'
-#' Create the `rawBiomassMap` raster containing biomass estimates for
-#' `pixelCohortData`.
+#' Create the `rawBiomassMap` raster containing biomass estimates for `pixelCohortData`.
 #' Wrapper on [reproducible::prepInputs()] that will rasterize fire polygons.
 #'
 #' @template studyAreaName
@@ -493,7 +497,7 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 #'     \item{`useSAcrs` and `projectTo`: `FALSE` and `NA`}
 #'     \item{`method`: `"bilinear"`}
 #'     \item{`datatype`: `"INT2U"`}
-#'     \item{`filename2`: `suffix("rawBiomassMap.tif", paste0("_", studyAreaName))`}
+#'     \item{`writeTo`: `suffix("rawBiomassMap.tif", paste0("_", studyAreaName))`}
 #'     \item{`overwrite`: `TRUE`}
 #'     \item{`userTags`: `c(cacheTags, "rawBiomassMap")`}
 #'     \item{`omitArgs`: `c("destinationPath", "targetFile", "userTags", "stable")`}
@@ -519,8 +523,13 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
   if (is.null(Args$datatype)) {
     Args$datatype <- "INT2U"
   }
-  if (is.null(Args$filename2)) {
-    Args$filename2 <- .suffix("rawBiomassMap.tif", paste0("_", studyAreaName))
+  if (is.null(Args$writeTo)) {
+    if (!is.null(Args$filename2)) {
+      Args$writeTo <- Args$filename2
+      Args$filename2 <- NULL
+    } else {
+      Args$writeTo <- .suffix("rawBiomassMap.tif", paste0("_", studyAreaName))
+    }
   }
   if (is.null(Args$overwrite)) {
     Args$overwrite <- TRUE
@@ -759,20 +768,16 @@ prepRasterToMatch <- function(studyArea, studyAreaLarge,
     if (is.null(rasterToMatch)) {
       rtmFilename <- .suffix(file.path(destinationPath, "rasterToMatch.tif"),
               paste0("_", studyAreaName))
-      rasterToMatch <- Cache(postProcessTerra,
+      rasterToMatch <- Cache(postProcess,
                              from = rasterToMatchLarge,
-                             studyArea = studyArea,
-                             # rasterToMatch = rasterToMatchLarge,   ## Ceres: this messes up the extent. if we are doing this it means BOTH RTMs come from biomassMap, so no need for RTMLarge here.
-                             useSAcrs = FALSE,
-                             # maskWithRTM = FALSE,   ## mask with SA
+                             to = studyArea,
                              method = "bilinear",
                              datatype = "INT2U",
-                             # filename2 = rtmFilename, # don't save -- can't with terra because same filename as sim$rtml
+                             # writeTo = rtmFilename, # can't save w/ terra b/c same filename as RTML
                              overwrite = TRUE,
-                             # useCache = "overwrite",
                              userTags = c(cacheTags, "rasterToMatch"),
                              omitArgs = c("destinationPath", "targetFile", "userTags", "stable",
-                                          "filename2", "overwrite"))
+                                          "writeTo", "overwrite"))
     }
     ## covert to 'mask'
     if (!anyNA(rasterToMatch[])) {

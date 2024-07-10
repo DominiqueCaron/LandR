@@ -12,7 +12,7 @@ prepInputsStandAgeMap(
   method = "bilinear",
   datatype = "INT2U",
   destinationPath = NULL,
-  filename2 = NULL,
+  writeTo = NULL,
   firePerimeters = NULL,
   fireURL = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/",
     "fire_poly/current_version/NFDB_poly.zip"),
@@ -37,7 +37,7 @@ prepInputsStandAgeMap(
 
 \item{destinationPath}{path to data directory where objects will be downloaded or saved to}
 
-\item{filename2}{passed to \code{\link[reproducible:prepInputs]{reproducible::prepInputs()}} of stand age map}
+\item{writeTo}{passed to \code{\link[reproducible:prepInputs]{reproducible::prepInputs()}} of stand age map}
 
 \item{firePerimeters}{fire raster layer fire year values.}
 
