@@ -1,6 +1,7 @@
 # LandR (development version)
 
 - add functions to visualize vegetation type transitions;
+- use `writeTo` instead of `filename2` in `prepInputs()` and related calls, following changes in `reproducible`;
 
 # LandR 1.1.5
 
