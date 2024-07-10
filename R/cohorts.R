@@ -159,7 +159,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   }
 
   ## give B in pixels that have serotiny/resprouting
-  # newPixelCohortData[, sumB := sum(B, na.rm = TRUE), by = pixelGroup]
+  # newPixelCohortData[, sumB := asInteger(sum(B, na.rm = TRUE)), by = pixelGroup]
 
   ## Add new cohorts and rm missing cohorts (i.e., those pixelGroups that are gone) -----------
   cohortData <- .initiateNewCohorts(
@@ -313,9 +313,9 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   }
 
   cohortData <- rbindlist(list(cohortData, newPixelCohortData), fill = TRUE, use.names = TRUE)
-  # cohortData[, sumB := sum(B, na.rm = TRUE), by = "pixelGroup"]  ## recalculate sumB
-  # if (!is.integer(cohortData[["sumB"]]))
-  #   set(cohortData, NULL, "sumB", asInteger(cohortData[["sumB"]]))
+
+  ## recalculate sumB
+  cohortData[, sumB := asInteger(sum(B, na.rm = TRUE)), by = "pixelGroup"]
 
   return(cohortData)
 }
