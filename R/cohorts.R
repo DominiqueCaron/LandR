@@ -318,7 +318,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   ## recalculate sumB
   cohortData[, sumB := asInteger(sum(B, na.rm = TRUE)), by = "pixelGroup"]
 
-  assertCohortDataERG(cohortData, doAssertion = doAssertion)
+  assertCohortDataERG(cohortData)
 
   return(cohortData)
 }
