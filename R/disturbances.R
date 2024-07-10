@@ -222,15 +222,17 @@ FireDisturbance <- function(cohortData = copy(sim$cohortData), cohortDefinitionC
       if (verbose > 0)
         message(blue("Post serotiny and resprouting"))
 
-      outs <- updateCohortData(newPixelCohortData = copy(postFirePixelCohortData),
-                               cohortData = copy(cohortData),
-                               pixelGroupMap = pixelGroupMap,
-                               currentTime = round(currentTime),
-                               speciesEcoregion = copy(speciesEcoregion),
-                               cohortDefinitionCols = cohortDefinitionCols,
-                               treedFirePixelTableSinceLastDisp = copy(treedFirePixelTableSinceLastDisp),
-                               initialB = initialB,
-                               successionTimestep = successionTimestep)
+      outs <- updateCohortData(
+        newPixelCohortData = copy(postFirePixelCohortData),
+        cohortData = copy(cohortData),
+        pixelGroupMap = pixelGroupMap,
+        currentTime = round(currentTime),
+        speciesEcoregion = copy(speciesEcoregion),
+        cohortDefinitionCols = cohortDefinitionCols,
+        treedFirePixelTableSinceLastDisp = copy(treedFirePixelTableSinceLastDisp),
+        initialB = initialB,
+        successionTimestep = successionTimestep
+      )
 
       cohortData <- outs$cohortData
       pixelGroupMap <- outs$pixelGroupMap

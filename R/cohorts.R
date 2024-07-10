@@ -172,8 +172,6 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
     initialB = initialB
   )
 
-  assertCohortDataERG(cohortData, doAssertion = doAssertion)
-
   outs <- rmMissingCohorts(cohortData, pixelGroupMap, cohortDefinitionCols = cohortDefinitionCols)
 
   if (!is.null(outs$cohortData$sumB)) {
@@ -319,6 +317,8 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
 
   ## recalculate sumB
   cohortData[, sumB := asInteger(sum(B, na.rm = TRUE)), by = "pixelGroup"]
+
+  assertCohortDataERG(cohortData, doAssertion = doAssertion)
 
   return(cohortData)
 }
