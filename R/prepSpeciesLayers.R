@@ -286,7 +286,7 @@ prepSpeciesLayers_CASFRI <- function(destinationPath, outputPath,
                      rasterToMatch = rasterToMatch,
                      method = "bilinear", ## ignore warning re: ngb (#5)
                      datatype = "INT4U",
-                     filename2 = NULL,
+                     writeTo = NULL,
                      overwrite = TRUE,
                      userTags =  c("CASFRIRas", "stable"))
 
@@ -335,7 +335,7 @@ prepSpeciesLayers_Pickell <- function(destinationPath, outputPath,
                          rasterToMatch = rasterToMatch,
                          method = "bilinear", ## ignore warning re: ngb (#5)
                          datatype = "INT2U",
-                         filename2 = NULL,
+                         writeTo = NULL,
                          overwrite = TRUE,
                          userTags = c("speciesLayers", "KNN", "Pickell", "stable"))
 
@@ -371,7 +371,7 @@ prepSpeciesLayers_ForestInventory <- function(destinationPath, outputPath,
 
   lr <- lapply(CClayerNamesFiles, prepInputs, studyArea = studyArea, rasterToMatch = rasterToMatch,
                url = url, alsoExtract = "similar", method = "ngb",
-               destinationPath = destinationPath, filename2 = NULL)
+               destinationPath = destinationPath, writeTo = NULL)
   rs <- raster::stack(lr)
   names(rs) <- CClayerNames
 
@@ -424,7 +424,7 @@ prepSpeciesLayers_MBFRI <- function(destinationPath, outputPath,
 
   lr <- lapply(CClayerNamesFiles, prepInputs, studyArea = studyArea, rasterToMatch = rasterToMatch,
                url = url, alsoExtract = "similar", method = "ngb",
-               destinationPath = destinationPath, filename2 = NULL)
+               destinationPath = destinationPath, writeTo = NULL)
   rs <- stack(lr)
   names(rs) <- CClayerNames2
 
@@ -506,7 +506,7 @@ prepSpeciesLayers_ONFRI <- function(destinationPath, outputPath,
 
   sppLayers <- rast(lapply(FRIlayerNamesFiles, function(f) {
     prepInputs(url = url, studyArea = studyArea, rasterToMatch = rasterToMatch,
-               destinationPath = destinationPath, targetFile = f, filename2 = NULL,
+               destinationPath = destinationPath, targetFile = f, writeTo = NULL,
                alsoExtract = NA, method = "near")
   }))
   names(sppLayers) <- FRIlayerNames

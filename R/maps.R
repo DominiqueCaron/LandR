@@ -16,13 +16,20 @@ utils::globalVariables(c(
 #' @param to Passed to `postProcessTo(..., to = to)` and to the `mask` arg here, if
 #'   `mask` is not supplied.
 #'
-#' @param filename2 See [reproducible::postProcess()]. Default `NULL`.
+#' @param writeTo See [reproducible::postProcess()]. Default `NULL`.
+#'
+#' @param ... additional args (not used)
 #'
 #' @export
 #' @importFrom reproducible postProcessTo
 defineFlammable <- function(LandCoverClassifiedMap = NULL,
                             nonFlammClasses = c(0L, 25L, 30L, 33L,  36L, 37L, 38L, 39L),
-                            mask = NULL, to = NULL, filename2 = NULL) {
+                            mask = NULL, to = NULL, writeTo = NULL, ...) {
+  dots <- list(...)
+  if (is.null(writeTo) && !is.null(dots$filename2)) {
+    writeTo <- dots$filename2
+  }
+
   if (!inherits(LandCoverClassifiedMap, c("RasterLayer", "SpatRaster"))) {
     stop("Need a classified land cover map that is a RasterLayer or SpatRaster")
   }
@@ -67,14 +74,16 @@ defineFlammable <- function(LandCoverClassifiedMap = NULL,
     ratify(reclassed)
   }
 
-  if (!is.null(filename2))
-    rstFlammable <- writeRaster(rstFlammable, filename = filename2, overwrite = TRUE)
+  if (!is.null(writeTo)) {
+    rstFlammable <- writeRaster(rstFlammable, filename = writeTo, overwrite = TRUE)
+  }
 
   cols <- colorRampPalette(c("blue", "red"))(2)
-  if (is(rstFlammable, "SpatRaster"))
+  if (is(rstFlammable, "SpatRaster")) {
     coltab(rstFlammable, layer = 1) <- cols
-  else
+  } else {
     setColors(rstFlammable, n = 2) <- cols
+  }
 
   if (!is.null(mask)) {
     rstFlammable <- mask(rstFlammable, mask)
@@ -100,14 +109,19 @@ defineFlammable <- function(LandCoverClassifiedMap = NULL,
 #' @param year Numeric, either 2010 or 2015. See note re: backwards compatibility for 2005.
 #' @param method passed to [terra::intersect] or [raster::intersect],
 #'   and [reproducible::prepInputs]
-#' @param filename2 passed to [reproducible::prepInputs]
+#' @param writeTo passed to [reproducible::prepInputs]
 #'
 #' @export
 prepInputsLCC <- function(year = 2010,
                           destinationPath = asPath("."),
                           method = c("ngb", "near"),
-                          filename2 = NULL, ...) {
+                          writeTo = NULL, ...) {
   dots <- list(...)
+
+  if (is.null(writeTo) && !is.null(dots$filename2)) {
+    writeTo <- dots$filename2
+  }
+
   if (is.null(dots$url)) {
     if (identical(as.integer(year), 2005L)) {
       ## May 2021: LCC2005 data no longer being hosted by NRCAN
@@ -147,17 +161,17 @@ prepInputsLCC <- function(year = 2010,
     }
   }
 
-  if (identical(eval(parse(text = getOption("reproducible.rasterRead"))),
-                terra::rast))
+  if (identical(eval(parse(text = getOption("reproducible.rasterRead"))), terra::rast)) {
     method <- intersect("near", method)
-  else
+  } else {
     method <- intersect("ngb", method)
+  }
 
   fullArgs <- append(dots,
-                     list("destinationPath" = asPath(destinationPath),
-                          "method" = method,
-                          "datatype" = "INT2U",
-                          "filename2" = filename2))
+                     list(destinationPath = asPath(destinationPath),
+                          method = method,
+                          datatype = "INT2U",
+                          writeTo = writeTo))
 
   out <- do.call(prepInputs, fullArgs)
   out[] <- as.integer(as.vector(values(out)))
@@ -864,7 +878,7 @@ loadkNNSpeciesLayers <- function(dPath, rasterToMatch = NULL, studyArea = NULL, 
 
   speciesLayers <- Cache(Map,
                          targetFile = targetFiles,
-                         filename2 = postProcessedFilenamesWithStudyAreaName,
+                         writeTo = postProcessedFilenamesWithStudyAreaName,
                          url = URLs,
                          MoreArgs = list(destinationPath = dPath,
                                          # fun = "raster::raster",
@@ -876,7 +890,7 @@ loadkNNSpeciesLayers <- function(dPath, rasterToMatch = NULL, studyArea = NULL, 
                                          userTags = dots$userTags
                          ),
                          .functionName = "prepInputs",
-                         prepInputs, quick = c("targetFile", "filename2", "destinationPath"))
+                         prepInputs, quick = c("targetFile", "writeTo", "destinationPath"))
 
   correctOrder <- sapply(unique(kNNnames), function(x) grep(pattern = x, x = targetFiles, value = TRUE))
   names(speciesLayers) <- names(correctOrder)[match(correctOrder, targetFiles)]

@@ -19,7 +19,7 @@ the NRCan National Forest Inventory}
 \item{\code{useSAcrs} and \code{projectTo}: \code{FALSE} and \code{NA}}
 \item{\code{method}: \code{"bilinear"}}
 \item{\code{datatype}: \code{"INT2U"}}
-\item{\code{filename2}: \code{suffix("rawBiomassMap.tif", paste0("_", studyAreaName))}}
+\item{\code{writeTo}: \code{suffix("rawBiomassMap.tif", paste0("_", studyAreaName))}}
 \item{\code{overwrite}: \code{TRUE}}
 \item{\code{userTags}: \code{c(cacheTags, "rawBiomassMap")}}
 \item{\code{omitArgs}: \code{c("destinationPath", "targetFile", "userTags", "stable")}}
@@ -29,7 +29,6 @@ the NRCan National Forest Inventory}
 a \code{rawBiomassMap} raster
 }
 \description{
-Create the \code{rawBiomassMap} raster containing biomass estimates for
-\code{pixelCohortData}.
+Create the \code{rawBiomassMap} raster containing biomass estimates for \code{pixelCohortData}.
 Wrapper on \code{\link[reproducible:prepInputs]{reproducible::prepInputs()}} that will rasterize fire polygons.
 }
