@@ -3,7 +3,7 @@ utils::globalVariables(c(
   "cover", "coverOrig", "ecoregion", "ecoregionGroup", "hasBadAge",
   "imputedAge", "initialEcoregion", "initialEcoregionCode", "initialPixels",
   "lcc", "maxANPP", "maxB", "maxB_eco", "mortality",
-  "newPossLCC", "noPixels", "oldSumB", "ord", "outBiomass", "oldEcoregionGroup",
+  "new", "newPossLCC", "noPixels", "oldSumB", "ord", "outBiomass", "oldEcoregionGroup",
   "pixelGroup2", "pixelIndex", "pixels", "planted", "Provenance", "possERC",
   "speciesposition", "speciesGroup", "speciesInt", "state", "sumB",
   "temppixelGroup", "toDelete", "totalBiomass", "totalBiomass2", "totalCover",
@@ -309,7 +309,13 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
     }
   }
 
+  ## keep track of new cohorts to ensure they get the correct ecoregionGroup (from existing ones)
+  set(cohortData, NULL, "new", FALSE)
+  set(newPixelCohortData, NULL, "new", TRUE)
   cohortData <- rbindlist(list(cohortData, newPixelCohortData), fill = TRUE, use.names = TRUE)
+  cohortData[, ecoregionGroup := unique(.SD[!new]), by = "pixelGroup"]
+  set(cohortData, NULL, "new", NULL)
+  set(newPixelCohortData, NULL, "new", NULL)
 
   ## recalculate sumB
   cohortData[, sumB := asInteger(sum(B, na.rm = TRUE)), by = "pixelGroup"]
