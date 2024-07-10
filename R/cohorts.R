@@ -250,10 +250,8 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   newPixelCohortData <- newPixelCohortData[!duplicated(newPixelCohortData), ] ## faster than unique
 
   specieseco_current <- speciesEcoregionLatestYear(speciesEcoregion, currentTime)
-  specieseco_current <- setkey(
-    specieseco_current[, .(speciesCode, maxANPP, maxB, ecoregionGroup)],
-    speciesCode, ecoregionGroup
-  )
+  specieseco_current <- specieseco_current[, .(speciesCode, maxANPP, maxB, ecoregionGroup)] |>
+    setkey(speciesCode, ecoregionGroup)
 
   ## Note that after the following join, some cohorts will be lost due to lack of
   ##  parameters in speciesEcoregion. These need to be modified in pixelGroupMap.
@@ -277,9 +275,8 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
 
   cohortData[age >= successionTimestep, oldSumB := sum(B, na.rm = TRUE), by = "pixelGroup"]
 
-  newPixelCohortData <- unique(cohortData[, .(pixelGroup, oldSumB)],
-                               by = "pixelGroup"
-  )[newPixelCohortData, on = "pixelGroup"]
+  newPixelCohortData <- unique(cohortData[, .(pixelGroup, oldSumB)], by = "pixelGroup")[
+    newPixelCohortData, on = "pixelGroup"]
   ## using set() is faster than [:=]
   set(newPixelCohortData, which(is.na(newPixelCohortData$oldSumB)), "oldSumB", 0)
   setnames(newPixelCohortData, "oldSumB", "sumB")
