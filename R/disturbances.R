@@ -744,21 +744,25 @@ PeatlandThermokarst <- function(thawedPixIDs = copy(sim$thawedPixIDs),
     postThawPixelCohortData[, type := "survivor"]
 
     ## redo PGs in all burnt pixels
-    tempObjs <- genPGsPostDisturbance(cohortData = copy(cohortData),
-                                      pixelGroupMap = pixelGroupMap,
-                                      disturbedPixelTable = copy(treedThawedPixelTableSinceLastDisp),
-                                      disturbedPixelCohortData = thawedPixelCohortData,
-                                      doAssertion = getOption("LandR.assertions", TRUE))
+    tempObjs <- genPGsPostDisturbance(
+      cohortData = copy(cohortData),
+      pixelGroupMap = pixelGroupMap,
+      disturbedPixelTable = copy(treedThawedPixelTableSinceLastDisp),
+      disturbedPixelCohortData = thawedPixelCohortData,
+      doAssertion = getOption("LandR.assertions", TRUE)
+    )
 
-    outs <- updateCohortData(newPixelCohortData = copy(postThawPixelCohortData[, -"pixelGroup", with = FALSE]),
-                             cohortData = copy(tempObjs$cohortData),
-                             pixelGroupMap = tempObjs$pixelGroupMap,
-                             currentTime = round(currentTime),
-                             speciesEcoregion = copy(speciesEcoregion),
-                             cohortDefinitionCols = cohortDefinitionCols,
-                             treedFirePixelTableSinceLastDisp = copy(treedThawedPixelTableSinceLastDisp),
-                             initialB = initialB,
-                             successionTimestep = successionTimestep)
+    outs <- updateCohortData(
+      newPixelCohortData = copy(postThawPixelCohortData[, -"pixelGroup", with = FALSE]),
+      cohortData = copy(tempObjs$cohortData),
+      pixelGroupMap = tempObjs$pixelGroupMap,
+      currentTime = round(currentTime),
+      speciesEcoregion = copy(speciesEcoregion),
+      cohortDefinitionCols = cohortDefinitionCols,
+      treedFirePixelTableSinceLastDisp = copy(treedThawedPixelTableSinceLastDisp),
+      initialB = initialB,
+      successionTimestep = successionTimestep
+    )
 
     ## can use the same assertion.
     assertPostPartialDist(cohortDataOrig = copy(tempObjs$cohortData),
