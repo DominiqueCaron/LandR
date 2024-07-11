@@ -188,22 +188,6 @@ utils::globalVariables(c(
   st_crs(x) == st_crs(y)
 }
 
-#' Wrapper to read a raster using a specific package function
-#'
-#' Evaluates the function given by the option `reproducible.rasterRead`.
-#' E.g., `terra::rast` or `raster::raster`.
-#'
-#' TODO: Move to `reproducible`
-#'
-#' @param ... passed to [terra::rast()] or [raster::raster()]
-#'
-#' @return a raster of the type returned by the function
-#'
-#' @export
-rasterRead <- function(...) {
-  eval(parse(text = getOption("reproducible.rasterRead")))(...)
-}
-
 #' Helpers for transition to `terra`
 #'
 #' These all create a single function that can be used for either `Raster` or `SpatRaster` objects.
