@@ -407,7 +407,7 @@ makePixelGroupMap <- function(pixelCohortData, rasterToMatch) {
 #' attr(standAge, "imputedPixID")
 #' }
 prepInputsStandAgeMap <- function(..., ageURL = NULL,
-                                  ageFun = "raster::raster",
+                                  ageFun = "terra::rast",
                                   maskWithRTM = TRUE,
                                   method = "bilinear",
                                   datatype = "INT2U",
@@ -455,9 +455,15 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
     fun = ageFun,
     rasterToMatch = rasterToMatch
   )
-  standAgeMap[] <- asInteger(as.vector(standAgeMap[]))
+  if (is(standAgeMap, "SpatRaster")) {
+    vals <- as.vector(standAgeMap[])
+  } else {
+    vals <- standAgeMap[]
+  }
+  standAgeMap[] <- asInteger(vals)
 
   imputedPixID <- integer(0)
+  browser()
   if (getFires) {
     if (isFALSE(is.null(rasterToMatch))) {
       firePerimeters <- Cache(prepInputsFireYear, ...,
