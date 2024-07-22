@@ -32,7 +32,7 @@ alnurubr,ALNU.RUB,Alnu_rub,Alnu_Rub,Alnu rubr,Alnus rubra,,,,,,TRUE,Deciduous,re
 ,,Amel_spp,,,Amelanchier spp.,,Shadbush,,"a.k.a. sugarplu, serviceberry, saskatoon",,TRUE,Deciduous,shadbush,,,,,,AMEL_SPP,AME
 ,,Arbu_men,Arbu_Men,Arbu menz,Arbutus menziesii,,,,,,TRUE,Deciduous,arbutus,,,Ra,,,ARBU_MEN,
 ,,Asim_tri,Asim_Tri,Asim tril,Asimina triloba,,,,,,TRUE,Deciduous,,,,,,,ASIM_TRI,
-,BETU.ALL,Betu_all,Betu_All,Betu alle,Betula alleghaniensis,Sw birch,Swamp birch,Swamp birch leading,also known as swamp birch,Betu_All,TRUE,Deciduous,swamp birch,,class2,,,,BETU_ALL,BOJ
+,BETU.ALL,Betu_all,Betu_All,Betu alle,Betula alleghaniensis,Sw birch,Swamp birch,Swamp birch leading,also known as swamp birch,Betu_All,TRUE,Deciduous,yellow birch,,class2,,,,BETU_ALL,BOJ
 ,,Betu_len,,Betu lent,Betula lenta,,,,,,TRUE,Deciduous,,,,,,,BETU_LEN,
 ,,Betu_man,,Betu mand,Betula mandschurica var japonica,,,,,,TRUE,Deciduous,,,,,,,BETU_MAN,
 ,,Betu_neo,,Betu neoa,Betula neoalaskana,,,,,,TRUE,Deciduous,,,class2,Ea,,,BETU_NEO,
@@ -121,7 +121,7 @@ pinupon,PINU.PON,Pinu_pon,Pinu_Pon,Pinu pond,Pinus ponderosa,Pine,Pine,Pine lead
 pinuresi,PINU.RES,Pinu_res,Pinu_Res,Pinu resi,Pinus resinosa,Rd pine,Red pine,Red pine leading,,Pinu_Res,FALSE,Conifer,red pine,C5,class3,,,RP,PINU_RES,PIR
 ,,Pinu_rig,Pinu_Rig,Pinu rigi,Pinus rigida,Pine,Pine,Pine leading,,,FALSE,Conifer,,,,,,,PINU_RIG,PID
 ,,Pinu_sp,Pinu_Spp,Pinu spp,Pinus spp.,Pine,Pine,Pine leading,,Pinu_Spp,FALSE,Conifer,,,class3,,,,PINU_SP,
-pinustro,PINU.STR,Pinu_str,Pinu_Str,Pinu stro,Pinus strobus,Pine,Pine,Pine leading,,,FALSE,Conifer,white pine,C5,class3,Pw,,,PINU_STR,PIB
+pinustro,PINU.STR,Pinu_str,Pinu_Str,Pinu stro,Pinus strobus,Pine,Pine,Pine leading,,,FALSE,Conifer,eastern white pine,C5,class3,Pw,,,PINU_STR,PIB
 ,,Pinu_syl,Pinu_Syl,Pinu sylv,Pinus sylvestris,Pine,Pine,Pine leading,,,FALSE,Conifer,,,class3,,,SP,PINU_SYL,PIS
 ,,Plan_occ,Plat_Occ,Plan occi,Platanus occidentalis,,,,,,TRUE,Deciduous,,,,,,,PLAN_OCC,PLO
 ,,Popu_ang,,Popu angu,Populus angustifolia,,,,,,TRUE,Deciduous,,,,,,,POPU_ANG,
@@ -133,7 +133,7 @@ popubals,POPU.BAL,Popu_bal,Popu_Bal,Popu balb,Populus balsamifera v. balsamifera
 ,,Popu_del,Popu_Del,Popu delo,Populus deltoides v. occidentalis,,,,,,TRUE,Deciduous,eastern cotttonwood,,class2,,,,POPU_DEL,PED
 popudelt,,Popu_del,Popu_Del,Popu delt,Populus deltoides,,,,,,TRUE,Deciduous,eastern cotttonwood,,class2,,,CO,POPU_DEL,PED
 ,,Popu_del,Popu_Del,Popu delx,Populus deltoides,,,,,,TRUE,Deciduous,eastern cotttonwood,,class2,,,,POPU_DEL,PED
-,,Popu_gra,Popu_Gra,Popu gran,Populus grandidentata,Wh poplar,White poplar,White poplar leading,,Popu_Gra,TRUE,Deciduous,largetooth aspen,,,,,,POPU_GRA,PEG
+,,Popu_gra,Popu_Gra,Popu gran,Populus grandidentata,Bigtooth aspen,White poplar,White poplar leading,,Popu_Gra,TRUE,Deciduous,largetooth aspen,,,,,,POPU_GRA,PEG
 ,,Popu_nig,,Popu nigr,Populus nigra,,,,,,TRUE,Deciduous,,,,,,,POPU_NIG,
 ,,Popu_sp,Popu_Spp,Popu spp,Populus spp.,Poplar,Poplar,Poplar leading,,Popu_Spp,TRUE,Deciduous,trembling aspen,,class2,Ac,,,POPU_SP,
 poputrem,POPU.TRE,Popu_tre,Popu_Tre,Popu trem,Populus tremuloides,Tr aspen,Trembling poplar,Trembling aspen leading,,Popu_Tre,TRUE,Deciduous,trembling aspen,,class2,At,Aw,TA,POPU_TRE,PET
@@ -156,9 +156,9 @@ querelli,,Quer_ell,,,,,,,,,TRUE,Deciduous,,,,,,,QUER_ELL,
 ,,Quer_mue,,Quer mueh,Quercus muehlenbergii,,,,,,TRUE,Deciduous,,,,,,,QUER_MUE,
 ,,Quer_pal,,Quer palu,Quercus palustris,,,,,,TRUE,Deciduous,,,,,,,QUER_PAL,
 ,,Quer_rob,,Quer robu,Quercus robur,,,,,,TRUE,Deciduous,,,,,,,QUER_ROB,CHD
-querrubr,QUER.RUB,Quer_rub,Quer_Rub,Quer rubr,Quercus rubra,,,,,,TRUE,Deciduous,,,,,,,QUER_RUB,
+querrubr,QUER.RUB,Quer_rub,Quer_Rub,Quer rubr,Quercus rubra,,,,,,TRUE,Deciduous,red oak,,class2,,,,QUER_RUB,CHR
 ,,Quer_shu,,Quer shum,Quercus shumardii,,,,,,TRUE,Deciduous,,,,,,,QUER_SHU,
-,,Quer_sp,Quer_Spp,Quer spp,Quercus spp.,,,,,,TRUE,Deciduous,red oak,,class2,Q,,,QUER_SP,CHR
+,,Quer_sp,Quer_Spp,Quer spp,Quercus spp.,,,,,,TRUE,Deciduous,,,class2,Q,,,QUER_SP,
 ,,Quer_vel,,Quer velu,Quercus velutina,Bl Oak,Black oak,,,,TRUE,Deciduous,,,class2,,,,QUER_VEL,
 ,,Quer_vel,,Quer velu,Quercus velutina (nigra),,,,,,TRUE,Deciduous,,,,,,,QUER_VEL,
 ,,Rham_pur,,Rham purs,Rhamnus purshianus,,,,,,TRUE,Deciduous,,,,,,,RHAM_PUR,
