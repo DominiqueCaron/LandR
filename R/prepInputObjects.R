@@ -463,7 +463,6 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
   standAgeMap[] <- asInteger(vals)
 
   imputedPixID <- integer(0)
-  browser()
   if (getFires) {
     if (isFALSE(is.null(rasterToMatch))) {
       firePerimeters <- Cache(prepInputsFireYear, ...,
