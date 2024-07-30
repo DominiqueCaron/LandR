@@ -17,15 +17,14 @@ utils::globalVariables(c(
 #' a receiving cell has lots of seed sources around it vs. a single seed source.
 #' The difference will come with a higher probability of successfully receiving a "seed".
 #'
-#' `dispersalFn` (temporarily unused as code is converted to Rcpp -- the
-#' default `dispersalFn` is hard coded within the `spiralSeedDispersal`
-#' function that uses C++) must be an expression that returns a probability
-#' distribution. Because it is a dispersal kernel, it must be a probability
-#' distribution. The expression that can take an argument named "dis" (without
-#' quotes) as this will be calculated internally and represents the distance
-#' from the initial (receiving) pixel and all active pixels within that cluster
-#' of active pixels. `SpaDES` includes the [Ward()] kernel as
-#' defined in the LANDIS-II documentation.
+#' `dispersalFn` (temporarily unused as code is converted to Rcpp -- the default `dispersalFn`
+#' is hard coded within the `spiralSeedDispersal` function that uses C++) must be an expression
+#' that returns a probability distribution.
+#' Because it is a dispersal kernel, it must be a probability distribution.
+#' The expression that can take an argument named "dis" (without quotes) as this will be
+#' calculated internally and represents the distance from the initial (receiving) pixel
+#' and all active pixels within that cluster of active pixels.
+#' \pkg{LandR} includes the [Ward()] kernel as defined in the LANDIS-II documentation.
 #'
 #' @param dtSrc data.table
 #'
@@ -38,7 +37,7 @@ utils::globalVariables(c(
 #' @param dispersalFn  An expression that can take a "dis" argument. See details.
 #'   Default is "Ward" (temporarily unused, as it is hard coded inside Rcpp function)
 #'
-#' @param plot.it  Deprecated. If TRUE, then plot the raster at every interaction,
+#' @param plot.it  Deprecated. If `TRUE`, then plot the raster at every interaction,
 #'                 so one can watch the `LANDISDisp` event grow.
 #' @param b  LANDIS Ward seed dispersal calibration coefficient (set to 0.01 in LANDIS)
 #'
@@ -154,9 +153,7 @@ utils::globalVariables(c(
 LANDISDisp <- function(dtSrc, dtRcv, pixelGroupMap, speciesTable,
                        dispersalFn = Ward, b = 0.01, k = 0.95, plot.it = FALSE,
                        successionTimestep,
-                       verbose = getOption("LandR.verbose", TRUE),
-                       ...) {
-
+                       verbose = getOption("LandR.verbose", TRUE), ...) {
   if ((NROW(dtSrc) > 0) && (NROW(dtRcv) > 0)) {
     ####### Assertions #############
     if (!( (is.numeric(dtSrc$speciesCode) && is.numeric(dtRcv$speciesCode) && is.numeric(speciesTable$speciesCode)) ||

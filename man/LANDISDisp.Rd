@@ -48,7 +48,7 @@ Default is "Ward" (temporarily unused, as it is hard coded inside Rcpp function)
 \item{k}{LANDIS Ward seed dispersal the probability that seed will disperse within
 the effective distance (e.g., 0.95)}
 
-\item{plot.it}{Deprecated. If TRUE, then plot the raster at every interaction,
+\item{plot.it}{Deprecated. If \code{TRUE}, then plot the raster at every interaction,
 so one can watch the \code{LANDISDisp} event grow.}
 
 \item{successionTimestep}{The time between successive seed dispersal events.
@@ -77,15 +77,14 @@ a receiving cell has lots of seed sources around it vs. a single seed source.
 The difference will come with a higher probability of successfully receiving a "seed".
 }
 \details{
-\code{dispersalFn} (temporarily unused as code is converted to Rcpp -- the
-default \code{dispersalFn} is hard coded within the \code{spiralSeedDispersal}
-function that uses C++) must be an expression that returns a probability
-distribution. Because it is a dispersal kernel, it must be a probability
-distribution. The expression that can take an argument named "dis" (without
-quotes) as this will be calculated internally and represents the distance
-from the initial (receiving) pixel and all active pixels within that cluster
-of active pixels. \code{SpaDES} includes the \code{\link[=Ward]{Ward()}} kernel as
-defined in the LANDIS-II documentation.
+\code{dispersalFn} (temporarily unused as code is converted to Rcpp -- the default \code{dispersalFn}
+is hard coded within the \code{spiralSeedDispersal} function that uses C++) must be an expression
+that returns a probability distribution.
+Because it is a dispersal kernel, it must be a probability distribution.
+The expression that can take an argument named "dis" (without quotes) as this will be
+calculated internally and represents the distance from the initial (receiving) pixel
+and all active pixels within that cluster of active pixels.
+\pkg{LandR} includes the \code{\link[=Ward]{Ward()}} kernel as defined in the LANDIS-II documentation.
 }
 \examples{
 if (require("googledrive")) {
