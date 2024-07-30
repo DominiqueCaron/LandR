@@ -65,7 +65,7 @@ utils::globalVariables(c(
 #'   library(data.table)
 #'
 #'   # keep this here for interactive testing with a larger raster
-#'   rasterTemplate <- LandR:::rasterRead(terra::ext(0, 2500, 0, 2500), res = 100)
+#'   rasterTemplate <- reproducible::rasterRead(terra::ext(0, 2500, 0, 2500), res = 100)
 #'
 #'   # make a pixelGroupMap
 #'   pgs <- 4 # make even just because of approach below requires even
@@ -117,11 +117,11 @@ utils::globalVariables(c(
 #'     spMap$pixelGroupMap <- pixelGroupMap
 #'     for (sppp in unique(output$speciesCode)) {
 #'       spppChar <- paste0("Sp_", sppp)
-#'       spMap[[spppChar]] <- LandR:::rasterRead(pixelGroupMap)
+#'       spMap[[spppChar]] <- reproducible::rasterRead(pixelGroupMap)
 #'       ss <- unique(seedSource[speciesCode == sppp], on = c("pixelGroup", "speciesCode"))
 #'       spMap[[spppChar]][pixelGroupMap[] %in% ss$pixelGroup] <- 1
 #'
-#'       receivable <- LandR:::rasterRead(pixelGroupMap)
+#'       receivable <- reproducible::rasterRead(pixelGroupMap)
 #'       srf <- unique(seedReceiveFull[speciesCode == sppp], on = c("pixelGroup", "speciesCode"))
 #'       receivable[pixelGroupMap[] %in% srf$pixelGroup] <- 1
 #'
