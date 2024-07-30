@@ -7,7 +7,7 @@
 prepInputsStandAgeMap(
   ...,
   ageURL = NULL,
-  ageFun = "raster::raster",
+  ageFun = "terra::rast",
   maskWithRTM = TRUE,
   method = "bilinear",
   datatype = "INT2U",

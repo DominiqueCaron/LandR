@@ -199,11 +199,11 @@ utils::globalVariables(c(
 #' @rdname rasterTerraHelpers
 asInt <- function(ras) {
   if (!isInt(ras)) {
-    if (inherits(ras, "SpatRaster"))
+    if (inherits(ras, "SpatRaster")) {
       ras <- as.int(ras)
-    else
+    } else {
       ras[] <- as.integer(ras)
-
+    }
   }
   ras
 }
@@ -213,10 +213,11 @@ asInt <- function(ras) {
 #' @return
 #' `isInt` returns a logical as per `is.integer`.
 isInt <- function(ras) {
-  if (inherits(ras, "SpatRaster"))
+  if (inherits(ras, "SpatRaster")) {
     is.int(ras)
-  else
+  } else {
     is.integer(values(ras))
+  }
 }
 
 #' @param ras a `Raster`, or `SpatRaster` object

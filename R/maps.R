@@ -22,6 +22,7 @@ utils::globalVariables(c(
 #'
 #' @export
 #' @importFrom reproducible postProcessTo
+#' @importFrom terra set.names
 defineFlammable <- function(LandCoverClassifiedMap = NULL,
                             nonFlammClasses = c(0L, 25L, 30L, 33L,  36L, 37L, 38L, 39L),
                             mask = NULL, to = NULL, writeTo = NULL, ...) {
@@ -91,6 +92,8 @@ defineFlammable <- function(LandCoverClassifiedMap = NULL,
 
   rstFlammable <- asInt(rstFlammable)
   # rstFlammable[] <- as.integer(as.vector(rstFlammable[]))
+  set.names(rstFlammable, "flammable") #drop whatever name baggage file caries
+
   rstFlammable
 }
 

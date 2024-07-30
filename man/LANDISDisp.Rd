@@ -48,7 +48,7 @@ Default is "Ward" (temporarily unused, as it is hard coded inside Rcpp function)
 \item{k}{LANDIS Ward seed dispersal the probability that seed will disperse within
 the effective distance (e.g., 0.95)}
 
-\item{plot.it}{Deprecated. If TRUE, then plot the raster at every interaction,
+\item{plot.it}{Deprecated. If \code{TRUE}, then plot the raster at every interaction,
 so one can watch the \code{LANDISDisp} event grow.}
 
 \item{successionTimestep}{The time between successive seed dispersal events.
@@ -77,15 +77,14 @@ a receiving cell has lots of seed sources around it vs. a single seed source.
 The difference will come with a higher probability of successfully receiving a "seed".
 }
 \details{
-\code{dispersalFn} (temporarily unused as code is converted to Rcpp -- the
-default \code{dispersalFn} is hard coded within the \code{spiralSeedDispersal}
-function that uses C++) must be an expression that returns a probability
-distribution. Because it is a dispersal kernel, it must be a probability
-distribution. The expression that can take an argument named "dis" (without
-quotes) as this will be calculated internally and represents the distance
-from the initial (receiving) pixel and all active pixels within that cluster
-of active pixels. \code{SpaDES} includes the \code{\link[=Ward]{Ward()}} kernel as
-defined in the LANDIS-II documentation.
+\code{dispersalFn} (temporarily unused as code is converted to Rcpp -- the default \code{dispersalFn}
+is hard coded within the \code{spiralSeedDispersal} function that uses C++) must be an expression
+that returns a probability distribution.
+Because it is a dispersal kernel, it must be a probability distribution.
+The expression that can take an argument named "dis" (without quotes) as this will be
+calculated internally and represents the distance from the initial (receiving) pixel
+and all active pixels within that cluster of active pixels.
+\pkg{LandR} includes the \code{\link[=Ward]{Ward()}} kernel as defined in the LANDIS-II documentation.
 }
 \examples{
 if (require("googledrive")) {
@@ -94,7 +93,7 @@ if (require("googledrive")) {
   library(data.table)
 
   # keep this here for interactive testing with a larger raster
-  rasterTemplate <- LandR:::rasterRead(terra::ext(0, 2500, 0, 2500), res = 100)
+  rasterTemplate <- reproducible::rasterRead(terra::ext(0, 2500, 0, 2500), res = 100)
 
   # make a pixelGroupMap
   pgs <- 4 # make even just because of approach below requires even
@@ -146,11 +145,11 @@ if (require("googledrive")) {
     spMap$pixelGroupMap <- pixelGroupMap
     for (sppp in unique(output$speciesCode)) {
       spppChar <- paste0("Sp_", sppp)
-      spMap[[spppChar]] <- LandR:::rasterRead(pixelGroupMap)
+      spMap[[spppChar]] <- reproducible::rasterRead(pixelGroupMap)
       ss <- unique(seedSource[speciesCode == sppp], on = c("pixelGroup", "speciesCode"))
       spMap[[spppChar]][pixelGroupMap[] \%in\% ss$pixelGroup] <- 1
 
-      receivable <- LandR:::rasterRead(pixelGroupMap)
+      receivable <- reproducible::rasterRead(pixelGroupMap)
       srf <- unique(seedReceiveFull[speciesCode == sppp], on = c("pixelGroup", "speciesCode"))
       receivable[pixelGroupMap[] \%in\% srf$pixelGroup] <- 1
 
