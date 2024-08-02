@@ -309,12 +309,10 @@ assertCohortData <- function(cohortData, pixelGroupMap, maxExpectedNumDiverge = 
 #' @rdname assertions
 assertCohortDataERG <- function(cohortData, doAssertion = getOption("LandR.assertions", TRUE)) {
   if (isTRUE(doAssertion)) {
-    ## TODO: there is likely a better/faster, more data.table way of doing this
-    for (pg in unique(cohortData$pixelGroup)) {
-      if (NROW(unique(cohortData[pixelGroup == pg]$ecoregionGroup)) > 1) {
-        browser()
-        stop("there should only be one ecoregionGroup per pixelGroup in cohortData")
-      }
+    if (NROW(unique(cohortData, by = c("ecoregionGroup", "pixelGroup"))) !=
+        NROW(unique(cohortData$pixelGroup))) {
+      browser()
+      stop("there should only be one ecoregionGroup per pixelGroup in cohortData")
     }
   }
 }
