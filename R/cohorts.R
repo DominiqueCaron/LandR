@@ -311,7 +311,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   set(cohortData, NULL, "new", FALSE)
   set(newPixelCohortData, NULL, "new", TRUE)
   cohortData <- rbindlist(list(cohortData, newPixelCohortData), fill = TRUE, use.names = TRUE)
-  cohortData[, ecoregionGroup := unique(.SD[!new]), by = "pixelGroup"]
+  cohortData[, ecoregionGroup := unique(.SD[!new]), by = "pixelGroup"] ## TODO: slow!!
   set(cohortData, NULL, "new", NULL)
   set(newPixelCohortData, NULL, "new", NULL)
 
@@ -353,9 +353,9 @@ rmMissingCohorts <- function(cohortData, pixelGroupMap,
   whPgsStillInPGMGoneFromCD <- !pgmVals$pixelGroup %in% cohortData$pixelGroup
   pgsStillInPGMGoneFromCD <- pgmVals[whPgsStillInPGMGoneFromCD, ]
 
-  # REMOVE lines in cohortData that are no longer in the pixelGroupMap
+  ## REMOVE lines in cohortData that are no longer in the pixelGroupMap
   cohortData <- cohortData[!pixelGroup %in% pgsStillInCDGoneFromPGM$pixelGroup]
-  # REMOVE pixels in pixelGroupMap that are no longer in the cohortData
+  ## REMOVE pixels in pixelGroupMap that are no longer in the cohortData
   pixelGroupMap[pgsStillInPGMGoneFromCD$pixelIndex] <- NA
 
   assertCohortData(cohortData, pixelGroupMap,
