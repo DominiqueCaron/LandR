@@ -679,7 +679,7 @@ PeatlandThermokarst <- function(thawedPixIDs = copy(sim$thawedPixIDs),
                                 wetlands = sim$wetlands, cohortData = copy(sim$cohortData),
                                 pixelGroupMap = sim$pixelGroupMap, rasterToMatch = sim$rasterToMatch,
                                 species = copy(sim$species),  speciesEcoregion = copy(sim$speciesEcoregion),
-                                cohortDefinitionCols = c("pixelGroup", "speciesCode", "age"),
+                                cohortDefinitionCols = cohortDefinitionCols,
                                 initialB = 10L, inactivePixelIndex = sim$inactivePixelIndex, currentTime = NULL,
                                 successionTimestep = 10L) {
   ## check
