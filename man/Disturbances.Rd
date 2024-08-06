@@ -62,7 +62,7 @@ PeatlandThermokarst(
   rasterToMatch = sim$rasterToMatch,
   species = copy(sim$species),
   speciesEcoregion = copy(sim$speciesEcoregion),
-  cohortDefinitionCols = c("pixelGroup", "speciesCode", "age"),
+  cohortDefinitionCols = cohortDefinitionCols,
   initialB = 10L,
   inactivePixelIndex = sim$inactivePixelIndex,
   currentTime = NULL,
@@ -73,7 +73,8 @@ PeatlandThermokarst(
 \item{cohortData}{A \code{data.table} with columns: \code{pixelGroup}, \code{ecoregionGroup},
 \code{speciesCode}, and optionally \code{age}, \code{B}, \code{mortality}, \code{aNPPAct}, and \code{sumB}.}
 
-\item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts}
+\item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts
+(default: \code{c("pixelGroup", "speciesCode", "age")}).}
 
 \item{calibrate}{logical. Determines whether to output \code{postFirePixelCohortData}.
 Defaults to FALSE}

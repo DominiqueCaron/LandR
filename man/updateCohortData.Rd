@@ -13,7 +13,7 @@ updateCohortData(
   speciesEcoregion,
   treedFirePixelTableSinceLastDisp = NULL,
   successionTimestep,
-  cohortDefinitionCols = c("pixelGroup", "age", "speciesCode"),
+  cohortDefinitionCols = cohortDefinitionCols,
   initialB = 10,
   verbose = getOption("LandR.verbose", TRUE),
   doAssertion = getOption("LandR.assertions", TRUE)
@@ -24,7 +24,7 @@ updateCohortData(
   cohortData,
   pixelGroupMap,
   currentTime,
-  cohortDefinitionCols = c("pixelGroup", "speciesCode", "age"),
+  cohortDefinitionCols = cohortDefinitionCols,
   speciesEcoregion,
   successionTimestep,
   initialB = 10
@@ -63,7 +63,8 @@ to ensure that everything matches correctly.}
 \item{successionTimestep}{The time between successive seed dispersal events.
 In LANDIS-II, this is called "Succession Timestep".}
 
-\item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts}
+\item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts
+(default: \code{c("pixelGroup", "speciesCode", "age")}).}
 
 \item{initialB}{the initial biomass of new cohorts. Defaults to 10.
 If \code{NULL} or \code{NA}, initial cohort biomass is calculated as in LANDIS-II Biomass Succession
