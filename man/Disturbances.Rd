@@ -29,7 +29,7 @@ FireDisturbance(
 FireDisturbancePM(
   cohortData = copy(sim$cohortData),
   cohortDefinitionCols = c("pixelGroup", "age", "speciesCode"),
-  colsForPixelGroups = LandR::columnsForPixelGroups,
+  colsForPixelGroups = columnsForPixelGroups(),
   calibrate = FALSE,
   LANDISPM = TRUE,
   postFireRegenSummary = copy(sim$postFireRegenSummary),
@@ -62,7 +62,7 @@ PeatlandThermokarst(
   rasterToMatch = sim$rasterToMatch,
   species = copy(sim$species),
   speciesEcoregion = copy(sim$speciesEcoregion),
-  cohortDefinitionCols = cohortDefinitionCols,
+  cohortDefinitionCols = cohortDefinitionCols(),
   initialB = 10L,
   inactivePixelIndex = sim$inactivePixelIndex,
   currentTime = NULL,
@@ -171,8 +171,9 @@ Default: \code{getOption("LandR.assertions", TRUE)}.}
 
 \item{verbose}{Controls message output. Defaults to \code{getOption("LandR.verbose")}}
 
-\item{colsForPixelGroups}{character. \code{cohortData} columns used to find identical pixels in terms of
-cohort composition, and group them into \code{pixelGroups}.}
+\item{colsForPixelGroups}{character. \code{cohortData} columns used to find identical pixels in terms
+of cohort composition, and group them into \code{pixelGroups}
+(default: \code{c("ecoregionGroup", "speciesCode", "age", "B")}).}
 
 \item{LANDISPM}{logical. Should partial mortality be calculated as in LANDIS-II Dynamic Fire System v3.0.
 Must be \code{TRUE} for the time being.}

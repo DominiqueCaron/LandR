@@ -55,7 +55,7 @@ utils::globalVariables(c(
 updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, currentTime,
                              speciesEcoregion, treedFirePixelTableSinceLastDisp = NULL,
                              successionTimestep,
-                             cohortDefinitionCols = cohortDefinitionCols,
+                             cohortDefinitionCols = cohortDefinitionCols(),
                              initialB = 10,
                              verbose = getOption("LandR.verbose", TRUE),
                              doAssertion = getOption("LandR.assertions", TRUE)) {
@@ -172,14 +172,14 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
     initialB = initialB
   )
 
-  outs <- rmMissingCohorts(cohortData, pixelGroupMap, cohortDefinitionCols = cohortDefinitionCols)
+  outs <- rmMissingCohorts(cohortData, pixelGroupMap, cohortDefinitionCols = cohortDefinitionCols())
 
   if (!is.null(outs$cohortData$sumB)) {
     outs$cohortData[, sumB := NULL]
   }
 
   assertCohortData(outs$cohortData, outs$pixelGroupMap,
-                   cohortDefinitionCols = cohortDefinitionCols,
+                   cohortDefinitionCols = cohortDefinitionCols(),
                    doAssertion = doAssertion, verbose = verbose)
 
   if (verbose > 0) {
@@ -227,7 +227,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
 #'
 #' @rdname updateCohortData
 .initiateNewCohorts <- function(newPixelCohortData, cohortData, pixelGroupMap, currentTime,
-                                cohortDefinitionCols = cohortDefinitionCols,
+                                cohortDefinitionCols = cohortDefinitionCols(),
                                 speciesEcoregion, successionTimestep, initialB = 10) {
 
   ## get spp "productivity traits" per ecoregion/present year
@@ -339,7 +339,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
 #'
 #' @export
 rmMissingCohorts <- function(cohortData, pixelGroupMap,
-                             cohortDefinitionCols = cohortDefinitionCols,
+                             cohortDefinitionCols = cohortDefinitionCols(),
                              doAssertion = getOption("LandR.assertions", TRUE)) {
   pgmValues <- data.table(
     pixelGroup = as.vector(pixelGroupMap[]),
@@ -360,7 +360,7 @@ rmMissingCohorts <- function(cohortData, pixelGroupMap,
 
   assertCohortData(cohortData, pixelGroupMap,
                    message = "rmMissingCohorts",
-                   cohortDefinitionCols = cohortDefinitionCols,
+                   cohortDefinitionCols = cohortDefinitionCols(),
                    doAssertion = doAssertion)
 
   assertCohortDataERG(cohortData, doAssertion = doAssertion)
@@ -1344,12 +1344,16 @@ statsModel <- function(modelFn, uniqueEcoregionGroups, sumResponse, .specialData
 #' Default columns that define cohorts
 #'
 #' @export
-cohortDefinitionCols <- c("pixelGroup", "speciesCode", "age") ## "B"
+cohortDefinitionCols <- function() {
+  c("pixelGroup", "speciesCode", "age") ## "B"
+}
 
 #' Default columns that define pixel groups
 #'
 #' @export
-columnsForPixelGroups <- c("ecoregionGroup", "speciesCode", "age", "B")
+columnsForPixelGroups <- function() {
+  c("ecoregionGroup", "speciesCode", "age", "B")
+}
 
 #' Generate `cohortData` table per pixel:
 #'
@@ -1366,10 +1370,10 @@ columnsForPixelGroups <- c("ecoregionGroup", "speciesCode", "age", "B")
 #'
 #' @export
 addPixels2CohortData <- function(cohortData, pixelGroupMap,
-                                 cohortDefinitionCols = cohortDefinitionCols,
+                                 cohortDefinitionCols = cohortDefinitionCols(),
                                  doAssertion = getOption("LandR.assertions", TRUE)) {
   assertCohortData(cohortData, pixelGroupMap,
-                   cohortDefinitionCols = cohortDefinitionCols,
+                   cohortDefinitionCols = cohortDefinitionCols(),
                    doAssertion = doAssertion)
 
   pixelGroupTable <- na.omit(data.table(
@@ -1403,10 +1407,10 @@ addPixels2CohortData <- function(cohortData, pixelGroupMap,
 #'
 #' @export
 addNoPixel2CohortData <- function(cohortData, pixelGroupMap,
-                                  cohortDefinitionCols = cohortDefinitionCols,
+                                  cohortDefinitionCols = cohortDefinitionCols(),
                                   doAssertion = getOption("LandR.assertions", TRUE)) {
   assertCohortData(cohortData, pixelGroupMap,
-                   cohortDefinitionCols = cohortDefinitionCols, doAssertion = doAssertion)
+                   cohortDefinitionCols = cohortDefinitionCols(), doAssertion = doAssertion)
 
   noPixelsXGroup <- data.table(
     noPixels = tabulate(pixelGroupMap[]),
@@ -1574,15 +1578,14 @@ makeCohortDataFiles <- function(pixelCohortData, columnsForPixelGroups, speciesE
   # Lost some ecoregionGroups -- refactor
   pixelCohortData[, ecoregionGroup := factor(as.character(ecoregionGroup))]
 
-  cd <- pixelCohortData[, .SD, .SDcols = c("pixelIndex", columnsForPixelGroups)]
+  cd <- pixelCohortData[, .SD, .SDcols = c("pixelIndex", columnsForPixelGroups())]
   pixelCohortData[, pixelGroup := Cache(generatePixelGroups, cd,
                                         maxPixelGroup = 0,
-                                        columns = columnsForPixelGroups
-  )]
+                                        columns = columnsForPixelGroups())]
 
   pixelCohortData[, totalBiomass := asInteger(sum(B)), by = "pixelIndex"]
 
-  cohortData <- unique(pixelCohortData, by = c("pixelGroup", columnsForPixelGroups))
+  cohortData <- unique(pixelCohortData, by = c("pixelGroup", columnsForPixelGroups()))
   cohortData[, `:=`(pixelIndex = NULL)]
 
   assertUniqueCohortData(cohortData, c("pixelGroup", "ecoregionGroup", "speciesCode"))
@@ -1702,7 +1705,7 @@ updateCohortDataPostHarvest <- function(newPixelCohortData, cohortData, pixelGro
                                         speciesEcoregion, treedHarvestPixelTable = NULL,
                                         successionTimestep, provenanceTable, trackPlanting = FALSE,
                                         initialB = 10,
-                                        cohortDefinitionCols = cohortDefinitionCols,
+                                        cohortDefinitionCols = cohortDefinitionCols(),
                                         verbose = getOption("LandR.verbose", TRUE),
                                         doAssertion = getOption("LandR.assertions", TRUE)) {
   cohortData <- copy(cohortData)
@@ -1775,10 +1778,10 @@ updateCohortDataPostHarvest <- function(newPixelCohortData, cohortData, pixelGro
                                 initialB = initialB,
                                 trackPlanting = trackPlanting)
 
-  outs <- rmMissingCohorts(cohortData, pixelGroupMap, cohortDefinitionCols = cohortDefinitionCols)
+  outs <- rmMissingCohorts(cohortData, pixelGroupMap, cohortDefinitionCols = cohortDefinitionCols())
 
   assertCohortData(outs$cohortData, outs$pixelGroupMap,
-                   cohortDefinitionCols = cohortDefinitionCols,
+                   cohortDefinitionCols = cohortDefinitionCols(),
                    doAssertion = doAssertion, verbose = verbose)
 
   if (verbose > 0) {
