@@ -13,7 +13,7 @@ updateCohortData(
   speciesEcoregion,
   treedFirePixelTableSinceLastDisp = NULL,
   successionTimestep,
-  cohortDefinitionCols = cohortDefinitionCols,
+  cohortDefinitionCols = cohortDefinitionCols(),
   initialB = 10,
   verbose = getOption("LandR.verbose", TRUE),
   doAssertion = getOption("LandR.assertions", TRUE)
@@ -24,7 +24,7 @@ updateCohortData(
   cohortData,
   pixelGroupMap,
   currentTime,
-  cohortDefinitionCols = cohortDefinitionCols,
+  cohortDefinitionCols = cohortDefinitionCols(),
   speciesEcoregion,
   successionTimestep,
   initialB = 10

@@ -62,7 +62,7 @@ PeatlandThermokarst(
   rasterToMatch = sim$rasterToMatch,
   species = copy(sim$species),
   speciesEcoregion = copy(sim$speciesEcoregion),
-  cohortDefinitionCols = cohortDefinitionCols,
+  cohortDefinitionCols = cohortDefinitionCols(),
   initialB = 10L,
   inactivePixelIndex = sim$inactivePixelIndex,
   currentTime = NULL,
