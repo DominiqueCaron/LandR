@@ -1345,7 +1345,9 @@ cohortDefinitionCols <- c("pixelGroup", "speciesCode", "age") ## "B"
 #' Default columns that define pixel groups
 #'
 #' @export
-columnsForPixelGroups <- c("ecoregionGroup", "speciesCode", "age", "B")
+columnsForPixelGroups <- function() {
+  c("ecoregionGroup", "speciesCode", "age", "B")
+}
 
 #' Generate `cohortData` table per pixel:
 #'
@@ -1570,15 +1572,14 @@ makeCohortDataFiles <- function(pixelCohortData, columnsForPixelGroups, speciesE
   # Lost some ecoregionGroups -- refactor
   pixelCohortData[, ecoregionGroup := factor(as.character(ecoregionGroup))]
 
-  cd <- pixelCohortData[, .SD, .SDcols = c("pixelIndex", columnsForPixelGroups)]
+  cd <- pixelCohortData[, .SD, .SDcols = c("pixelIndex", columnsForPixelGroups())]
   pixelCohortData[, pixelGroup := Cache(generatePixelGroups, cd,
                                         maxPixelGroup = 0,
-                                        columns = columnsForPixelGroups
-  )]
+                                        columns = columnsForPixelGroups())]
 
   pixelCohortData[, totalBiomass := asInteger(sum(B)), by = "pixelIndex"]
 
-  cohortData <- unique(pixelCohortData, by = c("pixelGroup", columnsForPixelGroups))
+  cohortData <- unique(pixelCohortData, by = c("pixelGroup", columnsForPixelGroups()))
   cohortData[, `:=`(pixelIndex = NULL)]
 
   assertUniqueCohortData(cohortData, c("pixelGroup", "ecoregionGroup", "speciesCode"))

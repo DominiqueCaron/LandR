@@ -301,7 +301,7 @@ FireDisturbance <- function(cohortData = copy(sim$cohortData), cohortDefinitionC
 #' @export
 #' @rdname Disturbances
 FireDisturbancePM <- function(cohortData = copy(sim$cohortData), cohortDefinitionCols = c("pixelGroup", "age", "speciesCode"),
-                              colsForPixelGroups = LandR::columnsForPixelGroups,
+                              colsForPixelGroups = columnsForPixelGroups(),
                               calibrate = FALSE, LANDISPM = TRUE, postFireRegenSummary = copy(sim$postFireRegenSummary),
                               treedFirePixelTableSinceLastDisp = copy(sim$treedFirePixelTableSinceLastDisp),
                               rstCurrentBurn = sim$rstCurrentBurn, inactivePixelIndex = sim$inactivePixelIndex,
@@ -823,7 +823,7 @@ PeatlandThermokarst <- function(thawedPixIDs = copy(sim$thawedPixIDs),
 #' @export
 genPGsPostDisturbance <- function(cohortData, pixelGroupMap,
                                   disturbedPixelTable, disturbedPixelCohortData,
-                                  colsForPixelGroups = LandR::columnsForPixelGroups,
+                                  colsForPixelGroups = columnsForPixelGroups(),
                                   doAssertion = getOption("LandR.assertions", TRUE)) {
   ## check - are there duplicated cohorts, dead, surviving or regenerating in a given pixel?
   cols <- c("pixelIndex", "speciesCode", "age", "B")
@@ -850,8 +850,8 @@ genPGsPostDisturbance <- function(cohortData, pixelGroupMap,
 
   ## remove dead cohorts and re-do pixelGroups
   newPCohortData <- newPCohortData[B > 0]
-  cd <- newPCohortData[, c("pixelIndex", columnsForPixelGroups), with = FALSE]
-  newPCohortData[, pixelGroup := generatePixelGroups(cd, maxPixelGroup = 0L, columns = columnsForPixelGroups)]
+  cd <- newPCohortData[, c("pixelIndex", columnsForPixelGroups()), with = FALSE]
+  newPCohortData[, pixelGroup := generatePixelGroups(cd, maxPixelGroup = 0L, columns = columnsForPixelGroups())]
   pixelGroupMap[newPCohortData$pixelIndex] <- newPCohortData$pixelGroup
 
   ## recalculate sumB
@@ -877,4 +877,3 @@ genPGsPostDisturbance <- function(cohortData, pixelGroupMap,
   }
   return(list(cohortData = tempCohortData, pixelGroupMap = pixelGroupMap))
 }
-
