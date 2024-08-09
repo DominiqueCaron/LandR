@@ -7,7 +7,7 @@
 addNoPixel2CohortData(
   cohortData,
   pixelGroupMap,
-  cohortDefinitionCols = cohortDefinitionCols(),
+  cohortDefinitionCols = LandR::cohortDefinitionCols(),
   doAssertion = getOption("LandR.assertions", TRUE)
 )
 }

@@ -15,7 +15,7 @@ updateCohortDataPostHarvest(
   provenanceTable,
   trackPlanting = FALSE,
   initialB = 10,
-  cohortDefinitionCols = cohortDefinitionCols(),
+  cohortDefinitionCols = LandR::cohortDefinitionCols(),
   verbose = getOption("LandR.verbose", TRUE),
   doAssertion = getOption("LandR.assertions", TRUE)
 )

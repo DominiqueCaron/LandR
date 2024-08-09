@@ -250,7 +250,7 @@ assertColumns <- function(obj, colClasses,
 assertCohortData <- function(cohortData, pixelGroupMap, maxExpectedNumDiverge = 1,
                              message = "", doAssertion = getOption("LandR.assertions", TRUE),
                              verbose = getOption("LandR.verbose", TRUE),
-                             cohortDefinitionCols = cohortDefinitionCols()) {
+                             cohortDefinitionCols = LandR::cohortDefinitionCols()) {
   if (doAssertion) {
     if (!isTRUE("pixelGroup" %in% names(cohortData))) {
       stop("cohortData must have pixelGroup")
