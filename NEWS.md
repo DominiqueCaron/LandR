@@ -3,6 +3,8 @@
 - add functions to visualize vegetation type transitions;
 - use `writeTo` instead of `filename2` in `prepInputs()` and related calls, following changes in `reproducible`;
 - remove `rasterRead()` to use version from `reproducible`;
+- `columnsForPixelGroups` is now a function (i.e., use `columnsForPixelGroups()` for consistent `pixelGroup` definitions);
+- new function `cohortDefinitionCols()` to ensure consistent cohort definitions;
 
 # LandR 1.1.5
 

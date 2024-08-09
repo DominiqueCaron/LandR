@@ -205,7 +205,7 @@ was called.}
 \item{verbose}{Controls message output. Defaults to \code{getOption("LandR.verbose")}}
 
 \item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts
-(default: \code{c("pixelGroup", "speciesCode", "age", "ecoregionGroup", "B")}).}
+(default: \code{c("pixelGroup", "speciesCode", "age")}).}
 
 \item{pixelCohortData}{The full \code{cohortData} \code{data.table}}
 

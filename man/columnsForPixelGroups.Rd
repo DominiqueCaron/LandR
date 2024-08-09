@@ -9,3 +9,8 @@ columnsForPixelGroups()
 \description{
 Default columns that define pixel groups
 }
+\note{
+because the name \code{columnsForPixelGroups} is also used as a function argument,
+be sure to use \code{LandR::columnsForPixelGroups()} in those functions or you'll get a
+"promise already under evaluation" error.
+}
