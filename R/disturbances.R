@@ -228,7 +228,7 @@ FireDisturbance <- function(cohortData = copy(sim$cohortData), cohortDefinitionC
         pixelGroupMap = pixelGroupMap,
         currentTime = round(currentTime),
         speciesEcoregion = copy(speciesEcoregion),
-        cohortDefinitionCols = cohortDefinitionCols(),
+        cohortDefinitionCols = LandR::cohortDefinitionCols(),
         treedFirePixelTableSinceLastDisp = copy(treedFirePixelTableSinceLastDisp),
         initialB = initialB,
         successionTimestep = successionTimestep
@@ -303,7 +303,7 @@ FireDisturbance <- function(cohortData = copy(sim$cohortData), cohortDefinitionC
 #' @export
 #' @rdname Disturbances
 FireDisturbancePM <- function(cohortData = copy(sim$cohortData), cohortDefinitionCols = c("pixelGroup", "age", "speciesCode"),
-                              colsForPixelGroups = columnsForPixelGroups(),
+                              colsForPixelGroups = LandR::columnsForPixelGroups(),
                               calibrate = FALSE, LANDISPM = TRUE, postFireRegenSummary = copy(sim$postFireRegenSummary),
                               treedFirePixelTableSinceLastDisp = copy(sim$treedFirePixelTableSinceLastDisp),
                               rstCurrentBurn = sim$rstCurrentBurn, inactivePixelIndex = sim$inactivePixelIndex,
@@ -679,7 +679,7 @@ PeatlandThermokarst <- function(thawedPixIDs = copy(sim$thawedPixIDs),
                                 wetlands = sim$wetlands, cohortData = copy(sim$cohortData),
                                 pixelGroupMap = sim$pixelGroupMap, rasterToMatch = sim$rasterToMatch,
                                 species = copy(sim$species),  speciesEcoregion = copy(sim$speciesEcoregion),
-                                cohortDefinitionCols = cohortDefinitionCols(),
+                                cohortDefinitionCols = LandR::cohortDefinitionCols(),
                                 initialB = 10L, inactivePixelIndex = sim$inactivePixelIndex, currentTime = NULL,
                                 successionTimestep = 10L) {
   ## check
@@ -758,7 +758,7 @@ PeatlandThermokarst <- function(thawedPixIDs = copy(sim$thawedPixIDs),
       pixelGroupMap = tempObjs$pixelGroupMap,
       currentTime = round(currentTime),
       speciesEcoregion = copy(speciesEcoregion),
-      cohortDefinitionCols = cohortDefinitionCols(),
+      cohortDefinitionCols = LandR::cohortDefinitionCols(),
       treedFirePixelTableSinceLastDisp = copy(treedThawedPixelTableSinceLastDisp),
       initialB = initialB,
       successionTimestep = successionTimestep
@@ -829,7 +829,7 @@ PeatlandThermokarst <- function(thawedPixIDs = copy(sim$thawedPixIDs),
 #' @export
 genPGsPostDisturbance <- function(cohortData, pixelGroupMap,
                                   disturbedPixelTable, disturbedPixelCohortData,
-                                  colsForPixelGroups = columnsForPixelGroups(),
+                                  colsForPixelGroups = LandR::columnsForPixelGroups(),
                                   doAssertion = getOption("LandR.assertions", TRUE)) {
   ## check - are there duplicated cohorts, dead, surviving or regenerating in a given pixel?
   cols <- c("pixelIndex", "speciesCode", "age", "B")
@@ -857,7 +857,7 @@ genPGsPostDisturbance <- function(cohortData, pixelGroupMap,
   ## remove dead cohorts and re-do pixelGroups
   newPCohortData <- newPCohortData[B > 0]
   cd <- newPCohortData[, c("pixelIndex", columnsForPixelGroups()), with = FALSE]
-  newPCohortData[, pixelGroup := generatePixelGroups(cd, maxPixelGroup = 0L, columns = columnsForPixelGroups())]
+  newPCohortData[, pixelGroup := generatePixelGroups(cd, maxPixelGroup = 0L, columns = LandR::columnsForPixelGroups())]
   pixelGroupMap[newPCohortData$pixelIndex] <- newPCohortData$pixelGroup
 
   ## recalculate sumB

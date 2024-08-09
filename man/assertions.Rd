@@ -70,7 +70,7 @@ assertCohortData(
   message = "",
   doAssertion = getOption("LandR.assertions", TRUE),
   verbose = getOption("LandR.verbose", TRUE),
-  cohortDefinitionCols = cohortDefinitionCols()
+  cohortDefinitionCols = LandR::cohortDefinitionCols()
 )
 
 assertCohortDataERG(

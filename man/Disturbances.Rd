@@ -29,7 +29,7 @@ FireDisturbance(
 FireDisturbancePM(
   cohortData = copy(sim$cohortData),
   cohortDefinitionCols = c("pixelGroup", "age", "speciesCode"),
-  colsForPixelGroups = columnsForPixelGroups(),
+  colsForPixelGroups = LandR::columnsForPixelGroups(),
   calibrate = FALSE,
   LANDISPM = TRUE,
   postFireRegenSummary = copy(sim$postFireRegenSummary),
@@ -62,7 +62,7 @@ PeatlandThermokarst(
   rasterToMatch = sim$rasterToMatch,
   species = copy(sim$species),
   speciesEcoregion = copy(sim$speciesEcoregion),
-  cohortDefinitionCols = cohortDefinitionCols(),
+  cohortDefinitionCols = LandR::cohortDefinitionCols(),
   initialB = 10L,
   inactivePixelIndex = sim$inactivePixelIndex,
   currentTime = NULL,
