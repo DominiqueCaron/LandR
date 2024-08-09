@@ -19,7 +19,7 @@ addPixels2CohortData(
 number that corresponds exactly to \code{pixelGroup} column in \code{cohortData}.}
 
 \item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts
-(default: \code{c("pixelGroup", "speciesCode", "age")}).}
+(default: \code{c("pixelGroup", "speciesCode", "age", "ecoregionGroup", "B")}).}
 
 \item{doAssertion}{A logical indicating whether some internal tests should be run to
 ensure the function is running correctly.

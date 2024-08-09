@@ -74,7 +74,7 @@ PeatlandThermokarst(
 \code{speciesCode}, and optionally \code{age}, \code{B}, \code{mortality}, \code{aNPPAct}, and \code{sumB}.}
 
 \item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts
-(default: \code{c("pixelGroup", "speciesCode", "age")}).}
+(default: \code{c("pixelGroup", "speciesCode", "age", "ecoregionGroup", "B")}).}
 
 \item{calibrate}{logical. Determines whether to output \code{postFirePixelCohortData}.
 Defaults to FALSE}
