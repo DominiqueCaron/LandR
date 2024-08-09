@@ -64,7 +64,7 @@ to ensure that everything matches correctly.}
 In LANDIS-II, this is called "Succession Timestep".}
 
 \item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts
-(default: \code{c("pixelGroup", "speciesCode", "age", "ecoregionGroup", "B")}).}
+(default: \code{c("pixelGroup", "speciesCode", "age")}).}
 
 \item{initialB}{the initial biomass of new cohorts. Defaults to 10.
 If \code{NULL} or \code{NA}, initial cohort biomass is calculated as in LANDIS-II Biomass Succession

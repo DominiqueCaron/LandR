@@ -1339,14 +1339,23 @@ statsModel <- function(modelFn, uniqueEcoregionGroups, sumResponse, .specialData
 
 #' Default columns that define cohorts
 #'
+#' @note because the name `cohortDefinitionCols` is also used as a function argument,
+#' be sure to use `LandR::cohortDefinitionCols()` in those functions or you'll get a
+#' "promise already under evaluation" error.
+#'
 #' @export
 cohortDefinitionCols <- function() {
-  ## 2024-08-08: previous package version omitted ecoregionGroup and B,
-  ## but Biomass_core and Biomass_regeneration modules use definition below
-  c("pixelGroup", "speciesCode", "age", "ecoregionGroup", "B")
+  ## 2024-08-08: do not include ecoregionGroup and B when defining cohorts:
+  ## - ecoregionGroup already taken into account with pixelGroup;
+  ## - species with same age *should* have the same B already;
+  c("pixelGroup", "speciesCode", "age")
 }
 
 #' Default columns that define pixel groups
+#'
+#' @note because the name `columnsForPixelGroups` is also used as a function argument,
+#' be sure to use `LandR::columnsForPixelGroups()` in those functions or you'll get a
+#' "promise already under evaluation" error.
 #'
 #' @export
 columnsForPixelGroups <- function() {

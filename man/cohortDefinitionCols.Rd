@@ -9,3 +9,8 @@ cohortDefinitionCols()
 \description{
 Default columns that define cohorts
 }
+\note{
+because the name \code{cohortDefinitionCols} is also used as a function argument,
+be sure to use \code{LandR::cohortDefinitionCols()} in those functions or you'll get a
+"promise already under evaluation" error.
+}

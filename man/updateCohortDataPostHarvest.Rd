@@ -62,7 +62,7 @@ in column 'planted'}
 \item{initialB}{the initial biomass of new cohorts. Defaults to ten, even if NA/NULL is passed.}
 
 \item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts
-(default: \code{c("pixelGroup", "speciesCode", "age", "ecoregionGroup", "B")}).}
+(default: \code{c("pixelGroup", "speciesCode", "age")}).}
 
 \item{verbose}{Controls message output. Defaults to \code{getOption("LandR.verbose")}}
 
