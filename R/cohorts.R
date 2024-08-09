@@ -1341,7 +1341,9 @@ statsModel <- function(modelFn, uniqueEcoregionGroups, sumResponse, .specialData
 #'
 #' @export
 cohortDefinitionCols <- function() {
-  c("pixelGroup", "speciesCode", "age") ## "B"
+  ## 2024-08-08: previous package version omitted ecoregionGroup and B,
+  ## but Biomass_core and Biomass_regeneration modules use definition below
+  c("pixelGroup", "speciesCode", "age", "ecoregionGroup", "B")
 }
 
 #' Default columns that define pixel groups
