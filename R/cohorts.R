@@ -765,7 +765,7 @@ convertUnwantedLCC <- function(classesToReplace = 34:36, rstLCC,
 
   if (doAssertion) {
     if (any(gsub(".*_", "", out3$ecoregionGroup) %in% classesToReplace)) {
-      stop("classesToReplace we're not fully removed")
+      stop("classesToReplace were not fully removed")
     }
   }
 
