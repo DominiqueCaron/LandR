@@ -316,7 +316,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   if (NROW(unique(cohortData, by = c("pixelGroup"))) !=
       NROW(unique(cohortData, by = c("pixelGroup", "ecoregionGroup")))) {
     message("Found pixelGroup with multiple ecoregionGroups when initiating cohorts.")
-    message("Adjusting ecoregionGroups to match those of existing pixelGroups.")
+    message("Adjusting new ecoregionGroups to match those of existing pixelGroups.")
     cohortData[, ecoregionGroup := unique(.SD[new == FALSE, ecoregionGroup]),
                by = "pixelGroup", .SDcols = c("new", "ecoregionGroup")] ## TODO: very slow!!
   }
