@@ -85,7 +85,9 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
         "  Regenerating only burnt pixels with no survivors (i.e. resprouting & serotiny)"
       ))
     }
-    columnsForPG <- c("ecoregionGroup", "speciesCode", "age") ## no Biomass b/c they all have zero
+
+    ## NOTE: no B in this columnsForPG b/c they all have zero
+    columnsForPG <- LandR::columnsForPixelGroups()[-which(LandR::columnsForPixelGroups() == "B")]
     cd <- newPixelCohortData[, c("pixelIndex", columnsForPG), with = FALSE]
     newPixelCohortData[, pixelGroup := generatePixelGroups(cd,
                                                            maxPixelGroup = maxPixelGroup,
@@ -121,7 +123,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
     }
     cohorts <- rbindlist(list(cdLong, newPixelCohortData), use.names = TRUE, fill = TRUE)
 
-    columnsForPG <- c("ecoregionGroup", "speciesCode", "age", "B")
+    columnsForPG <- LandR::columnsForPixelGroups()
     cd <- cohorts[, c("pixelIndex", columnsForPG), with = FALSE]
     cohorts[, pixelGroup := generatePixelGroups(cd, maxPixelGroup = 0L, columns = columnsForPG)]
 
@@ -769,7 +771,7 @@ convertUnwantedLCC <- function(classesToReplace = 34:36, rstLCC,
 
   if (doAssertion) {
     if (any(gsub(".*_", "", out3$ecoregionGroup) %in% classesToReplace)) {
-      stop("classesToReplace we're not fully removed")
+      stop("classesToReplace were not fully removed")
     }
   }
 
@@ -1759,7 +1761,7 @@ updateCohortDataPostHarvest <- function(newPixelCohortData, cohortData, pixelGro
 
   newPixelCohortData <- specieseco_current[newPixelCohortData]
 
-  columnsForPG <- c("ecoregionGroup", "speciesCode", "age", "B", "maxB", "maxANPP", "Provenance")
+  columnsForPG <- c(LandR::columnsForPixelGroups(), "maxB", "maxANPP", "Provenance")
 
   cd <- newPixelCohortData[, c("pixelIndex", columnsForPG), with = FALSE]
 
