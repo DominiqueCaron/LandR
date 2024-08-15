@@ -313,7 +313,11 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   set(cohortData, NULL, "new", FALSE)
   set(newPixelCohortData, NULL, "new", TRUE)
   cohortData <- rbindlist(list(cohortData, newPixelCohortData), fill = TRUE, use.names = TRUE)
-  cohortData[, ecoregionGroup := unique(.SD[new == FALSE, ecoregionGroup]), by = "pixelGroup"] ## TODO: slow!!
+  if (NROW(unique(cohortData, by = c("pixelGroup"))) !=
+      NROW(unique(cohortData, by = c("pixelGroup", "ecoregionGroup")))) {
+    cohortData[, ecoregionGroup := unique(.SD[new == FALSE, ecoregionGroup]),
+               by = "pixelGroup", .SDcols = c("new", "ecoregionGroup")] ## TODO: very slow!!
+  }
   set(cohortData, NULL, "new", NULL)
   set(newPixelCohortData, NULL, "new", NULL)
 
