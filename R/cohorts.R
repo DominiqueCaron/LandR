@@ -354,7 +354,7 @@ rmMissingCohorts <- function(cohortData, pixelGroupMap,
     pixelIndex = seq(ncell(pixelGroupMap))
   )
 
-  pgmVals <- na.omit(pgmValues)
+  pgmVals <- pgmValues[!is.na(pixelGroup), ] ## na.omit() doesn't omit NaN, which terra returns
   pgmVals <- pgmVals[pixelGroup > 0]
   whPgsStillInCDGoneFromPGM <- !cohortData$pixelGroup %in% pgmVals$pixelGroup
   pgsStillInCDGoneFromPGM <- cohortData[whPgsStillInCDGoneFromPGM, ]

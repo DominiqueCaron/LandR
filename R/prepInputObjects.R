@@ -559,6 +559,7 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
 #' @param earliestYear the earliest fire date to allow
 #'
 #' @return a `SpatRaster` layer of fire perimeters with fire year values.
+#' @importFrom terra is.valid
 #'
 #' @export
 #'
@@ -601,8 +602,17 @@ prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestY
   fun <- if (is.null(dots$fun)) "terra::vect" else dots$fun
   dots$fun <- NULL # need to do this or else it will pass double to the prepInputs
   to <- rasterToMatch
+
+  #invalid NFDB polygons will cause Rstudio to crash during postProcess as of 8/21/2024
+  #removing invalid polygons is far faster than fixing the 0.1% of data
+  postProcessArgs <- dots[names(dots) %in% c("to", "maskTo", "projectTo", "cropTo")]
+  preProcessArgs <- dots[!names(dots) %in% names(postProcessArgs)]
+  allFires <- do.call(prepInputs, append(list(fun = fun), preProcessArgs))
+  allFires <- allFires[terra::is.valid(allFires),] #drop invalids
+
+  #This may potentially result in dots intended for postProcess being lost.
   a <- {
-      do.call(prepInputs, append(list(to = to, maskTo = maskTo, fun = fun), dots)) |>
+      do.call(postProcessTo, append(list(from = allFires), postProcessArgs)) |>
         st_as_sf()
     } |>
       Cache()
