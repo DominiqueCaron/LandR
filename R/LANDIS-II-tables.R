@@ -162,18 +162,36 @@ prepSpeciesTable <- function(speciesTable, speciesLayers = NULL,
 #'
 #' Changes longevity and shade tolerance values in the species table.
 #' Longevity values are changed to follow Burton & Cumming (1995) for the following species:
-#' *Abies balsamea*, *Abies lasiocarpa*, *Betula papyrifera*, *Larix laricina*,
-#' *Larix occidentalis*, *Picea engelmannii*, *Picea glauca*, *Picea mariana*,
-#' *Pinus banksiana*, *Pinus contorta*, *Pinus resinosa*, *Pinus strobus*,
-#' *Populus balsamifera v. balsamifera*, *Populus tremuloides*, *Pseudotsuga menziesii var. glauca*,
-#' *Pseudotsuga menziesii*, *Thuja plicata*, *Tsuga heterophylla*,
-#' *Tsuga mertensiana x heterophylla*, and only for the  Boreal Shield West (BSW), Boreal Plains (BP)
-#'  and Montane Cordillera (MC) `speciesTable$Area`s.
+#' - *Abies balsamea*;
+#' - *Abies lasiocarpa*;
+#' - *Betula papyrifera*;
+#' - *Larix laricina*;
+#' - *Larix occidentalis*;
+#' - *Picea engelmannii*;
+#' - *Picea glauca*;
+#' - *Picea mariana*;
+#' - *Pinus banksiana*;
+#' - *Pinus contorta*;
+#' - *Pinus resinosa*;
+#' - *Pinus strobus*;
+#' - *Populus balsamifera v. balsamifera*;
+#' - *Populus tremuloides*;
+#' - *Pseudotsuga menziesii var. glauca*;
+#' - *Pseudotsuga menziesii*;
+#' - *Thuja plicata*;
+#' - *Tsuga heterophylla*;
+#' - *Tsuga mertensiana x heterophylla*;
+#'
+#' and only for the following `speciesTable$Area`s:
+#' - Boreal Shield West (BSW);
+#' - Boreal Plains (BP);
+#' - Montane Cordillera (MC).
+#'
 #' Note that BSW and BP areas correspond more closely to the region considered in Table 2 of
 #' Burton & Cumming (1995), while MC will correspond to both tables.
 #'
 #' Of the above species, shade tolerance values are changed for *Abies spp*, *Picea spp*,
-#' and *Tsuga spp.* to reflect western boreal shade tolerances better.
+#' and *Tsuga spp* to better reflect the western boreal.
 #'
 #' When different longevity/shade tolerance trait values exist for a given species, the minimum
 #' value across `Area`'s (BSW, BP, MC) is kept.
@@ -181,7 +199,7 @@ prepSpeciesTable <- function(speciesTable, speciesLayers = NULL,
 #' ATTENTION: if none of species in `species` are from BSW, BP or MC area this function will not
 #' change any values.
 #'
-#' All other species/Area trait values follow Dominic Cyr and Yan Boulanger's trait values available at:
+#' All other species/Area trait values follow Dominic Cyr and Yan Boulanger's trait values
 #' (<https://raw.githubusercontent.com/dcyr/LANDIS-II_IA_generalUseFiles/master/speciesTraits.csv>).
 #'
 #'
@@ -197,7 +215,7 @@ prepSpeciesTable <- function(speciesTable, speciesLayers = NULL,
 #'
 #' @export
 #' @rdname speciesTableUpdate
-speciesTableUpdate <- function(species, speciesTable, sppEquiv, sppEquivCol) {
+speciesTableUpdate <- function(species, speciesTable, sppEquiv = NULL, sppEquivCol = NULL) {
   ## if "Area"is a column in the (final) traits table, then check and warn the user for area
   ## mismatches
   if (!"Area" %in% names(species)) {
@@ -211,17 +229,22 @@ speciesTableUpdate <- function(species, speciesTable, sppEquiv, sppEquivCol) {
     }
   }
 
-  if (is.null(sppEquiv))
-    sppEquiv <- data.table(utils::data("sppEquivalencies_CA", package = "LandR", envir = environment()))
+  if (is.null(sppEquiv)) {
+    sppEquiv <- data.table(
+      utils::data("sppEquivalencies_CA", package = "LandR", envir = environment())
+    )
+  }
 
-  if (is.null(sppEquivCol))
+  if (is.null(sppEquivCol)) {
     stop("Please provide sppEquivCol")
+  }
 
   names(speciesTable) <- .speciesTableColNames
 
   ## make temporary table that will have new parameters for Boreal spp.
   ## longevity values from Burton & Cumming (1995)
-  speciesTableShort <- speciesTable[Area %in% c("BSW", "BP", "MC"), .(species, longevity, shadetolerance)]
+  speciesTableShort <- speciesTable[Area %in% c("BSW", "BP", "MC"),
+                                    .(species, longevity, shadetolerance)]
   speciesTableShort[species == "ABIE.BAL", longevity := 200] ## default 150
   speciesTableShort[species == "ABIE.LAS", longevity := 240] ## default 250
   speciesTableShort[species == "BETU.PAP", longevity := 140] ## default 150
