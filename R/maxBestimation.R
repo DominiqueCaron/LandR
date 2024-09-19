@@ -443,7 +443,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
       # plim = c(min = 0.001, max = 1), ## Eliot's
       plim = c(min = min(rateEstimates), max = max(rateEstimates)),
       Alim = c(min = ObsMaxB * 0.3, max = ObsMaxB * 0.9),
-      klim <- c(min = min(kLogEstimates), max = max(kLogEstimates))
+      klim = c(min = min(kLogEstimates), max = max(kLogEstimates))
     )
     # modelParams$klim <- c(min = 10, max = max(modelParams$Alim)) ## Eliot's
 
