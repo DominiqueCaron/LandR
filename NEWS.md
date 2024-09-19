@@ -5,6 +5,7 @@
 - remove `rasterRead()` to use version from `reproducible`;
 - `columnsForPixelGroups` is now a function (i.e., use `columnsForPixelGroups()` for consistent `pixelGroup` definitions);
 - new function `cohortDefinitionCols()` to ensure consistent cohort definitions;
+- new function `lccMapGenerator()` to calculate landcover classes from `cohortData` and `pixelGroupMap`;
 
 # LandR 1.1.5
 

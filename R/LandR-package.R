@@ -19,14 +19,17 @@
 
 ## usethis namespace: start
 #' @importFrom crayon blue cyan green magenta red
-#' @importFrom data.table as.data.table copy data.table fread is.data.table last melt rbindlist
-#' @importFrom data.table set setattr setcolorder setDT setDTthreads setkey setkeyv setnames setorderv
+#' @importFrom data.table as.data.table copy data.table dcast fifelse fread
+#' @importFrom data.table is.data.table last melt rbindlist
+#' @importFrom data.table set setattr setcolorder setDT setDTthreads
+#' @importFrom data.table setkey setkeyv setnames setorderv
 #' @importFrom fpCompare %==% %>>% %<<% %<=%
 #' @importFrom ggplot2 aes coord_equal coord_sf element_blank element_text facet_wrap
 #' @importFrom ggplot2 geom_bar geom_hline geom_line geom_point labs geom_raster geom_ribbon geom_sf
 #' @importFrom ggplot2 ggplot ggtitle guide_legend guides labs
 #' @importFrom ggplot2 scale_color_distiller
-#' @importFrom ggplot2 scale_fill_distiller scale_fill_manual scale_fill_viridis_c scale_fill_viridis_d
+#' @importFrom ggplot2 scale_fill_distiller scale_fill_manual
+#' @importFrom ggplot2 scale_fill_viridis_c scale_fill_viridis_d
 #' @importFrom ggplot2 scale_linetype_manual scale_x_discrete
 #' @importFrom ggplot2 stat stat_summary sym theme theme_classic unit
 #' @importFrom ggpubr theme_pubr
@@ -50,11 +53,12 @@
 #' @importFrom sp CRS proj4string SpatialPoints
 #' @importFrom SpaDES.tools inRange neutralLandscapeMap randomPolygons rasterizeReduced runifC
 #' @importFrom SpaDES.tools spread2
-#' @importFrom stats as.formula complete.cases fitted glm na.omit predict quantile runif terms update vcov
-#' @importFrom terra app as.int cellFromRowCol cellFromXY classify coltab<- compareGeom
+#' @importFrom stats as.formula complete.cases fitted glm na.omit
+#' @importFrom stats predict quantile runif setNames terms update vcov
+#' @importFrom terra app as.factor as.int cellFromRowCol cellFromXY classify coltab<- compareGeom
 #' @importFrom terra crop crs crs<- ext extract focalMat intersect is.factor is.int is.points
 #' @importFrom terra levels mask minmax NAflag<- ncell nlyr project
-#' @importFrom terra rast rasterize res rowColFromCell terraOptions values vect
+#' @importFrom terra rast rasterize res rowColFromCell set.values terraOptions values vect
 #' @importFrom terra writeRaster xmax xmin ymax ymin xyFromCell
 #' @importFrom tidyterra geom_spatraster
 #' @importFrom tools file_path_sans_ext
