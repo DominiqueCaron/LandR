@@ -189,8 +189,8 @@ makeSpeciesEcoregion <- function(cohortDataBiomass, cohortDataShort, cohortDataS
   speciesEcoregion <- species[, .(speciesCode, longevity)][speciesEcoregion, on = "speciesCode"]
   speciesEcoregion[ , ecoregionGroup := factor(as.character(ecoregionGroup))]
 
-  #################################################
-  ## establishProb
+
+  ## establishProb ----------------------------------------------------------------------------
   predictedCoverVals <- if (is(modelCover, "numeric")) {
     modelCover
   } else {
@@ -201,20 +201,19 @@ makeSpeciesEcoregion <- function(cohortDataBiomass, cohortDataShort, cohortDataS
   cohortDataShort <- species[, .(resproutprob, postfireregen, speciesCode)][cohortDataShort,
                                                                             on = "speciesCode"]
 
-  # Partitioning between seed and resprout. See documentation about the "* 0.5"
+  ## partitioning between seed and resprout. See documentation about the "* 0.5"
   cohortDataShort[, establishprob := pmax(0, pmin(1, (establishprob * (1 - resproutprob * 0.5))))]
 
   cohortDataShort <- rbindlist(list(cohortDataShort, cohortDataShortNoCover),
                                use.names = TRUE, fill = TRUE)
   cohortDataShort[is.na(establishprob), establishprob := 0]
 
-  # Join cohortDataShort with establishprob predictions to speciesEcoregion
+  ## join cohortDataShort with establishprob predictions to speciesEcoregion
   speciesEcoregion <- cohortDataShort[, .(ecoregionGroup, speciesCode, establishprob)][
     speciesEcoregion, on = joinOn]
 
-  #################################################
-  # maxB
-  # Set age to the age of longevity and cover to 100%
+  ## maxB -------------------------------------------------------------------------------------
+  ## set age to the age of longevity and cover to 100%
   speciesEcoregion[, `:=`(logAge = .logFloor(longevity), cover = 100)]
 
   ## rescale if need be (modelBiomass may have been fitted on scaled variables)
@@ -238,13 +237,11 @@ makeSpeciesEcoregion <- function(cohortDataBiomass, cohortDataShort, cohortDataS
 
   speciesEcoregion[maxB < 0L, maxB := 0L] # fix negative predictions
 
-  ########################################################################
-  # maxANPP
+  ## maxANPP ----------------------------------------------------------------------------------
   message(blue("Add maxANPP to speciesEcoregion -- currently --> maxB/30"))
   speciesEcoregion[ , maxANPP := asInteger(maxB / 30)]
 
-  ########################################################################
-  # Clean up unneeded columns
+  ## clean up unneeded columns
   speciesEcoregion[ , `:=`(logAge = NULL, cover = NULL, longevity = NULL,  lcc = NULL)]
 
   speciesEcoregion[ , year := currentYear]

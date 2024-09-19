@@ -446,7 +446,7 @@ FireDisturbancePM <- function(cohortData = copy(sim$cohortData), cohortDefinitio
 
   ## DO MORTALITY -----------------------------
   ## Highest severity kills all cohorts
-  burnedPixelCohortData[severity == 5, `:=` (B = 0, mortality = 0, aNPPAct = 0)]
+  burnedPixelCohortData[severity == 5, `:=`(B = 0, mortality = 0, aNPPAct = 0)]
 
   if (LANDISPM) {
     ## FIRE DAMAGE ---------------------------

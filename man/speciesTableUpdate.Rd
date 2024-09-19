@@ -4,7 +4,7 @@
 \alias{speciesTableUpdate}
 \title{Change species table of parameters/traits}
 \usage{
-speciesTableUpdate(species, speciesTable, sppEquiv, sppEquivCol)
+speciesTableUpdate(species, speciesTable, sppEquiv = NULL, sppEquivCol = NULL)
 }
 \arguments{
 \item{species}{a \code{data.table} with species traits such as longevity, shade tolerance, etc.
