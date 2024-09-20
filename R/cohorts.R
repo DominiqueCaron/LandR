@@ -1864,9 +1864,8 @@ pixelFate <- function(pixelFateDT, fate = NA_character_, pixelsRemoved = 0,
 
 #' Generate and add vegetation type column to `cohortData`
 #'
-#' This function is a simplification of `vegTypeMapGenerator`
-#' and instead of generating a map, it adds the vegetation type column
-#' to the `cohortData` table.
+#' This function is a simplification of `vegTypeMapGenerator` and instead of generating a map,
+#' it adds the vegetation type column to the `cohortData` table.
 #'
 #' @param x A `cohortData` object
 #'
