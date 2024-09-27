@@ -627,8 +627,12 @@ prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestY
       d[[fireField]] <- as.numeric(as.factor(d[[fireField]]))
     }
     if (is(rasterToMatch, "SpatRaster")) {
+      if (!is(d, "SpatVector")) {
+        d <- vect(d)
+      }
       fireRas <- terra::rasterize(d, rasterToMatch, field = fireField)
-      fireRas[!is.na(terra::values(fireRas)) & terra::values(fireRas) < earliestYear] <- NA
+      fireRas[!is.na(terra::values(fireRas, mat = FALSE)) &
+                terra::values(fireRas, mat = FALSE) < earliestYear] <- NA
     } else {
       .requireNamespace("fasterize", stopOnFALSE = TRUE)
       fireRas <- fasterize::fasterize(d, raster = rasterToMatch, field = fireField)
