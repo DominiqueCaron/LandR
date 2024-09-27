@@ -609,7 +609,7 @@ prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestY
   postProcessArgs <- dots[names(dots) %in% c("to", "maskTo", "projectTo", "cropTo")]
   preProcessArgs <- dots[!names(dots) %in% names(postProcessArgs)]
   allFires <- do.call(prepInputs, append(list(fun = fun), preProcessArgs))
-  allFires <- allFires[terra::is.valid(allFires), ] ## drop invalids
+  allFires <- allFires[terra::is.valid(allFires), ] ## drop invalid geometries
 
   ## This may potentially result in dots intended for postProcess being lost.
   a <- do.call(postProcess, append(list(x = allFires), postProcessArgs)) |>
