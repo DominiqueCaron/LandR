@@ -8,12 +8,6 @@
 #'
 #' @export
 getWildfire_NFI <- function(dPath, rasterToMatch, url = NULL) {
-  if (!requireNamespace("terra", quietly = TRUE)) {
-    ## since terra is dependency of raster, it should already be installed, but just in case...
-    stop("Suggested package 'terra' not installed.\n",
-         "Install it using `install.packages('terra')`.")
-  }
-
   if (is.null(url)) {
     url <- paste0("https://opendata.nfis.org/downloads/forest_change/",
                   "CA_forest_wildfire_year_DNBR_Magnitude_1985_2015.zip")

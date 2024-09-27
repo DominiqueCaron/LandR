@@ -694,12 +694,6 @@ makePickellStack <- function(PickellRaster, sppEquiv, sppEquivCol, destinationPa
 #'
 #' @export
 NAcover2zero <- function(speciesLayers, rasterToMatch) {
-  if (!requireNamespace("terra", quietly = TRUE)) {
-    ## since terra is dependency of raster, it should already be installed, but just in case...
-    stop("Suggested package 'terra' not installed.\n",
-         "Install it using `install.packages('terra')`.")
-  }
-
   tempRas <- rasterToMatch
   tempRas[!is.na(as.vector(tempRas[]))] <- 0
   namesLayers <- names(speciesLayers)
