@@ -564,7 +564,7 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
 #' library(terra)
 #' library(reproducible)
 #'
-#' options(
+#' opts <- options(
 #'   reproducible.useTerra = TRUE,
 #'   reproducible.rasterRead = "terra::rast"
 #' )
@@ -590,6 +590,8 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
 #'   plot(firePerimeters)
 #'   plot(randomPoly, add = TRUE)
 #' }
+#'
+#' options(opts)
 prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestYear = 1950) {
   dots <- list(...)
   if (is.null(dots$studyArea)) {

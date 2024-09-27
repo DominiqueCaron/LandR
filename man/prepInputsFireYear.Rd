@@ -26,7 +26,7 @@ Create a raster of fire perimeters
 library(terra)
 library(reproducible)
 
-options(
+opts <- options(
   reproducible.useTerra = TRUE,
   reproducible.rasterRead = "terra::rast"
 )
@@ -52,4 +52,6 @@ if (interactive()) {
   plot(firePerimeters)
   plot(randomPoly, add = TRUE)
 }
+
+options(opts)
 }
