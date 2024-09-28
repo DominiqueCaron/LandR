@@ -47,12 +47,6 @@ projectTo <- utils::getFromNamespace("projectTo", "reproducible")
 #' @export
 #' @rdname speciesPresent
 speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, minPctCover = 10) {
-  if (!requireNamespace("terra", quietly = TRUE)) {
-    ## since terra is dependency of raster, it should already be installed, but just in case...
-    stop("Suggested package 'terra' not installed.\n",
-         "Install it using `install.packages('terra')`.")
-  }
-
   studyAreaED <- Cache(
     prepInputs,
     url =  "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/district/ecodistrict_shp.zip",
@@ -162,12 +156,6 @@ speciesInStudyArea <- function(studyArea, url = NULL, speciesPresentRas = NULL,
 
 #' @keywords internal
 forestOutline <- function(x) {
-  if (!requireNamespace("terra", quietly = TRUE)) {
-    ## since terra is dependency of raster, it should already be installed, but just in case...
-    stop("Suggested package 'terra' not installed.\n",
-         "Install it using `install.packages('terra')`.")
-  }
-
   x1 <- terra::vect(x)
   bf2 <- terra::simplifyGeom(x1, tolerance = 5000)
   bf3 <- terra::makeValid(bf2)
@@ -183,12 +171,6 @@ borealForestURL <- "https://d278fo2rk9arr5.cloudfront.net/downloads/boreal.zip"
 
 #' @keywords internal
 SA_ERIntersect <- function(x, studyArea) {
-  if (!requireNamespace("terra", quietly = TRUE)) {
-    ## since terra is dependency of raster, it should already be installed, but just in case...
-    stop("Suggested package 'terra' not installed.\n",
-         "Install it using `install.packages('terra')`.")
-  }
-
   x <- sf::st_read(x)
   sa_sf <- sf::st_as_sf(studyArea)
   ecoregions <- sf::st_transform(x, sf::st_crs(sa_sf))
@@ -198,12 +180,6 @@ SA_ERIntersect <- function(x, studyArea) {
 
 #' @keywords internal
 loadAndAggregateKNN <- function(dPath, res, sa) {
-  if (!requireNamespace("terra", quietly = TRUE)) {
-    ## since terra is dependency of raster, it should already be installed, but just in case...
-    stop("Suggested package 'terra' not installed.\n",
-         "Install it using `install.packages('terra')`.")
-  }
-
   ll <- terra::rast(loadkNNSpeciesLayers(dPath))
   llCoarse <- terra::aggregate(ll, res / 250)
   postProcessTerra(from = llCoarse, to = sa, method = "near")

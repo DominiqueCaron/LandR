@@ -561,14 +561,16 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
 #' @export
 #'
 #' @examples
-#' library(SpaDES.tools)
 #' library(terra)
 #' library(reproducible)
 #'
-#' options("reproducible.useTerra" = TRUE, "reproducible.rasterRead" = "terra::rast")
+#' opts <- options(
+#'   reproducible.useTerra = TRUE,
+#'   reproducible.rasterRead = "terra::rast"
+#' )
 #'
-#' targetCRS <- crs(randomStudyArea())
-#' randomPoly <- randomStudyArea(
+#' targetCRS <- crs(SpaDES.tools::randomStudyArea())
+#' randomPoly <- SpaDES.tools::randomStudyArea(
 #'   center = vect(cbind(-115, 50), crs = targetCRS),
 #'   size = 1e+7,
 #' )
@@ -577,8 +579,8 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
 #' ras2match <- rasterize(randomPoly, ras2match)
 #'
 #' firePerimeters <- prepInputsFireYear(
-#'   url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads",
-#'                "/nfdb/fire_poly/current_version/NFDB_poly.zip"),
+#'   url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads/",
+#'                "nfdb/fire_poly/current_version/NFDB_poly.zip"),
 #'   destinationPath = tempdir(),
 #'   rasterToMatch = ras2match,
 #'   earliestYear = 1930
@@ -588,6 +590,8 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
 #'   plot(firePerimeters)
 #'   plot(randomPoly, add = TRUE)
 #' }
+#'
+#' options(opts)
 prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestYear = 1950) {
   dots <- list(...)
   if (is.null(dots$studyArea)) {
@@ -600,19 +604,16 @@ prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestY
   dots$fun <- NULL # need to do this or else it will pass double to the prepInputs
   to <- rasterToMatch
 
-  #invalid NFDB polygons will cause Rstudio to crash during postProcess as of 8/21/2024
-  #removing invalid polygons is far faster than fixing the 0.1% of data
+  ## invalid NFDB polygons will cause Rstudio to crash during postProcess as of 8/21/2024
+  ## removing invalid polygons is far faster than fixing the 0.1% of data
   postProcessArgs <- dots[names(dots) %in% c("to", "maskTo", "projectTo", "cropTo")]
   preProcessArgs <- dots[!names(dots) %in% names(postProcessArgs)]
   allFires <- do.call(prepInputs, append(list(fun = fun), preProcessArgs))
-  allFires <- allFires[terra::is.valid(allFires),] #drop invalids
+  allFires <- allFires[terra::is.valid(allFires), ] ## drop invalid geometries
 
-  #This may potentially result in dots intended for postProcess being lost.
-  a <- {
-      do.call(postProcessTo, append(list(from = allFires), postProcessArgs)) |>
-        st_as_sf()
-    } |>
-      Cache()
+  ## This may potentially result in dots intended for postProcess being lost.
+  a <- do.call(postProcess, append(list(x = allFires), postProcessArgs)) |>
+    st_as_sf() ## Cache() takes vastly more time and RAM explodes, killing R rsession
 
   if (isTRUE(grepl("st_read", dots$fun))) {
     a <- st_zm(a)
@@ -625,16 +626,20 @@ prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestY
       warning("Chosen fireField will be coerced to numeric")
       d[[fireField]] <- as.numeric(as.factor(d[[fireField]]))
     }
-    if (is(rasterToMatch, "SpatRaster") && requireNamespace("terra", quietly = TRUE)) {
+    if (is(rasterToMatch, "SpatRaster")) {
+      if (!is(d, "SpatVector")) {
+        d <- vect(d)
+      }
       fireRas <- terra::rasterize(d, rasterToMatch, field = fireField)
-      fireRas[!is.na(terra::values(fireRas)) & terra::values(fireRas) < earliestYear] <- NA
+      fireRas[!is.na(terra::values(fireRas, mat = FALSE)) &
+                terra::values(fireRas, mat = FALSE) < earliestYear] <- NA
     } else {
       .requireNamespace("fasterize", stopOnFALSE = TRUE)
       fireRas <- fasterize::fasterize(d, raster = rasterToMatch, field = fireField)
       fireRas[!is.na(as.vector(fireRas[])) & as.vector(fireRas[]) < earliestYear] <- NA
     }
   } else {
-    if (is(rasterToMatch, "SpatRaster") && requireNamespace("terra", quietly = TRUE)) {
+    if (is(rasterToMatch, "SpatRaster")) {
       fireRas <- rast(rasterToMatch, vals = NA)
     } else {
       fireRas <- raster::raster(rasterToMatch)

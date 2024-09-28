@@ -23,14 +23,16 @@ a \code{SpatRaster} layer of fire perimeters with fire year values.
 Create a raster of fire perimeters
 }
 \examples{
-library(SpaDES.tools)
 library(terra)
 library(reproducible)
 
-options("reproducible.useTerra" = TRUE, "reproducible.rasterRead" = "terra::rast")
+opts <- options(
+  reproducible.useTerra = TRUE,
+  reproducible.rasterRead = "terra::rast"
+)
 
-targetCRS <- crs(randomStudyArea())
-randomPoly <- randomStudyArea(
+targetCRS <- crs(SpaDES.tools::randomStudyArea())
+randomPoly <- SpaDES.tools::randomStudyArea(
   center = vect(cbind(-115, 50), crs = targetCRS),
   size = 1e+7,
 )
@@ -39,8 +41,8 @@ ras2match <- rast(res = 10, ext = ext(randomPoly), crs = crs(randomPoly))
 ras2match <- rasterize(randomPoly, ras2match)
 
 firePerimeters <- prepInputsFireYear(
-  url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads",
-               "/nfdb/fire_poly/current_version/NFDB_poly.zip"),
+  url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads/",
+               "nfdb/fire_poly/current_version/NFDB_poly.zip"),
   destinationPath = tempdir(),
   rasterToMatch = ras2match,
   earliestYear = 1930
@@ -50,4 +52,6 @@ if (interactive()) {
   plot(firePerimeters)
   plot(randomPoly, add = TRUE)
 }
+
+options(opts)
 }
