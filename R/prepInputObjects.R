@@ -724,7 +724,7 @@ replaceAgeInFires <- function(standAgeMap, firePerimeters, startTime) {
 prepRasterToMatch <- function(studyArea, studyAreaLarge,
                               rasterToMatch, rasterToMatchLarge,
                               destinationPath,
-                              templateRas, studyAreaName, cacheTags) {
+                              templateRas, studyAreaName, cacheTags = NULL) {
 
   if (is.null(rasterToMatch) || is.null(rasterToMatchLarge)) {
     ## if we need rasterToMatch/rasterToMatchLarge, that means a) we don't have it,
@@ -783,7 +783,7 @@ prepRasterToMatch <- function(studyArea, studyAreaLarge,
     if (is.null(rasterToMatch)) {
       rtmFilename <- .suffix(file.path(destinationPath, "rasterToMatch.tif"),
               paste0("_", studyAreaName))
-      rasterToMatch <- Cache(postProcess,
+      rasterToMatch <- Cache(postProcessTo,
                              from = rasterToMatchLarge,
                              to = studyArea,
                              method = "bilinear",
