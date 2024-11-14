@@ -3,7 +3,7 @@ utils::globalVariables(c(
   "cover", "coverOrig", "ecoregion", "ecoregionGroup", "hasBadAge",
   "imputedAge", "initialEcoregion", "initialEcoregionCode", "initialPixels",
   "lcc", "maxANPP", "maxB", "maxB_eco", "mortality",
-  "newPossLCC", "noPixels", "oldSumB", "ord", "outBiomass", "oldEcoregionGroup",
+  "new", "newPossLCC", "noPixels", "oldSumB", "ord", "outBiomass", "oldEcoregionGroup",
   "pixelGroup2", "pixelIndex", "pixels", "planted", "Provenance", "possERC",
   "speciesposition", "speciesGroup", "speciesInt", "state", "sumB",
   "temppixelGroup", "toDelete", "totalBiomass", "totalBiomass2", "totalCover",
@@ -161,7 +161,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   }
 
   ## give B in pixels that have serotiny/resprouting
-  # newPixelCohortData[, sumB := sum(B, na.rm = TRUE), by = pixelGroup]
+  # newPixelCohortData[, sumB := asInteger(sum(B, na.rm = TRUE)), by = pixelGroup]
 
   ## Add new cohorts and rm missing cohorts (i.e., those pixelGroups that are gone) -----------
   cohortData <- .initiateNewCohorts(
@@ -250,10 +250,8 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   newPixelCohortData <- newPixelCohortData[!duplicated(newPixelCohortData), ] ## faster than unique
 
   specieseco_current <- speciesEcoregionLatestYear(speciesEcoregion, currentTime)
-  specieseco_current <- setkey(
-    specieseco_current[, .(speciesCode, maxANPP, maxB, ecoregionGroup)],
-    speciesCode, ecoregionGroup
-  )
+  specieseco_current <- specieseco_current[, .(speciesCode, maxANPP, maxB, ecoregionGroup)] |>
+    setkey(speciesCode, ecoregionGroup)
 
   ## Note that after the following join, some cohorts will be lost due to lack of
   ##  parameters in speciesEcoregion. These need to be modified in pixelGroupMap.
@@ -277,9 +275,8 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
 
   cohortData[age >= successionTimestep, oldSumB := sum(B, na.rm = TRUE), by = "pixelGroup"]
 
-  newPixelCohortData <- unique(cohortData[, .(pixelGroup, oldSumB)],
-                               by = "pixelGroup"
-  )[newPixelCohortData, on = "pixelGroup"]
+  newPixelCohortData <- unique(cohortData[, .(pixelGroup, oldSumB)], by = "pixelGroup")[
+    newPixelCohortData, on = "pixelGroup"]
   ## using set() is faster than [:=]
   set(newPixelCohortData, which(is.na(newPixelCohortData$oldSumB)), "oldSumB", 0)
   setnames(newPixelCohortData, "oldSumB", "sumB")
@@ -307,16 +304,29 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
                                                mortality = 0L, aNPPAct = 0L)]
 
   if (getOption("LandR.assertions")) {
-    if (isTRUE(NROW(unique(newPixelCohortData,
-                           by = cohortDefinitionCols)) != NROW(newPixelCohortData))) {
+    if (NROW(unique(newPixelCohortData, by = cohortDefinitionCols)) != NROW(newPixelCohortData)) {
       stop("Duplicated new cohorts in a pixelGroup. Please debug LandR:::.initiateNewCohorts")
     }
   }
 
+  ## keep track of new cohorts to ensure they get the correct ecoregionGroup (from existing ones)
+  set(cohortData, NULL, "new", FALSE)
+  set(newPixelCohortData, NULL, "new", TRUE)
   cohortData <- rbindlist(list(cohortData, newPixelCohortData), fill = TRUE, use.names = TRUE)
-  # cohortData[, sumB := sum(B, na.rm = TRUE), by = "pixelGroup"]  ## recalculate sumB
-  # if (!is.integer(cohortData[["sumB"]]))
-  #   set(cohortData, NULL, "sumB", asInteger(cohortData[["sumB"]]))
+  if (NROW(unique(cohortData, by = c("pixelGroup"))) !=
+      NROW(unique(cohortData, by = c("pixelGroup", "ecoregionGroup")))) {
+    message("Found pixelGroup with multiple ecoregionGroups when initiating cohorts.")
+    message("Adjusting new ecoregionGroups to match those of existing pixelGroups.")
+    cohortData[, ecoregionGroup := unique(.SD[new == FALSE, ecoregionGroup]),
+               by = "pixelGroup", .SDcols = c("new", "ecoregionGroup")] ## TODO: very slow!!
+  }
+  set(cohortData, NULL, "new", NULL)
+  set(newPixelCohortData, NULL, "new", NULL)
+
+  ## recalculate sumB
+  cohortData[, sumB := asInteger(sum(B, na.rm = TRUE)), by = "pixelGroup"]
+
+  assertCohortDataERG(cohortData)
 
   return(cohortData)
 }
@@ -351,9 +361,9 @@ rmMissingCohorts <- function(cohortData, pixelGroupMap,
   whPgsStillInPGMGoneFromCD <- !pgmVals$pixelGroup %in% cohortData$pixelGroup
   pgsStillInPGMGoneFromCD <- pgmVals[whPgsStillInPGMGoneFromCD, ]
 
-  # REMOVE lines in cohortData that are no longer in the pixelGroupMap
+  ## REMOVE lines in cohortData that are no longer in the pixelGroupMap
   cohortData <- cohortData[!pixelGroup %in% pgsStillInCDGoneFromPGM$pixelGroup]
-  # REMOVE pixels in pixelGroupMap that are no longer in the cohortData
+  ## REMOVE pixels in pixelGroupMap that are no longer in the cohortData
   pixelGroupMap[pgsStillInPGMGoneFromCD$pixelIndex] <- NA
 
   assertCohortData(cohortData, pixelGroupMap,
@@ -361,7 +371,7 @@ rmMissingCohorts <- function(cohortData, pixelGroupMap,
                    cohortDefinitionCols = LandR::cohortDefinitionCols(),
                    doAssertion = doAssertion)
 
-  if (NROW(unique(cohortData[pixelGroup == 67724]$ecoregionGroup)) > 1) stop()
+  assertCohortDataERG(cohortData, doAssertion = doAssertion)
 
   return(list(
     cohortData = cohortData,

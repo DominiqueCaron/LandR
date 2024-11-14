@@ -744,11 +744,13 @@ PeatlandThermokarst <- function(thawedPixIDs = copy(sim$thawedPixIDs),
     postThawPixelCohortData[, type := "survivor"]
 
     ## redo PGs in all burnt pixels
-    tempObjs <- genPGsPostDisturbance(cohortData = copy(cohortData),
-                                      pixelGroupMap = pixelGroupMap,
-                                      disturbedPixelTable = copy(treedThawedPixelTableSinceLastDisp),
-                                      disturbedPixelCohortData = thawedPixelCohortData,
-                                      doAssertion = getOption("LandR.assertions", TRUE))
+    tempObjs <- genPGsPostDisturbance(
+      cohortData = copy(cohortData),
+      pixelGroupMap = pixelGroupMap,
+      disturbedPixelTable = copy(treedThawedPixelTableSinceLastDisp),
+      disturbedPixelCohortData = thawedPixelCohortData,
+      doAssertion = getOption("LandR.assertions", TRUE)
+    )
 
     outs <- updateCohortData(
       newPixelCohortData = copy(postThawPixelCohortData[, -"pixelGroup", with = FALSE]),

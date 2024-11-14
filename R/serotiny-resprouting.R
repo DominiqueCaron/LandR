@@ -75,13 +75,13 @@ doSerotiny <- function(burnedPixelCohortData, postFirePixelCohortData,
                                                        nomatch = 0]
     # serotinyPixelCohortData <- setkey(serotinyPixelCohortData, ecoregionGroup, speciesCode)[
     #   specieseco_current, nomatch = 0]  ## join table to add probs
-    serotinyPixelCohortData <- serotinyPixelCohortData[runif(nrow(serotinyPixelCohortData)) %<=% establishprob][, establishprob := NULL]
+    serotinyPixelCohortData <- serotinyPixelCohortData[runif(nrow(serotinyPixelCohortData)) %<=% establishprob][
+      , establishprob := NULL]
 
     ## only need one cohort per spp per pixel survives/establishes
     serotinyPixelCohortData <- unique(serotinyPixelCohortData, by = c("pixelIndex", "speciesCode"))
 
     if (NROW(serotinyPixelCohortData)) {
-      ## rm age
       serotinyPixelCohortData <- serotinyPixelCohortData[, .(pixelGroup, ecoregionGroup,
                                                              speciesCode, pixelIndex)]
       serotinyPixelCohortData[, type := "serotiny"]
@@ -98,8 +98,11 @@ doSerotiny <- function(burnedPixelCohortData, postFirePixelCohortData,
       } else {
         postFireRegenSummary <- NULL
       }
-      serotinyPixel <- unique(serotinyPixelCohortData$pixelIndex) # save the pixel index for resprouting assessment use,
-      # i.e., removing these pixel from assessing resprouting
+
+      ## save the pixel index for resprouting assessment use,
+      ## i.e., removing these pixel from assessing resprouting
+      serotinyPixel <- unique(serotinyPixelCohortData$pixelIndex)
+
       ## append table to postFirePixelCohortData
       postFirePixelCohortData <- rbindlist(list(postFirePixelCohortData, serotinyPixelCohortData), fill = TRUE)
     } else {
