@@ -57,10 +57,11 @@
 #' @importFrom stats as.formula complete.cases fitted glm na.omit
 #' @importFrom stats predict quantile runif setNames terms update vcov
 #' @importFrom terra app as.factor as.int cellFromRowCol cellFromXY classify coltab<- compareGeom
-#' @importFrom terra crop crs crs<- ext extract focalMat intersect is.factor is.int is.points
+#' @importFrom terra crop crs crs<- ext extract focalMat
+#' @importFrom terra intersect is.factor is.int is.points is.valid
 #' @importFrom terra levels mask minmax NAflag<- ncell nlyr project
-#' @importFrom terra rast rasterize res rowColFromCell set.values terraOptions values vect
-#' @importFrom terra writeRaster xmax xmin ymax ymin xyFromCell
+#' @importFrom terra rast rasterize res rowColFromCell set.names set.values terraOptions
+#' @importFrom terra values vect writeRaster xmax xmin ymax ymin xyFromCell
 #' @importFrom tidyterra geom_spatraster
 #' @importFrom tools file_path_sans_ext
 #' @importFrom utils capture.output combn count.fields data getFromNamespace head install.packages

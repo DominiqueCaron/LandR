@@ -65,9 +65,6 @@ utils::globalVariables(c(
 #' @references Scheller, R.M. & Miranda, B.R. (2015). LANDIS-II Biomass Succession v3.2 Extension  – User Guide.
 #' @references Scheller, R.M. & Mladenoff, D.J. (2004). A forest growth and biomass module for a landscape simulation model, LANDIS: design, validation, and application. Ecological Modelling, 180, 211–229.
 #'
-#' @importFrom terra ncell as.int
-#' @importFrom data.table copy data.table rbindlist
-#'
 #' @export
 #' @rdname Disturbances
 FireDisturbance <- function(cohortData = copy(sim$cohortData), cohortDefinitionCols = c("pixelGroup", "age", "speciesCode"),
@@ -295,10 +292,6 @@ FireDisturbance <- function(cohortData = copy(sim$cohortData), cohortDefinitionC
 #' @template minRelativeB
 #'
 #' @references Sturtevant, B.R., Miranda, B.R., Scheller, R.M. & Shinneman, D. (2018). LANDIS-II Dynamic Fire System Extension v3.0  – User Guide.
-#'
-#' @importFrom crayon red
-#' @importFrom terra ncell as.int
-#' @importFrom data.table copy data.table rbindlist
 #'
 #' @export
 #' @rdname Disturbances
@@ -666,9 +659,6 @@ FireDisturbancePM <- function(cohortData = copy(sim$cohortData), cohortDefinitio
 #'  the last year's `pixelGroupMap` and not necessarily the pixelGroupMap of
 #'  the `burnTime` year.
 #' @param wetlands binary SpatRaster with current wetland pixels.
-#'
-#' @importFrom terra ncell as.int
-#' @importFrom data.table copy data.table rbindlist
 #'
 #' @references Scheller, R.M. & Domingo, J.B. (2021). LANDIS-II Biomass Harvest v4.4 Extension – User Guide
 #'

@@ -556,7 +556,6 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
 #' @param earliestYear the earliest fire date to allow
 #'
 #' @return a `SpatRaster` layer of fire perimeters with fire year values.
-#' @importFrom terra is.valid
 #'
 #' @export
 #'
