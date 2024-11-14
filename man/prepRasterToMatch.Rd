@@ -12,7 +12,7 @@ prepRasterToMatch(
   destinationPath,
   templateRas,
   studyAreaName,
-  cacheTags
+  cacheTags = NULL
 )
 }
 \arguments{
