@@ -11,7 +11,7 @@ utils::globalVariables(c(
 #' @return a `SpatRaster` with corrected forest pixels
 #'
 #' @export
-prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, ...) {
+prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, resampleMethod = "near", ...) {
   if (year > 2019 || year < 1984) {
     stop("LCC for this year is unavailable")
   }
@@ -34,7 +34,7 @@ prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, ...) {
   ## 220 = broadleaf; 230 = mixedwood
   lccURL <- paste0("https://opendata.nfis.org/downloads/forest_change/CA_forest_VLCE2_", year, ".zip")
   lccTF <- paste0("CA_forest_VLCE2_", year, ".tif")
-  lcc <- prepInputs(url = lccURL, targetFile = lccTF, method = "near", ...)
+  lcc <- prepInputs(url = lccURL, targetFile = lccTF, method = resampleMethod, ...)
   ## unlink this file as it is 24 GB
   toUnlink <- ifelse(is.null(dots$destinationPath), lccTF,
                      file.path(dots$destinationPath, lccTF))
