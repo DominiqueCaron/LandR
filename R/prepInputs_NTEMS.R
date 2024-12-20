@@ -43,7 +43,7 @@ prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, resampleMet
   ## 1 is forest, 2 is disturbed forest
   ## do not pass dots, or the filename is passed and is overwritten
   fao <- prepInputs(url = "https://opendata.nfis.org/downloads/forest_change/CA_FAO_forest_2019.zip",
-                    method = "near", destinationPath = dots$destinationPath, cropTo = lcc,
+                    method = resampleMethod, destinationPath = dots$destinationPath, cropTo = lcc,
                     maskTo = lcc, projectTo = lcc)
 
   ## 10 is not a class in use - make it disturbed forest
