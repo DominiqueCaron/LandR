@@ -6,6 +6,7 @@ utils::globalVariables(c(
 #'
 #' @param year stack of species layers rasters
 #' @param disturbedCode value assigned to pixels that are forest per FAO definition but not in LCC year
+#' @param resampleMethod method used when resampling LCC layers to match `rasterToMatch`
 #' @param ... passed to `prepInputs`
 #'
 #' @return a `SpatRaster` with corrected forest pixels
