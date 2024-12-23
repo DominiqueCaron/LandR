@@ -36,10 +36,11 @@ prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, resampleMet
   lccURL <- paste0("https://opendata.nfis.org/downloads/forest_change/CA_forest_VLCE2_", year, ".zip")
   lccTF <- paste0("CA_forest_VLCE2_", year, ".tif")
   lcc <- prepInputs(url = lccURL, targetFile = lccTF, method = resampleMethod, ...)
-  ## unlink this file as it is 24 GB
-  toUnlink <- ifelse(is.null(dots$destinationPath), lccTF,
-                     file.path(dots$destinationPath, lccTF))
-  unlink(toUnlink)
+  ## 2024-12: see #110; don't delete CA_forest_VLCE2 raster even though it's 24GB
+  ## deleteing it results in redownload every time and breaks parallel sims (race condition)
+  # toUnlink <- ifelse(is.null(dots$destinationPath), lccTF,
+  #                    file.path(dots$destinationPath, lccTF))
+  # unlink(toUnlink)
 
   ## 1 is forest, 2 is disturbed forest
   ## do not pass dots, or the filename is passed and is overwritten
