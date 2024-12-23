@@ -1,56 +1,42 @@
 test_that("test .compareRas, .compareCRS -- rasters only", {
-  require(reproducible)
-  opts <- options(
-    reproducible.inputPaths = NULL,
-    reproducible.overwrite = TRUE,
-    reproducible.useTerra = TRUE,
-    reproducible.rasterRead = "terra::rast"
-  )
+  withr::with_package("reproducible", {
+    withr::with_options(list(reproducible.inputPaths = NULL,
+                             reproducible.overwrite = TRUE,
+                             reproducible.useTerra = TRUE,
+                             reproducible.rasterRead = "terra::rast"), {
+      url <- "https://github.com/tati-micheletti/host/raw/master/data/rasterTest.tif"
+      targetFile <- basename(url)
 
-  on.exit(options(opts), add = TRUE)
+      ras <- prepInputs(url = url, destinationPath = tempdir(), targetFile = targetFile)
+      ras2 <- terra::project(ras, "EPSG:2169")
+      expect_true(.compareRas(ras, ras))
+      expect_true(.compareRas(ras, ras, ras))
+      expect_error(.compareRas(ras, ras, ras2))
+      expect_true(.compareRas(ras, ras, ras2, crs = FALSE, ext = FALSE))
+      expect_false(.compareRas(ras, ras, ras2, stopOnError = FALSE))
 
-  url <- "https://github.com/tati-micheletti/host/raw/master/data/rasterTest.tif"
-  targetFile <- basename(url)
+      ras3 <- terra::extend(ras, 10)
+      expect_error(.compareRas(ras, ras3))
+      expect_false(.compareRas(ras, ras3, stopOnError = FALSE))
 
-  ras <- prepInputs(url = url, destinationPath = tempdir(), targetFile = targetFile)
-  ras2 <- terra::project(ras, "EPSG:2169")
-  expect_true(.compareRas(ras, ras))
-  expect_true(.compareRas(ras, ras, ras))
-  expect_error(.compareRas(ras, ras, ras2))
-  expect_true(.compareRas(ras, ras, ras2, crs = FALSE, ext = FALSE))
-  expect_false(.compareRas(ras, ras, ras2, stopOnError = FALSE))
+      ## and with RasterLayer
+      ras <- prepInputs(url = url, destinationPath = tempdir(),
+                        fun = "raster::raster", targetFile = targetFile)
+      ras2 <- raster::projectRaster(ras, crs = crs("EPSG:2169", proj = TRUE))
+      expect_true(.compareRas(ras, ras))
+      expect_true(.compareRas(ras, ras, ras))
+      expect_error(.compareRas(ras, ras, ras2))
+      expect_false(.compareRas(ras, ras, ras2, stopOnError = FALSE))
 
-  ras3 <- terra::extend(ras, 10)
-  expect_error(.compareRas(ras, ras3))
-  expect_false(.compareRas(ras, ras3, stopOnError = FALSE))
-
-  ## and with RasterLayer
-  ras <- prepInputs(url = url, destinationPath = tempdir(),
-                    fun = "raster::raster", targetFile = targetFile)
-  ras2 <- raster::projectRaster(ras, crs = crs("EPSG:2169", proj = TRUE))
-  expect_true(.compareRas(ras, ras))
-  expect_true(.compareRas(ras, ras, ras))
-  expect_error(.compareRas(ras, ras, ras2))
-  expect_false(.compareRas(ras, ras, ras2, stopOnError = FALSE))
-
-  ras3 <- raster::extend(ras, 10)
-  expect_true(.compareRas(ras, ras3, ext = FALSE, rowcol = FALSE))
-  expect_error(.compareRas(ras, ras3))
-  expect_false(.compareRas(ras, ras3, stopOnError = FALSE))
+      ras3 <- raster::extend(ras, 10)
+      expect_true(.compareRas(ras, ras3, ext = FALSE, rowcol = FALSE))
+      expect_error(.compareRas(ras, ras3))
+      expect_false(.compareRas(ras, ras3, stopOnError = FALSE))
+    })
+  })
 })
 
 test_that("test .compareRas, .compareCRS -- vectors only", {
-  require(reproducible)
-
-  opts <- options(
-    reproducible.inputPaths = NULL,
-    reproducible.overwrite = TRUE,
-    reproducible.useTerra = TRUE,
-    reproducible.rasterRead = "terra::rast"
-  )
-
-  on.exit(options(opts), add = TRUE)
-
   f <- system.file("ex/lux.shp", package = "terra")
   v <- terra::vect(f)
   v2 <- terra::project(v, crs(v))
@@ -94,17 +80,6 @@ test_that("test .compareRas, .compareCRS -- vectors only", {
 })
 
 test_that("test .compareRas, .compareCRS -- vectors and rasters", {
-  require(reproducible)
-
-  opts <- options(
-    reproducible.inputPaths = NULL,
-    reproducible.overwrite = TRUE,
-    reproducible.useTerra = TRUE,
-    reproducible.rasterRead = "terra::rast"
-  )
-
-  on.exit(options(opts), add = TRUE)
-
   f <- system.file("ex/lux.shp", package = "terra")
   v <- terra::vect(f)
 
