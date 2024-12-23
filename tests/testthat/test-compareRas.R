@@ -1,18 +1,19 @@
 test_that("test .compareRas, .compareCRS -- rasters only", {
   require(reproducible)
   require(raster)
-  opts <- options("reproducible.inputPaths" = NULL,
-                  "reproducible.overwrite" = TRUE,
-                  "reproducible.useTerra" = TRUE,
-                  "reproducible.rasterRead" = "terra::rast")
+  opts <- options(
+    reproducible.inputPaths = NULL,
+    reproducible.overwrite = TRUE,
+    reproducible.useTerra = TRUE,
+    reproducible.rasterRead = "terra::rast"
+  )
 
   on.exit(options(opts), add = TRUE)
 
-  targetFile <- "rasterTest.tif"
   url <- "https://github.com/tati-micheletti/host/raw/master/data/rasterTest.tif"
+  targetFile <- basename(url)
 
-  ras <- prepInputs(url = url,
-                    targetFile = targetFile)
+  ras <- prepInputs(url = url, destinationPath = tempdir(), targetFile = targetFile)
   ras2 <- project(ras, "EPSG:2169")
   expect_true(.compareRas(ras, ras))
   expect_true(.compareRas(ras, ras, ras))
@@ -25,9 +26,8 @@ test_that("test .compareRas, .compareCRS -- rasters only", {
   expect_false(.compareRas(ras, ras3, stopOnError = FALSE))
 
   ## and with RasterLayer
-  ras <- prepInputs(url = url,
-                    fun = "raster::raster",
-                    targetFile = targetFile)
+  ras <- prepInputs(url = url, destinationPath = tempdir(),
+                    fun = "raster::raster", targetFile = targetFile)
   ras2 <- projectRaster(ras, crs = crs("EPSG:2169", proj = TRUE))
   expect_true(.compareRas(ras, ras))
   expect_true(.compareRas(ras, ras, ras))
@@ -45,10 +45,12 @@ test_that("test .compareRas, .compareCRS -- vectors only", {
   require(raster)
   require(sf)
 
-  opts <- options(reproducible.inputPaths = NULL,
-                  reproducible.overwrite = TRUE,
-                  reproducible.useTerra = TRUE,
-                  reproducible.rasterRead = "terra::rast")
+  opts <- options(
+    reproducible.inputPaths = NULL,
+    reproducible.overwrite = TRUE,
+    reproducible.useTerra = TRUE,
+    reproducible.rasterRead = "terra::rast"
+  )
 
   on.exit(options(opts), add = TRUE)
 
@@ -99,10 +101,12 @@ test_that("test .compareRas, .compareCRS -- vectors and rasters", {
   require(raster)
   require(sf)
 
-  opts <- options(reproducible.inputPaths = NULL,
-                  reproducible.overwrite = TRUE,
-                  reproducible.useTerra = TRUE,
-                  reproducible.rasterRead = "terra::rast")
+  opts <- options(
+    reproducible.inputPaths = NULL,
+    reproducible.overwrite = TRUE,
+    reproducible.useTerra = TRUE,
+    reproducible.rasterRead = "terra::rast"
+  )
 
   on.exit(options(opts), add = TRUE)
 
