@@ -14,7 +14,7 @@ test_that("test .compareRas, .compareCRS -- rasters only", {
   targetFile <- basename(url)
 
   ras <- prepInputs(url = url, destinationPath = tempdir(), targetFile = targetFile)
-  ras2 <- project(ras, "EPSG:2169")
+  ras2 <- terra::project(ras, "EPSG:2169")
   expect_true(.compareRas(ras, ras))
   expect_true(.compareRas(ras, ras, ras))
   expect_error(.compareRas(ras, ras, ras2))
