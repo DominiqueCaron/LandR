@@ -32,16 +32,21 @@ ras2match <- rast(res = 250, ext = ext(randomPoly), crs = crs(randomPoly))
 ras2match <- rasterize(randomPoly, ras2match)
 tempDir <- tempdir()
 
-standAge <- prepInputsStandAgeMap(destinationPath = tempDir,
-                                  rasterToMatch = ras2match,
-                                  fireURL = NA)   ## or NULL
+standAge <- prepInputsStandAgeMap(
+  destinationPath = tempDir,
+  rasterToMatch = ras2match,
+  fireURL = NA
+) ## or NULL
 attr(standAge, "imputedPixID")
 
 firePerimeters <- Cache(prepInputsFireYear,
-                        url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads",
-                        "/nfdb/fire_poly/current_version/NFDB_poly.zip"),
-                        destinationPath = tempDir,
-                        rasterToMatch = ras2match)
+  url = paste0(
+    "https://cwfis.cfs.nrcan.gc.ca/downloads",
+    "/nfdb/fire_poly/current_version/NFDB_poly.zip"
+  ),
+  destinationPath = tempDir,
+  rasterToMatch = ras2match
+)
 standAge <- replaceAgeInFires(standAge, firePerimeters)
 attr(standAge, "imputedPixID")
 }

@@ -16,12 +16,16 @@ utils::globalVariables(c(
 #' @export
 checkSpeciesTraits <- function(speciesLayers, species, sppColorVect) {
   missTraits <- setdiff(names(speciesLayers), species$species)
-  missTraits <- c(missTraits, setdiff(species$species,
-                                      species[complete.cases(species), species]))
+  missTraits <- c(missTraits, setdiff(
+    species$species,
+    species[complete.cases(species), species]
+  ))
   if (length(missTraits)) {
-    message(blue("The following species in 'speciesLayers' have missing traits",
-                 "and will be excluded:\n", paste(missTraits, collapse = " "),
-                 "\n If this is wrong check if species synonyms are included in 'sppEquiv'"))
+    message(blue(
+      "The following species in 'speciesLayers' have missing traits",
+      "and will be excluded:\n", paste(missTraits, collapse = " "),
+      "\n If this is wrong check if species synonyms are included in 'sppEquiv'"
+    ))
     speciesLayers <- speciesLayers[[which(!names(speciesLayers) %in% missTraits)]]
     sppColorVect <- sppColorVect[c(names(speciesLayers), "Mixed")]
   }
@@ -50,7 +54,7 @@ checkSpeciesTraits <- function(speciesLayers, species, sppColorVect) {
 #'
 #' @export
 makePixelTable <- function(speciesLayers, standAgeMap, ecoregionFiles,
-                           biomassMap, rasterToMatch, rstLCC, #pixelGroupAgeClass = 1,
+                           biomassMap, rasterToMatch, rstLCC, # pixelGroupAgeClass = 1,
                            printSummary = TRUE,
                            doAssertion = getOption("LandR.assertions", TRUE)) {
   if (missing(rasterToMatch)) {
@@ -69,7 +73,8 @@ makePixelTable <- function(speciesLayers, standAgeMap, ecoregionFiles,
     initialEcoregionCodeVals <- factorValues2(
       ecoregionFiles$ecoregionMap,
       as.vector(values(ecoregionFiles$ecoregionMap)),
-      att = "ecoregion_lcc")
+      att = "ecoregion_lcc"
+    )
   }
 
   # message(blue("Round age to nearest pixelGroupAgeClass, which is", pixelGroupAgeClass))
@@ -82,10 +87,11 @@ makePixelTable <- function(speciesLayers, standAgeMap, ecoregionFiles,
   } else {
     factor(initialEcoregionCodeVals)
   }
-  pixelTable <- data.table(initialEcoregionCode = iec,
-                           cover = coverMatrix,
-                           pixelIndex = seq(ncell(rasterToMatch)),
-                           rasterToMatch = as.vector(values(rasterToMatch))
+  pixelTable <- data.table(
+    initialEcoregionCode = iec,
+    cover = coverMatrix,
+    pixelIndex = seq(ncell(rasterToMatch)),
+    rasterToMatch = as.vector(values(rasterToMatch))
   )
   if (!missing(standAgeMap)) {
     set(pixelTable, NULL, "age", asInteger(as.vector(standAgeMap[])))
@@ -93,14 +99,14 @@ makePixelTable <- function(speciesLayers, standAgeMap, ecoregionFiles,
   }
 
   if (!missing(biomassMap)) {
-    set(pixelTable, NULL, "totalBiomass", asInteger(as.vector(biomassMap[]) * 100) ) # change units)
+    set(pixelTable, NULL, "totalBiomass", asInteger(as.vector(biomassMap[]) * 100)) # change units)
   }
 
   if (!missing(rstLCC)) {
     set(pixelTable, NULL, "lcc", as.vector(rstLCC[]))
   }
 
-  #pixelTable <- data.table(#age = asInteger(ceiling(asInteger(as.vector(standAgeMap[])) /
+  # pixelTable <- data.table(#age = asInteger(ceiling(asInteger(as.vector(standAgeMap[])) /
   #                           pixelGroupAgeClass) * pixelGroupAgeClass),
   # logAge = .logFloor(as.vector(standAgeMap[])),
   # initialEcoregionCode = factor(initialEcoregionCodeVals),
@@ -119,13 +125,17 @@ makePixelTable <- function(speciesLayers, standAgeMap, ecoregionFiles,
   coverColNames <- paste0("cover.", names(speciesLayers))
   pixelTable <- na.omit(pixelTable2, cols = c(coverColNames))
 
-  if (NROW(pixelTable1) != NROW(pixelTable))
-    message("Setting pixels to NA where there is NA in sim$speciesLayers. Vegetation succession",
-            " parameters will only be calculated where there is data for species cover.",
-            "\n  Check if rasterToMatch shoudn't also only have data where there is cover data,",
-            " as this may affect other modules.")
-  if (NROW(pixelTable2) != NROW(pixelTable))
+  if (NROW(pixelTable1) != NROW(pixelTable)) {
+    message(
+      "Setting pixels to NA where there is NA in sim$speciesLayers. Vegetation succession",
+      " parameters will only be calculated where there is data for species cover.",
+      "\n  Check if rasterToMatch shoudn't also only have data where there is cover data,",
+      " as this may affect other modules."
+    )
+  }
+  if (NROW(pixelTable2) != NROW(pixelTable)) {
     message("Setting pixels to NA where there is NA in 'ecoregionMap'")
+  }
 
   message(blue("rm NAs, leaving", magenta(NROW(pixelTable)), "pixels with data"))
   message(blue("This is the summary of the input data for age, ecoregionGroup, biomass, speciesLayers:"))
@@ -174,11 +184,13 @@ makePixelTable <- function(speciesLayers, standAgeMap, ecoregionFiles,
 makeSpeciesEcoregion <- function(cohortDataBiomass, cohortDataShort, cohortDataShortNoCover,
                                  species, modelCover, modelBiomass, successionTimestep, currentYear) {
   if (!is.null(modelBiomass$scaledVarsModelB)) {
-    if (!is(modelBiomass$scaledVarsModelB, "list"))
+    if (!is(modelBiomass$scaledVarsModelB, "list")) {
       stop("modelBiomass$scaledVarsModelB must be a list")
+    }
 
-    if (!all(names(modelBiomass$scaledVarsModelB) %in% c("cover", "logAge")))
+    if (!all(names(modelBiomass$scaledVarsModelB) %in% c("cover", "logAge"))) {
       stop("modelBiomass$scaledVarsModelB must be a list with 'cover' and 'logAge' entries")
+    }
   }
 
   ## Create speciesEcoregion table
@@ -187,7 +199,7 @@ makeSpeciesEcoregion <- function(cohortDataBiomass, cohortDataShort, cohortDataS
   speciesEcoregion[, c("B", "logAge", "cover") := NULL]
   species[, speciesCode := as.factor(species)]
   speciesEcoregion <- species[, .(speciesCode, longevity)][speciesEcoregion, on = "speciesCode"]
-  speciesEcoregion[ , ecoregionGroup := factor(as.character(ecoregionGroup))]
+  speciesEcoregion[, ecoregionGroup := factor(as.character(ecoregionGroup))]
 
 
   ## establishProb ----------------------------------------------------------------------------
@@ -199,18 +211,22 @@ makeSpeciesEcoregion <- function(cohortDataBiomass, cohortDataShort, cohortDataS
   establishprobBySuccessionTimestep <- 1 - (1 - predictedCoverVals)^successionTimestep
   cohortDataShort[, establishprob := establishprobBySuccessionTimestep]
   cohortDataShort <- species[, .(resproutprob, postfireregen, speciesCode)][cohortDataShort,
-                                                                            on = "speciesCode"]
+    on = "speciesCode"
+  ]
 
   ## partitioning between seed and resprout. See documentation about the "* 0.5"
   cohortDataShort[, establishprob := pmax(0, pmin(1, (establishprob * (1 - resproutprob * 0.5))))]
 
   cohortDataShort <- rbindlist(list(cohortDataShort, cohortDataShortNoCover),
-                               use.names = TRUE, fill = TRUE)
+    use.names = TRUE, fill = TRUE
+  )
   cohortDataShort[is.na(establishprob), establishprob := 0]
 
   ## join cohortDataShort with establishprob predictions to speciesEcoregion
   speciesEcoregion <- cohortDataShort[, .(ecoregionGroup, speciesCode, establishprob)][
-    speciesEcoregion, on = joinOn]
+    speciesEcoregion,
+    on = joinOn
+  ]
 
   ## maxB -------------------------------------------------------------------------------------
   ## set age to the age of longevity and cover to 100%
@@ -219,32 +235,38 @@ makeSpeciesEcoregion <- function(cohortDataBiomass, cohortDataShort, cohortDataS
   ## rescale if need be (modelBiomass may have been fitted on scaled variables)
   if (!is.null(modelBiomass$scaledVarsModelB)) {
     speciesEcoregion2 <- copy(speciesEcoregion)
-    speciesEcoregion2[, `:=`(logAge = scale(logAge,
-                                            center = attr(modelBiomass$scaledVarsModelB$logAge, "scaled:center"),
-                                            scale = attr(modelBiomass$scaledVarsModelB$logAge, "scaled:scale")),
-                             cover = scale(cover,
-                                           center = attr(modelBiomass$scaledVarsModelB$cover, "scaled:center"),
-                                           scale = attr(modelBiomass$scaledVarsModelB$cover, "scaled:scale")))]
-    speciesEcoregion2[ , maxB := asInteger(predict(modelBiomass$mod,
-                                                   newdata = speciesEcoregion2,
-                                                   type = "response"))]
+    speciesEcoregion2[, `:=`(
+      logAge = scale(logAge,
+        center = attr(modelBiomass$scaledVarsModelB$logAge, "scaled:center"),
+        scale = attr(modelBiomass$scaledVarsModelB$logAge, "scaled:scale")
+      ),
+      cover = scale(cover,
+        center = attr(modelBiomass$scaledVarsModelB$cover, "scaled:center"),
+        scale = attr(modelBiomass$scaledVarsModelB$cover, "scaled:scale")
+      )
+    )]
+    speciesEcoregion2[, maxB := asInteger(predict(modelBiomass$mod,
+      newdata = speciesEcoregion2,
+      type = "response"
+    ))]
     speciesEcoregion[, maxB := speciesEcoregion2$maxB]
   } else {
-    speciesEcoregion[ , maxB := asInteger(predict(modelBiomass$mod,
-                                                  newdata = speciesEcoregion,
-                                                  type = "response"))]
+    speciesEcoregion[, maxB := asInteger(predict(modelBiomass$mod,
+      newdata = speciesEcoregion,
+      type = "response"
+    ))]
   }
 
   speciesEcoregion[maxB < 0L, maxB := 0L] # fix negative predictions
 
   ## maxANPP ----------------------------------------------------------------------------------
   message(blue("Add maxANPP to speciesEcoregion -- currently --> maxB/30"))
-  speciesEcoregion[ , maxANPP := asInteger(maxB / 30)]
+  speciesEcoregion[, maxANPP := asInteger(maxB / 30)]
 
   ## clean up unneeded columns
-  speciesEcoregion[ , `:=`(logAge = NULL, cover = NULL, longevity = NULL,  lcc = NULL)]
+  speciesEcoregion[, `:=`(logAge = NULL, cover = NULL, longevity = NULL, lcc = NULL)]
 
-  speciesEcoregion[ , year := currentYear]
+  speciesEcoregion[, year := currentYear]
   return(speciesEcoregion)
 }
 
@@ -260,7 +282,7 @@ makeSpeciesEcoregion <- function(cohortDataBiomass, cohortDataShort, cohortDataS
 #' @return The `biomassMap`, a raster of total stand biomass per pixel.
 #'
 #' @export
-makeBiomassMap <-  function(pixelCohortData, rasterToMatch) {
+makeBiomassMap <- function(pixelCohortData, rasterToMatch) {
   pixelData <- unique(pixelCohortData, by = "pixelIndex")
   pixelData[, ecoregionGroup := factor(as.character(ecoregionGroup))] # resorts them in order
 
@@ -292,13 +314,14 @@ makeMinRelativeB <- function(pixelCohortData) {
   ## https://github.com/dcyr/LANDIS-II_IA_generalUseFiles/blob/master/LandisInputs/BSW/biomass-succession-main-inputs_BSW_Baseline.txt
   ##
   ## Adjusted values for western forests:
-  minRelativeB <- data.frame(ecoregionGroup = as.factor(levels(pixelData$ecoregionGroup)),
-                             minRelativeBDefaults()
-                             # X1 = 0.15, ## 0.2
-                             # X2 = 0.25, ## 0.4
-                             # X3 = 0.50, ## 0.5
-                             # X4 = 0.75, ## 0.7
-                             # X5 = 0.85  ## 0.9
+  minRelativeB <- data.frame(
+    ecoregionGroup = as.factor(levels(pixelData$ecoregionGroup)),
+    minRelativeBDefaults()
+    # X1 = 0.15, ## 0.2
+    # X2 = 0.25, ## 0.4
+    # X3 = 0.50, ## 0.5
+    # X4 = 0.75, ## 0.7
+    # X5 = 0.85  ## 0.9
   )
 
   return(minRelativeB)
@@ -307,11 +330,15 @@ makeMinRelativeB <- function(pixelCohortData) {
 #' minRelativeB defaults for Western Boreal Forest Canada
 #'
 #' @export
-minRelativeBDefaults <- function() data.frame(X1 = 0.15, ## 0.2
-                                              X2 = 0.25, ## 0.4
-                                              X3 = 0.50, ## 0.5
-                                              X4 = 0.75, ## 0.7
-                                              X5 = 0.85)
+minRelativeBDefaults <- function() {
+  data.frame(
+    X1 = 0.15, ## 0.2
+    X2 = 0.25, ## 0.4
+    X3 = 0.50, ## 0.5
+    X4 = 0.75, ## 0.7
+    X5 = 0.85
+  )
+}
 
 #' Create `makePixelGroupMap`
 #'
@@ -379,28 +406,37 @@ makePixelGroupMap <- function(pixelCohortData, rasterToMatch) {
 #'
 #' ## NOT USING FIRE PERIMETERS TO CORRECT STAND AGE
 #' ## rasterToMatch does not need to be provided, but can be for masking/cropping.
-#' standAge <- prepInputsStandAgeMap(destinationPath = tempDir,
-#'                                   rasterToMatch = ras2match,
-#'                                   fireURL = NA)   ## or NULL
+#' standAge <- prepInputsStandAgeMap(
+#'   destinationPath = tempDir,
+#'   rasterToMatch = ras2match,
+#'   fireURL = NA
+#' ) ## or NULL
 #' attr(standAge, "imputedPixID")
 #'
 #' ## USING FIRE PERIMETERS TO CORRECT STAND AGE
 #' ## ideally, get the firePerimenters layer first
 #' firePerimeters <- Cache(prepInputsFireYear,
-#'                         url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads",
-#'                         "/nfdb/fire_poly/current_version/NFDB_poly.zip"),
-#'                         destinationPath = tempDir,
-#'                         rasterToMatch = ras2match)
+#'   url = paste0(
+#'     "https://cwfis.cfs.nrcan.gc.ca/downloads",
+#'     "/nfdb/fire_poly/current_version/NFDB_poly.zip"
+#'   ),
+#'   destinationPath = tempDir,
+#'   rasterToMatch = ras2match
+#' )
 #'
-#' standAge <- prepInputsStandAgeMap(destinationPath = tempDir,
-#'                                   firePerimeters = firePerimeters,
-#'                                   rasterToMatch = ras2match)
+#' standAge <- prepInputsStandAgeMap(
+#'   destinationPath = tempDir,
+#'   firePerimeters = firePerimeters,
+#'   rasterToMatch = ras2match
+#' )
 #' attr(standAge, "imputedPixID")
 #'
 #' ## not providing firePerimeters is still possible, but will be deprecated
 #' ## in this case 'rasterToMatch' MUST be provided
-#' standAge <- prepInputsStandAgeMap(destinationPath = tempDir,
-#'                                   rasterToMatch = ras2match)
+#' standAge <- prepInputsStandAgeMap(
+#'   destinationPath = tempDir,
+#'   rasterToMatch = ras2match
+#' )
 #' attr(standAge, "imputedPixID")
 #' }
 prepInputsStandAgeMap <- function(..., ageURL = NULL,
@@ -411,27 +447,30 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
                                   destinationPath = NULL,
                                   writeTo = NULL,
                                   firePerimeters = NULL,
-                                  fireURL = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/",
-                                                   "fire_poly/current_version/NFDB_poly.zip"),
+                                  fireURL = paste0(
+                                    "https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/",
+                                    "fire_poly/current_version/NFDB_poly.zip"
+                                  ),
                                   fireFun = "terra::vect",
                                   fireField = "YEAR",
                                   rasterToMatch = NULL,
                                   startTime) {
-
   dots <- list(...)
   if (is.null(writeTo) && !is.null(dots$filename2)) {
     writeTo <- dots$filename2
   }
 
   if (is.null(ageURL)) {
-    ageURL <- paste0("https://ftp.maps.canada.ca/pub/nrcan_rncan/Forests_Foret/",
-                     "canada-forests-attributes_attributs-forests-canada/",
-                     "2001-attributes_attributs-2001/",
-                     "NFI_MODIS250m_2001_kNN_Structure_Stand_Age_v1.tif")
+    ageURL <- paste0(
+      "https://ftp.maps.canada.ca/pub/nrcan_rncan/Forests_Foret/",
+      "canada-forests-attributes_attributs-forests-canada/",
+      "2001-attributes_attributs-2001/",
+      "NFI_MODIS250m_2001_kNN_Structure_Stand_Age_v1.tif"
+    )
   }
 
   getFires <- if (is.null(firePerimeters) &&
-                  (isFALSE(is.null(fireURL)) && isFALSE(is.na(fireURL)))) {
+    (isFALSE(is.null(fireURL)) && isFALSE(is.na(fireURL)))) {
     TRUE
   } else {
     FALSE
@@ -463,11 +502,12 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
   if (getFires) {
     if (isFALSE(is.null(rasterToMatch))) {
       firePerimeters <- Cache(prepInputsFireYear, ...,
-                              url = fireURL,
-                              fun = fireFun,
-                              fireField = fireField,
-                              destinationPath = destinationPath,
-                              rasterToMatch = rasterToMatch)
+        url = fireURL,
+        fun = fireFun,
+        fireField = fireField,
+        destinationPath = destinationPath,
+        rasterToMatch = rasterToMatch
+      )
     } else {
       message("No 'rasterToMatch' or 'firePerimeters' supplied; ages will NOT be adjusted using fire data.")
     }
@@ -511,9 +551,11 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
   Args <- list(...)
   if (is.null(Args$url)) {
-    Args$url <- paste0("http://ftp.maps.canada.ca/pub/nrcan_rncan/Forests_Foret/",
-                       "canada-forests-attributes_attributs-forests-canada/2011-attributes_attributs-2011/",
-                       "NFI_MODIS250m_2011_kNN_Structure_Biomass_TotalLiveAboveGround_v1.tif")
+    Args$url <- paste0(
+      "http://ftp.maps.canada.ca/pub/nrcan_rncan/Forests_Foret/",
+      "canada-forests-attributes_attributs-forests-canada/2011-attributes_attributs-2011/",
+      "NFI_MODIS250m_2011_kNN_Structure_Biomass_TotalLiveAboveGround_v1.tif"
+    )
   }
   if (is.null(Args$useSAcrs)) {
     Args$useSAcrs <- FALSE
@@ -578,8 +620,10 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
 #' ras2match <- rasterize(randomPoly, ras2match)
 #'
 #' firePerimeters <- prepInputsFireYear(
-#'   url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads/",
-#'                "nfdb/fire_poly/current_version/NFDB_poly.zip"),
+#'   url = paste0(
+#'     "https://cwfis.cfs.nrcan.gc.ca/downloads/",
+#'     "nfdb/fire_poly/current_version/NFDB_poly.zip"
+#'   ),
 #'   destinationPath = tempdir(),
 #'   rasterToMatch = ras2match,
 #'   earliestYear = 1930
@@ -631,7 +675,7 @@ prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestY
       }
       fireRas <- terra::rasterize(d, rasterToMatch, field = fireField)
       fireRas[!is.na(terra::values(fireRas, mat = FALSE)) &
-                terra::values(fireRas, mat = FALSE) < earliestYear] <- NA
+        terra::values(fireRas, mat = FALSE) < earliestYear] <- NA
     } else {
       .requireNamespace("fasterize", stopOnFALSE = TRUE)
       fireRas <- fasterize::fasterize(d, raster = rasterToMatch, field = fireField)
@@ -671,22 +715,28 @@ prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestY
 #' ras2match <- rasterize(randomPoly, ras2match)
 #' tempDir <- tempdir()
 #'
-#' standAge <- prepInputsStandAgeMap(destinationPath = tempDir,
-#'                                   rasterToMatch = ras2match,
-#'                                   fireURL = NA)   ## or NULL
+#' standAge <- prepInputsStandAgeMap(
+#'   destinationPath = tempDir,
+#'   rasterToMatch = ras2match,
+#'   fireURL = NA
+#' ) ## or NULL
 #' attr(standAge, "imputedPixID")
 #'
 #' firePerimeters <- Cache(prepInputsFireYear,
-#'                         url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads",
-#'                         "/nfdb/fire_poly/current_version/NFDB_poly.zip"),
-#'                         destinationPath = tempDir,
-#'                         rasterToMatch = ras2match)
+#'   url = paste0(
+#'     "https://cwfis.cfs.nrcan.gc.ca/downloads",
+#'     "/nfdb/fire_poly/current_version/NFDB_poly.zip"
+#'   ),
+#'   destinationPath = tempDir,
+#'   rasterToMatch = ras2match
+#' )
 #' standAge <- replaceAgeInFires(standAge, firePerimeters)
 #' attr(standAge, "imputedPixID")
 #' }
 replaceAgeInFires <- function(standAgeMap, firePerimeters, startTime) {
-  if (missing(startTime))
+  if (missing(startTime)) {
     startTime <- 0
+  }
   if (startTime < 1950 || startTime > 2023) {
     message("'startTime' is missing or is not within a reasonable range of 1950 to 2023, ")
     message("  --> The most recent fire year will be used.")
@@ -724,7 +774,6 @@ prepRasterToMatch <- function(studyArea, studyAreaLarge,
                               rasterToMatch, rasterToMatchLarge,
                               destinationPath,
                               templateRas, studyAreaName, cacheTags = NULL) {
-
   if (is.null(rasterToMatch) || is.null(rasterToMatchLarge)) {
     ## if we need rasterToMatch/rasterToMatchLarge, that means a) we don't have it,
     ## but b) we will have templateRas
@@ -732,24 +781,29 @@ prepRasterToMatch <- function(studyArea, studyAreaLarge,
     if (is.null(rasterToMatchLarge) && !is.null(rasterToMatch)) {
       rasterToMatchLarge <- rasterToMatch
     } else if (is.null(rasterToMatchLarge) && is.null(rasterToMatch)) {
-      warning(paste0("rasterToMatch and rasterToMatchLarge are missing. Both will be created \n",
-                     "from templateRas and studyArea/studyAreaLarge.\n
-                     If this is wrong, provide both rasters"))
+      warning(paste0(
+        "rasterToMatch and rasterToMatchLarge are missing. Both will be created \n",
+        "from templateRas and studyArea/studyAreaLarge.\n
+                     If this is wrong, provide both rasters"
+      ))
 
       if (is.null(templateRas)) {
-        stop(paste("Please provide a template raster to make rasterToMatch(Large).",
-                   "An option is to use 'rawBiomassMap'"))
+        stop(paste(
+          "Please provide a template raster to make rasterToMatch(Large).",
+          "An option is to use 'rawBiomassMap'"
+        ))
       }
       if (!.compareRas(templateRas, studyAreaLarge, stopOnError = FALSE)) {
         ## note that extents/origin may never align if the resolution and projection do not allow for it
         templateRas <- Cache(postProcessTo,
-                             templateRas,
-                             cropTo = studyAreaLarge,
-                             maskTo = studyAreaLarge,
-                             # studyArea = studyAreaLarge,
-                             # useSAcrs = FALSE,
-                             overwrite = TRUE,
-                             userTags = c("postRTMtemplate"))
+          templateRas,
+          cropTo = studyAreaLarge,
+          maskTo = studyAreaLarge,
+          # studyArea = studyAreaLarge,
+          # useSAcrs = FALSE,
+          overwrite = TRUE,
+          userTags = c("postRTMtemplate")
+        )
         templateRas <- fixErrors(templateRas)
       }
       rasterToMatchLarge <- templateRas
@@ -759,8 +813,10 @@ prepRasterToMatch <- function(studyArea, studyAreaLarge,
       whZeros <- as.vector(rasterToMatchLarge[]) == 0
       if (sum(whZeros) > 0) { ## means there are zeros instead of NAs for RTML --> change
         rasterToMatchLarge[whZeros] <- NA
-        message("There were no NAs on the rasterToMatchLarge, but there were zeros;",
-                " converting these zeros to NA.")
+        message(
+          "There were no NAs on the rasterToMatchLarge, but there were zeros;",
+          " converting these zeros to NA."
+        )
       }
     }
 
@@ -777,26 +833,32 @@ prepRasterToMatch <- function(studyArea, studyAreaLarge,
       userTags = c(cacheTags, "rasterToMatchLarge"),
       omitArgs = c("userTags")
     ))
-    if (!is(rasterToMatchLargeTmp, "try-error"))
+    if (!is(rasterToMatchLargeTmp, "try-error")) {
       rasterToMatchLarge <- rasterToMatchLargeTmp
+    }
     if (is.null(rasterToMatch)) {
-      rtmFilename <- .suffix(file.path(destinationPath, "rasterToMatch.tif"),
-              paste0("_", studyAreaName))
+      rtmFilename <- .suffix(
+        file.path(destinationPath, "rasterToMatch.tif"),
+        paste0("_", studyAreaName)
+      )
       rasterToMatch <- Cache(postProcessTo,
-                             from = rasterToMatchLarge,
-                             to = studyArea,
-                             method = "bilinear",
-                             datatype = "INT2U",
-                             # writeTo = rtmFilename, # can't save w/ terra b/c same filename as RTML
-                             overwrite = TRUE,
-                             userTags = c(cacheTags, "rasterToMatch"),
-                             omitArgs = c("destinationPath", "targetFile", "userTags", "stable",
-                                          "writeTo", "overwrite"))
+        from = rasterToMatchLarge,
+        to = studyArea,
+        method = "bilinear",
+        datatype = "INT2U",
+        # writeTo = rtmFilename, # can't save w/ terra b/c same filename as RTML
+        overwrite = TRUE,
+        userTags = c(cacheTags, "rasterToMatch"),
+        omitArgs = c(
+          "destinationPath", "targetFile", "userTags", "stable",
+          "writeTo", "overwrite"
+        )
+      )
     }
     ## covert to 'mask'
     if (!anyNA(rasterToMatch[])) {
       whZeros <- as.vector(rasterToMatch[]) == 0
-      if (sum(whZeros) > 0) {# means there are zeros instead of NAs for RTML --> change
+      if (sum(whZeros) > 0) { # means there are zeros instead of NAs for RTML --> change
         rasterToMatch[whZeros] <- NA
         message("There were no NAs on the RTM, but there were zeros; converting these zeros to NA.")
       }

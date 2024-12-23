@@ -90,14 +90,14 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
     columnsForPG <- LandR::columnsForPixelGroups()[-which(LandR::columnsForPixelGroups() == "B")]
     cd <- newPixelCohortData[, c("pixelIndex", columnsForPG), with = FALSE]
     newPixelCohortData[, pixelGroup := generatePixelGroups(cd,
-                                                           maxPixelGroup = maxPixelGroup,
-                                                           columns = columnsForPG
+      maxPixelGroup = maxPixelGroup,
+      columns = columnsForPG
     )] # ,
     # successionTimestep = successionTimestep)
 
     ## Remove the duplicated pixels within pixelGroup (i.e., 2+ species in the same pixel)
     pixelsToChange <- unique(newPixelCohortData[, c("pixelIndex", "pixelGroup")],
-                             by = c("pixelIndex")
+      by = c("pixelIndex")
     )
   } else {
     ## This is for situations where there are some empty pixels being filled,
@@ -140,8 +140,10 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
 
     ## newer way that will potentially conflict with LandR.CS due to differing aNPP
     colsToSubset <- setdiff(colnames(cohortData), c("pixelIndex"))
-    allCohortData <- cohorts[!duplicated(cohorts[, .(pixelGroup, speciesCode, ecoregionGroup, age)]),
-                             ..colsToSubset]
+    allCohortData <- cohorts[
+      !duplicated(cohorts[, .(pixelGroup, speciesCode, ecoregionGroup, age)]),
+      ..colsToSubset
+    ]
 
     theNewOnes <- is.na(allCohortData$B)
     cohortData <- allCohortData[!theNewOnes]
@@ -181,8 +183,9 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   }
 
   assertCohortData(outs$cohortData, outs$pixelGroupMap,
-                   cohortDefinitionCols = LandR::cohortDefinitionCols(),
-                   doAssertion = doAssertion, verbose = verbose)
+    cohortDefinitionCols = LandR::cohortDefinitionCols(),
+    doAssertion = doAssertion, verbose = verbose
+  )
 
   if (verbose > 0) {
     nPixForest <- sum(!is.na(outs$pixelGroupMap[]))
@@ -231,7 +234,6 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
 .initiateNewCohorts <- function(newPixelCohortData, cohortData, pixelGroupMap, currentTime,
                                 cohortDefinitionCols = LandR::cohortDefinitionCols(),
                                 speciesEcoregion, successionTimestep, initialB = 10) {
-
   ## get spp "productivity traits" per ecoregion/present year
   ## calculate maximum B per ecoregion, join to new cohort data
   namesNCD <- names(newPixelCohortData)
@@ -290,10 +292,12 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
     set(
       newPixelCohortData, NULL, "B",
       asInteger(pmax(1, newPixelCohortData$maxANPP *
-                       exp(-1.6 * newPixelCohortData$sumB / newPixelCohortData$maxB_eco)))
+        exp(-1.6 * newPixelCohortData$sumB / newPixelCohortData$maxB_eco)))
     )
-    set(newPixelCohortData, NULL, "B",
-        asInteger(pmin(newPixelCohortData$maxANPP, newPixelCohortData$B)))
+    set(
+      newPixelCohortData, NULL, "B",
+      asInteger(pmin(newPixelCohortData$maxANPP, newPixelCohortData$B))
+    )
   } else {
     ## 2022-02: change to 10 - maxANPP is unrealistic, particularly with
     ##          high maxANPP needed to produce realistic growth curves
@@ -301,7 +305,8 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   }
 
   newPixelCohortData <- newPixelCohortData[, .(pixelGroup, ecoregionGroup, speciesCode, age, B,
-                                               mortality = 0L, aNPPAct = 0L)]
+    mortality = 0L, aNPPAct = 0L
+  )]
 
   if (getOption("LandR.assertions")) {
     if (NROW(unique(newPixelCohortData, by = cohortDefinitionCols)) != NROW(newPixelCohortData)) {
@@ -314,7 +319,7 @@ updateCohortData <- function(newPixelCohortData, cohortData, pixelGroupMap, curr
   set(newPixelCohortData, NULL, "new", TRUE)
   cohortData <- rbindlist(list(cohortData, newPixelCohortData), fill = TRUE, use.names = TRUE)
   if (NROW(unique(cohortData, by = c("pixelGroup"))) !=
-      NROW(unique(cohortData, by = c("pixelGroup", "ecoregionGroup")))) {
+    NROW(unique(cohortData, by = c("pixelGroup", "ecoregionGroup")))) {
     message("Found pixelGroup with multiple ecoregionGroups when initiating cohorts.")
     message("Adjusting new ecoregionGroups to match those of existing pixelGroups.")
     cohortData[, ecoregionGroup := unique(.SD[new == FALSE, ecoregionGroup]),
@@ -367,9 +372,10 @@ rmMissingCohorts <- function(cohortData, pixelGroupMap,
   pixelGroupMap[pgsStillInPGMGoneFromCD$pixelIndex] <- NA
 
   assertCohortData(cohortData, pixelGroupMap,
-                   message = "rmMissingCohorts",
-                   cohortDefinitionCols = LandR::cohortDefinitionCols(),
-                   doAssertion = doAssertion)
+    message = "rmMissingCohorts",
+    cohortDefinitionCols = LandR::cohortDefinitionCols(),
+    doAssertion = doAssertion
+  )
 
   assertCohortDataERG(cohortData, doAssertion = doAssertion)
 
@@ -444,7 +450,7 @@ generatePixelGroups <- function(pixelDataTable, maxPixelGroup,
     ## concatenate within rows:
     ## e.g., ecoregionCode_speciesCode_age_biomass or 647_11_Abie_sp_100_2000
     pcdOld[, uniqueComboByRow := as.integer(factor(do.call(paste, as.list(.SD)))),
-           .SDcols = columns2
+      .SDcols = columns2
     ]
 
     ## concatenate within pixelIndex
@@ -458,8 +464,9 @@ generatePixelGroups <- function(pixelDataTable, maxPixelGroup,
 
     uniqPG <- unique(pcdOld$pixelGroup)
     pcdOld[, pixelGroup2 := mapvalues2(pixelGroup,
-                                       from = uniqPG,
-                                       to = as.character(seq_along(uniqPG)))]
+      from = uniqPG,
+      to = as.character(seq_along(uniqPG))
+    )]
 
     setorderv(pcdOld, "ord")
 
@@ -681,8 +688,8 @@ convertUnwantedLCC <- function(classesToReplace = 34:36, rstLCC,
   while (length(theUnwantedPixels) > 0) {
     message("Converting unwanted LCCs: ", length(theUnwantedPixels), " pixels remaining.")
     out <- spread2(rstLCC,
-                   start = theUnwantedPixels, asRaster = FALSE,
-                   iterations = iterations, allowOverlap = TRUE, spreadProb = 1
+      start = theUnwantedPixels, asRaster = FALSE,
+      iterations = iterations, allowOverlap = TRUE, spreadProb = 1
     )
     out <- out[initialPixels != pixels] # rm pixels which are same as initialPixels --> these are known wrong
     iterations <- iterations + 1
@@ -690,8 +697,8 @@ convertUnwantedLCC <- function(classesToReplace = 34:36, rstLCC,
     out[lcc %in% c(classesToReplace), lcc := NA]
     out <- na.omit(out)
     out5 <- availableERC_by_Sp[out[, state := NULL],
-                               allow.cartesian = TRUE,
-                               on = c("pixelIndex" = "initialPixels"), nomatch = NA
+      allow.cartesian = TRUE,
+      on = c("pixelIndex" = "initialPixels"), nomatch = NA
     ] # join the availableERC_by_Sp which has initialEcoregionCode
 
     if (hasPreDash) {
@@ -738,10 +745,10 @@ convertUnwantedLCC <- function(classesToReplace = 34:36, rstLCC,
         out2[, ecoregionGroup := paste0(
           initialEcoregion, "_",
           paddedFloatToChar(as.integer(newPossLCC), padL = 2, padR = 0)
-        )] # nolint
+        )] #nolint
         out2[, initialEcoregion := NULL]
       } else {
-        out2[, ecoregionGroup := as.integer(newPossLCC)] # nolint
+        out2[, ecoregionGroup := as.integer(newPossLCC)] #nolint
       }
 
       ## remove combinations of ecoregionGroup and speciesCode that don't exist
@@ -808,9 +815,12 @@ nonForestedPixels <- function(speciesLayers, omitNonTreedPixels, forestedLCCClas
 
   ## remove non-forested if asked by user
   if (omitNonTreedPixels) {
-    if (is.null(forestedLCCClasses))
-      stop("No P(sim)$forestedLCCClasses provided, but P(sim)$omitNonTreedPixels is TRUE.\n",
-           "Please provide a vector of forested classes in P(sim)$forestedLCCClasses")
+    if (is.null(forestedLCCClasses)) {
+      stop(
+        "No P(sim)$forestedLCCClasses provided, but P(sim)$omitNonTreedPixels is TRUE.\n",
+        "Please provide a vector of forested classes in P(sim)$forestedLCCClasses"
+      )
+    }
     lccPixelsRemoveTF <- !(as.vector(rstLCC[]) %in% forestedLCCClasses)
     pixelsToRm <- lccPixelsRemoveTF | pixelsToRm
   }
@@ -886,9 +896,10 @@ nonForestedPixels <- function(speciesLayers, omitNonTreedPixels, forestedLCCClas
   }
 
   cohortData <- data.table::melt(inputDataTable,
-                                 value.name = "cover",
-                                 measure.vars = newCoverColNames,
-                                 variable.name = "speciesCode")
+    value.name = "cover",
+    measure.vars = newCoverColNames,
+    variable.name = "speciesCode"
+  )
 
   ## Remove all cover <= minCoverThreshold
   whCoverGTMinCover <- which(cohortData$cover > minCoverThreshold)
@@ -1054,11 +1065,11 @@ makeAndCleanInitialCohortData <- function(inputDataTable, sppColumns,
   ## 3. Pixels with 0 stand biomass, are assigned 0 stand age.
   ## 4. (after calcualting cohort B and age): if `cover > 0` and `age == 0`, `B` is set to 0
   cohortData <- Cache(.createCohortData,
-                      inputDataTable = inputDataTable,
-                      # pixelGroupBiomassClass = pixelGroupBiomassClass,
-                      minCoverThreshold = minCoverThreshold,
-                      sppColumns = sppColumns,
-                      doAssertion = doAssertion
+    inputDataTable = inputDataTable,
+    # pixelGroupBiomassClass = pixelGroupBiomassClass,
+    minCoverThreshold = minCoverThreshold,
+    sppColumns = sppColumns,
+    doAssertion = doAssertion
   )
   assertCohortDataAttr(cohortData, doAssertion = doAssertion)
   imputedPixID <- attr(cohortData, "imputedPixID")
@@ -1072,7 +1083,7 @@ makeAndCleanInitialCohortData <- function(inputDataTable, sppColumns,
     , hasBadAge :=
       # (age == 0 & cover > 0)#| # ok because cover can be >0 with biomass = 0
       (age > 0 & cover == 0) |
-      is.na(age) #|
+        is.na(age) #|
     # (B > 0 & age == 0) |
     # (B == 0 & age > 0)
   ][hasBadAge == TRUE] # , by = "pixelIndex"]
@@ -1080,7 +1091,7 @@ makeAndCleanInitialCohortData <- function(inputDataTable, sppColumns,
   if (NROW(cohortDataMissingAge) > 0) {
     if (!is.null(imputeBadAgeModel)) {
       cohortDataMissingAgeUnique <- unique(cohortDataMissingAge,
-                                           by = c("initialEcoregionCode", "speciesCode")
+        by = c("initialEcoregionCode", "speciesCode")
       )[
         , .(initialEcoregionCode, speciesCode)
       ]
@@ -1110,18 +1121,18 @@ makeAndCleanInitialCohortData <- function(inputDataTable, sppColumns,
         })
       }
       cohortDataMissingAgeUnique <- subsetDT(cohortDataMissingAgeUnique,
-                                             by = c("initialEcoregionCode", "speciesCode"),
-                                             doSubset = doSubset
+        by = c("initialEcoregionCode", "speciesCode"),
+        doSubset = doSubset
       )
       message(blue("Impute missing age values: started", Sys.time()))
 
       outAge <- Cache(statsModel,
-                      modelFn = imputeBadAgeModel,
-                      uniqueEcoregionGroups = .sortDotsUnderscoreFirst(
-                        as.character(unique(cohortDataMissingAgeUnique$initialEcoregionCode))
-                      ),
-                      .specialData = cohortDataMissingAgeUnique,
-                      omitArgs = ".specialData"
+        modelFn = imputeBadAgeModel,
+        uniqueEcoregionGroups = .sortDotsUnderscoreFirst(
+          as.character(unique(cohortDataMissingAgeUnique$initialEcoregionCode))
+        ),
+        .specialData = cohortDataMissingAgeUnique,
+        omitArgs = ".specialData"
       )
       message(blue("                           completed", Sys.time()))
 
@@ -1131,8 +1142,8 @@ makeAndCleanInitialCohortData <- function(inputDataTable, sppColumns,
       ## allow.new.levels = TRUE because some groups will have only NA for age for all species
       cohortDataMissingAge[
         , imputedAge := pmax(0L, asInteger(predict(outAge$mod,
-                                                   newdata = cohortDataMissingAge,
-                                                   allow.new.levels = TRUE
+          newdata = cohortDataMissingAge,
+          allow.new.levels = TRUE
         )))
       ]
 
@@ -1235,8 +1246,10 @@ dropTerm <- function(form, term) {
     idr <- grepl(tt, rownames(fac))
     idc <- which(as.logical(fac[idr, ]))
     toDrop <- names(fac[idr, ][idc])
-    needsParenth <- vapply(paste0("(", toDrop, ")"), FUN = grepl, FUN.VALUE = logical(1),
-                           x = as.character(new_form)[3], fixed = TRUE)
+    needsParenth <- vapply(paste0("(", toDrop, ")"),
+      FUN = grepl, FUN.VALUE = logical(1),
+      x = as.character(new_form)[3], fixed = TRUE
+    )
     if (any(needsParenth)) {
       toDrop[needsParenth] <- paste0("(", toDrop[needsParenth], ")")
     }
@@ -1276,12 +1289,12 @@ statsModel <- function(modelFn, uniqueEcoregionGroups, sumResponse, .specialData
 
   ## get formula and check
   form <- tryCatch(as.formula(modelArgs[2], env = .GlobalEnv), # .GlobalEnv keeps object small
-                   error = function(e) {
-                     stop(paste(
-                       "Could not convert '", modelArgs[2], "'to formula.",
-                       "Check if formula is of type 'Y ~ X'"
-                     ))
-                   }
+    error = function(e) {
+      stop(paste(
+        "Could not convert '", modelArgs[2], "'to formula.",
+        "Check if formula is of type 'Y ~ X'"
+      ))
+    }
   )
 
   ## check the no of grouping levels
@@ -1392,16 +1405,17 @@ addPixels2CohortData <- function(cohortData, pixelGroupMap,
                                  cohortDefinitionCols = LandR::cohortDefinitionCols(),
                                  doAssertion = getOption("LandR.assertions", TRUE)) {
   assertCohortData(cohortData, pixelGroupMap,
-                   cohortDefinitionCols = LandR::cohortDefinitionCols(),
-                   doAssertion = doAssertion)
+    cohortDefinitionCols = LandR::cohortDefinitionCols(),
+    doAssertion = doAssertion
+  )
 
   pixelGroupTable <- na.omit(data.table(
     pixelGroup = as.vector(pixelGroupMap[]),
     pixelIndex = 1:ncell(pixelGroupMap)
   ))
   pixelCohortData <- cohortData[pixelGroupTable,
-                                on = "pixelGroup",
-                                nomatch = 0, allow.cartesian = TRUE
+    on = "pixelGroup",
+    nomatch = 0, allow.cartesian = TRUE
   ]
 
   assertPixelCohortData(pixelCohortData, pixelGroupMap, doAssertion = doAssertion)
@@ -1538,8 +1552,8 @@ makeCohortDataFiles <- function(pixelCohortData, columnsForPixelGroups, speciesE
   lenUniquePix <- length(unique(pixelCohortData2$pixelIndex))
   message(green("     leaving", lenUniquePix, "pixels"))
   pixelFateDT <- pixelFate(pixelFateDT,
-                           fate = "rm pixels with Biomass == 0, after updating young cohort B",
-                           length(lostPixels), runningPixelTotal = lenUniquePix
+    fate = "rm pixels with Biomass == 0, after updating young cohort B",
+    length(lostPixels), runningPixelTotal = lenUniquePix
   )
 
   pixelCohortData <- pixelCohortData2
@@ -1599,8 +1613,9 @@ makeCohortDataFiles <- function(pixelCohortData, columnsForPixelGroups, speciesE
 
   cd <- pixelCohortData[, .SD, .SDcols = c("pixelIndex", columnsForPixelGroups())]
   pixelCohortData[, pixelGroup := Cache(generatePixelGroups, cd,
-                                        maxPixelGroup = 0,
-                                        columns = LandR::columnsForPixelGroups())]
+    maxPixelGroup = 0,
+    columns = LandR::columnsForPixelGroups()
+  )]
 
   pixelCohortData[, totalBiomass := asInteger(sum(B)), by = "pixelIndex"]
 
@@ -1657,12 +1672,12 @@ plantNewCohorts <- function(newPixelCohortData, cohortData, pixelGroupMap, initi
 
   # Here we subset cohortData instead of setting added columns to NULL. However, as these are 'new' cohorts, this is okay
   newCohortData <- newCohortData[, .(pixelGroup, ecoregionGroup, speciesCode, age, B, Provenance,
-                                     mortality = 0L, aNPPAct = 0L
+    mortality = 0L, aNPPAct = 0L
   )]
 
   if (getOption("LandR.assertions")) {
     if (isTRUE(NROW(unique(newCohortData, by = c("pixelGroup", "age", "speciesCode", "Provenance")))
-               != NROW(newCohortData))) {
+    != NROW(newCohortData))) {
       stop("Duplicated new cohorts in a pixelGroup. Please debug LandR:::.plantNewCohorts")
       # in this situation, it may be caused by not replanting all species. Not sure if this will come up.
     }
@@ -1772,13 +1787,13 @@ updateCohortDataPostHarvest <- function(newPixelCohortData, cohortData, pixelGro
   cd <- newPixelCohortData[, c("pixelIndex", columnsForPG), with = FALSE]
 
   newPixelCohortData[, pixelGroup := generatePixelGroups(cd,
-                                                         maxPixelGroup = maxPixelGroup,
-                                                         columns = columnsForPG
+    maxPixelGroup = maxPixelGroup,
+    columns = columnsForPG
   )]
 
   # Remove the duplicated pixels within pixelGroup (i.e., 2+ species in the same pixel)
   pixelsToChange <- unique(newPixelCohortData[, c("pixelIndex", "pixelGroup")],
-                           by = c("pixelIndex")
+    by = c("pixelIndex")
   )
 
   pixelGroupMap[pixelsToChange$pixelIndex] <- pixelsToChange$pixelGroup
@@ -1791,17 +1806,19 @@ updateCohortDataPostHarvest <- function(newPixelCohortData, cohortData, pixelGro
 
   ## Add new cohorts and rm missing cohorts (i.e., those pixelGroups that are gone) -----------
   cohortData <- plantNewCohorts(newPixelCohortData, cohortData,
-                                pixelGroupMap,
-                                currentTime = currentTime,
-                                successionTimestep = successionTimestep,
-                                initialB = initialB,
-                                trackPlanting = trackPlanting)
+    pixelGroupMap,
+    currentTime = currentTime,
+    successionTimestep = successionTimestep,
+    initialB = initialB,
+    trackPlanting = trackPlanting
+  )
 
   outs <- rmMissingCohorts(cohortData, pixelGroupMap, cohortDefinitionCols = LandR::cohortDefinitionCols())
 
   assertCohortData(outs$cohortData, outs$pixelGroupMap,
-                   cohortDefinitionCols = LandR::cohortDefinitionCols(),
-                   doAssertion = doAssertion, verbose = verbose)
+    cohortDefinitionCols = LandR::cohortDefinitionCols(),
+    doAssertion = doAssertion, verbose = verbose
+  )
 
   if (verbose > 0) {
     nPixForest <- sum(!is.na(outs$pixelGroupMap[]))
@@ -1915,12 +1932,12 @@ vegTypeGenerator <- function(x, vegLeadingProportion = 0.8,
   if (mixedType == 2) {
     if (is.null(sppEquiv)) {
       sppEquiv <- get(data("sppEquivalencies_CA", package = "LandR", envir = environment()),
-                      inherits = FALSE
+        inherits = FALSE
       )
 
       # Find the sppEquivCol that best matches what you have in x
       sppEquivCol <- names(sort(sapply(sppEquiv, function(xx) sum(xx %in% unique(x$species))),
-                                decreasing = TRUE
+        decreasing = TRUE
       )[1])
       message(paste0(
         "Using mixedType == 2, but no sppEquiv provided. ",
@@ -1959,7 +1976,7 @@ vegTypeGenerator <- function(x, vegLeadingProportion = 0.8,
     setnames(pixelGroupData1, old = c("V1", "V2"), new = c(speciesOfLeadingBasedOn, totalOfLeadingBasedOn))
 
     set(pixelGroupData1, NULL, "speciesProportion", pixelGroupData1[[speciesOfLeadingBasedOn]] /
-          pixelGroupData1[[totalOfLeadingBasedOn]])
+      pixelGroupData1[[totalOfLeadingBasedOn]])
     systimePost1 <- Sys.time()
 
     setorderv(pixelGroupData1, pixelGroupColName)
@@ -2002,7 +2019,7 @@ vegTypeGenerator <- function(x, vegLeadingProportion = 0.8,
     } else {
       # cols <- c(pixelGroupColName, "speciesCode", "speciesProportion")
       set(cohortData2, NULL, "speciesProportion", cohortData2[[leadingBasedOn]] /
-            cohortData2[[totalOfLeadingBasedOn]])
+        cohortData2[[totalOfLeadingBasedOn]])
       # pixelGroupData2[[NROW(pixelGroupData2) + 1]] <- cohortData2[!GT1, ..cols]
     }
     pixelGroupData2 <- cohortData2
@@ -2057,7 +2074,8 @@ vegTypeGenerator <- function(x, vegLeadingProportion = 0.8,
     ## 4. change column names and convert pure to mixed ==> mixed <- !pure
     pixelGroupData3 <- pixelGroupData[, list(
       pure = speciesProportion >= vegLeadingProportion,
-      speciesCode, get(pixelGroupColName), speciesProportion)]
+      speciesCode, get(pixelGroupColName), speciesProportion
+    )]
     setnames(pixelGroupData3, "V3", pixelGroupColName)
     setorderv(pixelGroupData3, cols = c(pixelGroupColName, "speciesProportion"), order = -1L)
     set(pixelGroupData3, NULL, "speciesProportion", NULL)
@@ -2093,8 +2111,8 @@ vegTypeGenerator <- function(x, vegLeadingProportion = 0.8,
 
     setkeyv(pixelGroupData3, pgdAndSc)
     mixedType2Condition <- quote(Type == "Deciduous" &
-                                   speciesProportion < vegLeadingProportion &
-                                   speciesProportion > 1 - vegLeadingProportion)
+      speciesProportion < vegLeadingProportion &
+      speciesProportion > 1 - vegLeadingProportion)
     pixelGroupData3[, mixed := FALSE]
 
     if (algo == 2 || isTRUE(doAssertion)) {

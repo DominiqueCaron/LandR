@@ -58,7 +58,6 @@ lccMapGenerator <- function(cohortData, pixelGroupMap,
                             vegLeadingProportion = 0.75,
                             decidousSpp = NULL,
                             rstLCC) {
-
   stopifnot(
     !missing(cohortData),
     !missing(pixelGroupMap),
@@ -96,7 +95,6 @@ lccMapGenerator <- function(cohortData, pixelGroupMap,
       ## 14 can be either mixed open/sparse:
       c(14L, "mixed_open", FALSE),
       c(14L, "mixed_sparse", TRUE),
-
       c(15L, "mixed_sparse", FALSE),
       c(32L, "conif_sparse", FALSE)
     ) |>
@@ -122,14 +120,18 @@ lccMapGenerator <- function(cohortData, pixelGroupMap,
   species <- as.character(unique(cohortData[["speciesCode"]]))
   treeSpecies <- data.table(
     speciesCode = c(decidousSpp, species[!species %in% decidousSpp]),
-    treeRSF = c(rep("broadleaf", times = length(decidousSpp)),
-                rep("conifer", times = length(species[!species %in% decidousSpp])))
+    treeRSF = c(
+      rep("broadleaf", times = length(decidousSpp)),
+      rep("conifer", times = length(species[!species %in% decidousSpp]))
+    )
   )
 
   cohortData <- merge(cohortData, treeSpecies, by = "speciesCode", all.x = TRUE)
   if (NROW(cohortData) == 0) {
-    stop(paste("Empty 'cohortData' after merge with tree types.",
-               "Ensure 'cohortData$speciesCode' values match those in 'decidousSpp'."))
+    stop(paste(
+      "Empty 'cohortData' after merge with tree types.",
+      "Ensure 'cohortData$speciesCode' values match those in 'decidousSpp'."
+    ))
   }
 
   ## b. calculate species cover based on biomass
@@ -148,14 +150,17 @@ lccMapGenerator <- function(cohortData, pixelGroupMap,
 
   ## f. simplify and dcast cohortData to be able to compare the percentages
   cohortDataSim <- unique(cohortData[, c("pixelGroup", "treeRSF", "percTree")])
-  cohortDataD <- dcast(data = cohortDataSim, formula = pixelGroup ~ treeRSF,
-                       fill = 0, value.var = "percTree")
+  cohortDataD <- dcast(
+    data = cohortDataSim, formula = pixelGroup ~ treeRSF,
+    fill = 0, value.var = "percTree"
+  )
 
   ## g. define first if a stand is pure or mixed:
   cohortDataD[, decid := fifelse(broadleaf >= vegLeadingProportion, 1, 0)]
   cohortDataD[, conif := fifelse(conifer >= vegLeadingProportion, 1, 0)]
   cohortDataD[, leading := colnames(.SD)[max.col(.SD, ties.method = "first")],
-              .SDcols = c("decid", "conif")]
+    .SDcols = c("decid", "conif")
+  ]
   cohortDataD[, leading := fifelse(decid + conif == 0, "mixed", leading)]
 
   ## h. simplifying and recoding
@@ -185,8 +190,8 @@ lccMapGenerator <- function(cohortData, pixelGroupMap,
   levels(sparsenessMapDT$sparseness) <- c("dense", "open", "sparse")
   sparsenessMapDT[, sparseness := as.character(sparseness)]
 
-  finalDT  <- merge(cohortDataSim, sparsenessMapDT, by = "pixelGroup", all.x = TRUE)
-  finalDT[, leading  := paste(leading, sparseness, sep = "_")]
+  finalDT <- merge(cohortDataSim, sparsenessMapDT, by = "pixelGroup", all.x = TRUE)
+  finalDT[, leading := paste(leading, sparseness, sep = "_")]
 
   ## simplify mapping of LCC and cover/density type
   lccTable <- lccTable[keep == TRUE, ] |> set(NULL, "keep", NULL)
@@ -194,8 +199,10 @@ lccMapGenerator <- function(cohortData, pixelGroupMap,
   finalDT <- merge(finalDT, lccTable, by = "leading", all.x = TRUE)
 
   ## get the new classes to the LCC where they are supposed to be
-  newLCC <- rasterizeReduced(reduced = finalDT, fullRaster = pixelGroupMap,
-                             newRasterCols = "LCC", mapcode = "pixelGroup")
+  newLCC <- rasterizeReduced(
+    reduced = finalDT, fullRaster = pixelGroupMap,
+    newRasterCols = "LCC", mapcode = "pixelGroup"
+  )
   DT <- data.table(pixelID = 1:ncell(newLCC), values(c(rstLCC, newLCC)))
   names(DT) <- c("pixelID", "LCC", "newLCC")
   DT[, updatedLCC := fifelse(!is.na(newLCC), newLCC, LCC)]

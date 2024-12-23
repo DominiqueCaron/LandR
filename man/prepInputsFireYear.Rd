@@ -41,8 +41,10 @@ ras2match <- rast(res = 10, ext = ext(randomPoly), crs = crs(randomPoly))
 ras2match <- rasterize(randomPoly, ras2match)
 
 firePerimeters <- prepInputsFireYear(
-  url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads/",
-               "nfdb/fire_poly/current_version/NFDB_poly.zip"),
+  url = paste0(
+    "https://cwfis.cfs.nrcan.gc.ca/downloads/",
+    "nfdb/fire_poly/current_version/NFDB_poly.zip"
+  ),
   destinationPath = tempdir(),
   rasterToMatch = ras2match,
   earliestYear = 1930

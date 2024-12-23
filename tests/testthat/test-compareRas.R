@@ -1,39 +1,43 @@
 test_that("test .compareRas, .compareCRS -- rasters only", {
-  withr::with_package("reproducible", {
-    withr::with_options(list(reproducible.inputPaths = NULL,
-                             reproducible.overwrite = TRUE,
-                             reproducible.useTerra = TRUE,
-                             reproducible.rasterRead = "terra::rast"), {
-      url <- "https://github.com/tati-micheletti/host/raw/master/data/rasterTest.tif"
-      targetFile <- basename(url)
+  withr::local_package("reproducible")
 
-      ras <- prepInputs(url = url, destinationPath = tempdir(), targetFile = targetFile)
-      ras2 <- terra::project(ras, "EPSG:2169")
-      expect_true(.compareRas(ras, ras))
-      expect_true(.compareRas(ras, ras, ras))
-      expect_error(.compareRas(ras, ras, ras2))
-      expect_true(.compareRas(ras, ras, ras2, crs = FALSE, ext = FALSE))
-      expect_false(.compareRas(ras, ras, ras2, stopOnError = FALSE))
+  withr::local_options(list(
+    reproducible.inputPaths = NULL,
+    reproducible.overwrite = TRUE,
+    reproducible.useTerra = TRUE,
+    reproducible.rasterRead = "terra::rast"
+  ))
 
-      ras3 <- terra::extend(ras, 10)
-      expect_error(.compareRas(ras, ras3))
-      expect_false(.compareRas(ras, ras3, stopOnError = FALSE))
+  url <- "https://github.com/tati-micheletti/host/raw/master/data/rasterTest.tif"
+  targetFile <- basename(url)
 
-      ## and with RasterLayer
-      ras <- prepInputs(url = url, destinationPath = tempdir(),
-                        fun = "raster::raster", targetFile = targetFile)
-      ras2 <- raster::projectRaster(ras, crs = crs("EPSG:2169", proj = TRUE))
-      expect_true(.compareRas(ras, ras))
-      expect_true(.compareRas(ras, ras, ras))
-      expect_error(.compareRas(ras, ras, ras2))
-      expect_false(.compareRas(ras, ras, ras2, stopOnError = FALSE))
+  ras <- prepInputs(url = url, destinationPath = tempdir(), targetFile = targetFile)
+  ras2 <- terra::project(ras, "EPSG:2169")
+  expect_true(.compareRas(ras, ras))
+  expect_true(.compareRas(ras, ras, ras))
+  expect_error(.compareRas(ras, ras, ras2))
+  expect_true(.compareRas(ras, ras, ras2, crs = FALSE, ext = FALSE))
+  expect_false(.compareRas(ras, ras, ras2, stopOnError = FALSE))
 
-      ras3 <- raster::extend(ras, 10)
-      expect_true(.compareRas(ras, ras3, ext = FALSE, rowcol = FALSE))
-      expect_error(.compareRas(ras, ras3))
-      expect_false(.compareRas(ras, ras3, stopOnError = FALSE))
-    })
-  })
+  ras3 <- terra::extend(ras, 10)
+  expect_error(.compareRas(ras, ras3))
+  expect_false(.compareRas(ras, ras3, stopOnError = FALSE))
+
+  ## and with RasterLayer
+  ras <- prepInputs(
+    url = url, destinationPath = tempdir(),
+    fun = "raster::raster", targetFile = targetFile
+  )
+  ras2 <- raster::projectRaster(ras, crs = crs("EPSG:2169", proj = TRUE))
+  expect_true(.compareRas(ras, ras))
+  expect_true(.compareRas(ras, ras, ras))
+  expect_error(.compareRas(ras, ras, ras2))
+  expect_false(.compareRas(ras, ras, ras2, stopOnError = FALSE))
+
+  ras3 <- raster::extend(ras, 10)
+  expect_true(.compareRas(ras, ras3, ext = FALSE, rowcol = FALSE))
+  expect_error(.compareRas(ras, ras3))
+  expect_false(.compareRas(ras, ras3, stopOnError = FALSE))
 })
 
 test_that("test .compareRas, .compareCRS -- vectors only", {

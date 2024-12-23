@@ -44,9 +44,11 @@ prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, resampleMet
 
   ## 1 is forest, 2 is disturbed forest
   ## do not pass dots, or the filename is passed and is overwritten
-  fao <- prepInputs(url = "https://opendata.nfis.org/downloads/forest_change/CA_FAO_forest_2019.zip",
-                    method = resampleMethod, destinationPath = dots$destinationPath, cropTo = lcc,
-                    maskTo = lcc, projectTo = lcc)
+  fao <- prepInputs(
+    url = "https://opendata.nfis.org/downloads/forest_change/CA_FAO_forest_2019.zip",
+    method = resampleMethod, destinationPath = dots$destinationPath, cropTo = lcc,
+    maskTo = lcc, projectTo = lcc
+  )
 
   ## 10 is not a class in use - make it disturbed forest
   ## pixels may not be disturbed yet if year is prior to 2019 (FAO year)
@@ -88,8 +90,10 @@ prepInputs_NTEMS_Nonforest <- function(rstLCC, endYear = 2019, lccToAdjust = 33,
 
   lccURL <- paste0("https://opendata.nfis.org/downloads/forest_change/CA_forest_VLCE2_", endYear, ".zip")
   lccTF <- paste0("CA_forest_VLCE2_", endYear, ".tif")
-  finalLCC <- prepInputs(url = lccURL, targetFile = lccTF, method = "near",
-                         cropTo = rstLCC, projectTo = rstLCC, maskTo = rstLCC, ...)
+  finalLCC <- prepInputs(
+    url = lccURL, targetFile = lccTF, method = "near",
+    cropTo = rstLCC, projectTo = rstLCC, maskTo = rstLCC, ...
+  )
 
   toFix <- data.table(currentLCC = values(rstLCC, mat = FALSE), pixelID = seq_len(ncell(finalLCC)))
   toFix <- toFix[currentLCC %in% lccToAdjust]

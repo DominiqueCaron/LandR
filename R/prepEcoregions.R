@@ -48,13 +48,15 @@ prepEcoregions <- function(ecoregionRst = NULL, ecoregionLayer, ecoregionLayerFi
     rm(ecoregionLayer)
     if (is.factor(ecoregionMapSF$ecoregionLayerField)) {
       appendEcoregionFactor <- TRUE
-      #Preserve factor values
+      # Preserve factor values
       uniqVals <- unique(ecoregionMapSF$ecoregionLayerField)
       uniqIDs <- unique(ecoregionMapSF$ecoregionLayerFieldInt)
-      df <- data.frame(ID = uniqIDs,
-                       ecoregionName = uniqVals,
-                       stringsAsFactors = FALSE)
-      levels(ecoregionRst) <- df #this will preserve the factors
+      df <- data.frame(
+        ID = uniqIDs,
+        ecoregionName = uniqVals,
+        stringsAsFactors = FALSE
+      )
+      levels(ecoregionRst) <- df # this will preserve the factors
 
       ecoregionTable <- as.data.table(df)
       ecoregionTable[, ID := as.factor(paddedFloatToChar(ID, max(nchar(ID))))]
@@ -72,15 +74,16 @@ prepEcoregions <- function(ecoregionRst = NULL, ecoregionLayer, ecoregionLayerFi
 
   message(blue("Make initial ecoregionGroups ", Sys.time()))
 
-  if (!isTRUE(.compareRas(ecoregionRst, rstLCCAdj,
-                          res = TRUE, stopOnError = FALSE)))
+  if (!isTRUE(.compareRas(ecoregionRst, rstLCCAdj, res = TRUE, stopOnError = FALSE))) {
     stop("problem with rasters ecoregionRst and rstLCCAdj -- they don't have same metadata")
+  }
 
   ecoregionFiles <- Cache(ecoregionProducer,
-                          ecoregionMaps = list(ecoregionRst, rstLCCAdj),
-                          rasterToMatch = rasterToMatchLarge,
-                          userTags = c(cacheTags, "ecoregionFiles", "stable"),
-                          omitArgs = c("userTags"))
+    ecoregionMaps = list(ecoregionRst, rstLCCAdj),
+    rasterToMatch = rasterToMatchLarge,
+    userTags = c(cacheTags, "ecoregionFiles", "stable"),
+    omitArgs = c("userTags")
+  )
 
   if (appendEcoregionFactor) {
     ecoregionFiles$ecoregion <- ecoregionFiles$ecoregion[ecoregionTable, on = c("ecoregion" = "ID")] |>

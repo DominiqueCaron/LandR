@@ -20,8 +20,10 @@ utils::globalVariables(c(
 #' @rdname vegetation-transitions
 vtm2conifdecid <- function(vtm, sppEquiv = NULL, sppEquivCol = "LandR", studyArea) {
   if (is.null(sppEquiv)) {
-    sppEquiv <- get(data("sppEquivalencies_CA", package = "LandR",
-                         envir = environment()), inherits = FALSE)
+    sppEquiv <- get(data("sppEquivalencies_CA",
+      package = "LandR",
+      envir = environment()
+    ), inherits = FALSE)
   }
 
   vapply(seq_along(vtm), function(i) {
@@ -115,7 +117,6 @@ plotVegTransitions <- function(transitions_df) {
     requireNamespace("dplyr", quietly = TRUE),
     requireNamespace("ggalluvial", quietly = TRUE),
     requireNamespace("ggrepel", quietly = TRUE),
-
     all(c("pixelID", "ecoregion", "vegType", "time") %in% colnames(transitions_df))
   )
 
@@ -125,7 +126,7 @@ plotVegTransitions <- function(transitions_df) {
       ggplot(aes(x = time, stratum = vegType, alluvium = pixelID, fill = vegType, label = vegType)) +
       scale_x_discrete(expand = c(0.1, 0)) +
       ggalluvial::geom_flow(color = "darkgray") +
-      ggalluvial::geom_stratum(width = 1/8) +
+      ggalluvial::geom_stratum(width = 1 / 8) +
       scale_linetype_manual(values = c("blank", "solid")) +
       ggrepel::geom_text_repel(
         aes(label = ifelse(as.numeric(as.character(time)) == head(as.numeric(as.character(time)), 1), vegType, NA)),

@@ -8,13 +8,14 @@ testthat::test_that("test prepRawBiomassMap", {
   withr::local_package("sf")
 
   dPath <- file.path(tempdir(), "inputs")
-  opts <- options("reproducible.inputPaths" = NULL,
-                  "reproducible.overwrite" = TRUE,
-                  "reproducible.useTerra" = TRUE,
-                  "reproducible.rasterRead" = "terra::rast",
-                  "reproducible.destinationPath" = dPath)
 
-  on.exit(options(opts), add = TRUE)
+  withr::local_options(list(
+    reproducible.destinationPath = dPath,
+    reproducible.inputPaths = NULL,
+    reproducible.overwrite = TRUE,
+    reproducible.rasterRead = "terra::rast",
+    reproducible.useTerra = TRUE
+  ))
 
   biomassURL <- paste0(
     "http://ftp.maps.canada.ca/pub/nrcan_rncan/Forests_Foret/",
@@ -31,20 +32,24 @@ testthat::test_that("test prepRawBiomassMap", {
   ## new args
   reproducible::clearCache(userTags = "test", ask = FALSE)
   rawBiomassMap <- suppressWarnings({
-    prepRawBiomassMap(url = biomassURL,
-                      studyAreaName = "test",
-                      cacheTags = "test",
-                      cropTo = studyArea,
-                      maskTo = studyArea,
-                      projectTo = NA)
+    prepRawBiomassMap(
+      url = biomassURL,
+      studyAreaName = "test",
+      cacheTags = "test",
+      cropTo = studyArea,
+      maskTo = studyArea,
+      projectTo = NA
+    )
   })
 
   ## old args
   rawBiomassMap2 <- suppressWarnings({
-    prepRawBiomassMap(url = biomassURL,
-                      studyAreaName = "test",
-                      cacheTags = "test",
-                      studyArea = studyArea)
+    prepRawBiomassMap(
+      url = biomassURL,
+      studyAreaName = "test",
+      cacheTags = "test",
+      studyArea = studyArea
+    )
   })
 
   expect_false(crs(studyArea) == crs(rawBiomassMap))
@@ -54,20 +59,24 @@ testthat::test_that("test prepRawBiomassMap", {
   ## use SA for cropping/masking, proj with RTM
   ## new args
   reproducible::clearCache(userTags = "test", ask = FALSE)
-  rawBiomassMap <- prepRawBiomassMap(url = biomassURL,
-                                     studyAreaName = "test",
-                                     cacheTags = "test",
-                                     cropTo = studyArea,
-                                     maskTo = studyArea,
-                                     projectTo = RTM)
+  rawBiomassMap <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    cropTo = studyArea,
+    maskTo = studyArea,
+    projectTo = RTM
+  )
 
   ## old args
-  rawBiomassMap2 <- prepRawBiomassMap(url = biomassURL,
-                                      studyAreaName = "test",
-                                      cacheTags = "test",
-                                      studyArea = studyArea,
-                                      rasterToMatch = RTM,
-                                      maskWithRTM = FALSE)
+  rawBiomassMap2 <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    studyArea = studyArea,
+    rasterToMatch = RTM,
+    maskWithRTM = FALSE
+  )
 
   expect_true(st_crs(studyArea) == st_crs(rawBiomassMap))
   expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
@@ -84,27 +93,32 @@ testthat::test_that("test prepRawBiomassMap", {
   #                                    projectTo = crs(studyArea))   ## this is failing; reported issue #331-reproducible
 
   reproducible::clearCache(userTags = "test", ask = FALSE)
-  rawBiomassMap <- prepRawBiomassMap(url = biomassURL,
-                                     studyAreaName = "test",
-                                     cacheTags = "test",
-                                     to = RTM)   ## for some reason when not interactive the masking doesn't happen if only supplying `to`
+  rawBiomassMap <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    to = RTM
+  ) ## for some reason when not interactive the masking doesn't happen if only supplying `to`
 
-  rawBiomassMap <- prepRawBiomassMap(url = biomassURL,
-                                     studyAreaName = "test",
-                                     cacheTags = "test",
-                                     to = RTM)   ## for some reason when not interactive the masking doesn't happen if only supplying `to`
+  rawBiomassMap <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    to = RTM
+  ) ## for some reason when not interactive the masking doesn't happen if only supplying `to`
   expect_true(all(is.na(rawBiomassMap[]) == is.na(RTM[])))
 
   ## old args
   reproducible::clearCache(userTags = "test", ask = FALSE)
-  rawBiomassMap2 <- prepRawBiomassMap(url = biomassURL,
-                                      studyAreaName = "test",
-                                      cacheTags = "test",
-                                      studyArea = studyArea,
-                                      rasterToMatch = RTM,
-                                      maskWithRTM = TRUE #,
-                                      # useSAcrs = TRUE    ## due to issue #331-reproducible we can't reproduce this.
-                                      )
+  rawBiomassMap2 <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    studyArea = studyArea,
+    rasterToMatch = RTM,
+    maskWithRTM = TRUE # ,
+    # useSAcrs = TRUE    ## due to issue #331-reproducible we can't reproduce this.
+  )
 
   expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
   expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))

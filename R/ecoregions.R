@@ -26,7 +26,7 @@ ecoregionProducer <- function(ecoregionMaps, ecoregionName = NULL, rasterToMatch
 
   # change the coordinate reference for all spatialpolygons
   message("ecoregionProducer 1: ", Sys.time())
-  #ecoregionMapInStudy <- intersect(ecoregionMapFull, fixErrors(aggregate(studyArea)))
+  # ecoregionMapInStudy <- intersect(ecoregionMapFull, fixErrors(aggregate(studyArea)))
 
   # Alternative
   rstEcoregion <- list()
@@ -35,8 +35,9 @@ ecoregionProducer <- function(ecoregionMaps, ecoregionName = NULL, rasterToMatch
     if (!inherits(ecoregionMaps[[erm]], c("Raster", "SpatRaster"))) {
       message("ecoregionProducer fastRasterize: ", Sys.time())
       rstEcoregion[[erm]] <- fasterize::fasterize(sf::st_as_sf(ecoregionMaps[[erm]]),
-                                                  raster(rasterToMatch),
-                                                  field = ecoregionName)
+        raster(rasterToMatch),
+        field = ecoregionName
+      )
     } else {
       rstEcoregion[[erm]] <- ecoregionMaps[[erm]]
     }
@@ -55,17 +56,19 @@ ecoregionProducer <- function(ecoregionMaps, ecoregionName = NULL, rasterToMatch
   ecoregionFactorLevels <- levels(ecoregionValues)
 
   rstEcoregion[!NAs] <- as.integer(ecoregionValues)
-  levs <- data.frame(ID = seq(ecoregionFactorLevels),
-                                     mapcode = seq(ecoregionFactorLevels),
-                                     ecoregion = gsub("_.*", "", ecoregionFactorLevels),
-                                     landcover = gsub(".*_", "", ecoregionFactorLevels),
-                                     ecoregion_lcc = ecoregionFactorLevels,
-                                     stringsAsFactors = TRUE)
+  levs <- data.frame(
+    ID = seq(ecoregionFactorLevels),
+    mapcode = seq(ecoregionFactorLevels),
+    ecoregion = gsub("_.*", "", ecoregionFactorLevels),
+    landcover = gsub(".*_", "", ecoregionFactorLevels),
+    ecoregion_lcc = ecoregionFactorLevels,
+    stringsAsFactors = TRUE
+  )
   levels(rstEcoregion) <- levs
 
   ecoregionTable <- as.data.table(levs)
   message("ecoregionProducer mapvalues: ", Sys.time())
-  ecoregionTable <- ecoregionTable[,.(active = "yes", mapcode, ecoregion, landcover, ecoregion_lcc)]
+  ecoregionTable <- ecoregionTable[, .(active = "yes", mapcode, ecoregion, landcover, ecoregion_lcc)]
 
   return(list(ecoregionMap = rstEcoregion, ecoregion = ecoregionTable))
 }
@@ -145,32 +148,37 @@ speciesEcoregionStack <- function(ecoregionMap, speciesEcoregion,
   on.exit(data.table::setDTthreads(orig), add = TRUE)
   whNonNAs <- which(!is.na(ecoregionMap[]))
   fv <- factorValues2(ecoregionMap,
-                      ecoregionMap[][whNonNAs],
-                      att = "ecoregionGroup")
+    ecoregionMap[][whNonNAs],
+    att = "ecoregionGroup"
+  )
   fvdt <- data.table(ecoregionGroup = as.character(fv), pixelID = whNonNAs)
   se2 <- fvdt[speciesEcoregion, on = "ecoregionGroup", allow.cartesian = TRUE]
   seList <- split(se2, by = "speciesCode")
   rasTemplate <- rasterRead(ecoregionMap)
   names(columns) <- columns
   spp <- names(seList)
-  stks <- lapply(columns, dtList = seList, rasTemplate = rasTemplate, spp = spp,
-                 function(column, dtList, rasTemplate, spp = spp) {
-    createStack(dtList = dtList, rasTemplate = rasTemplate, column = column, spp = spp)
-  })
+  stks <- lapply(columns,
+    dtList = seList, rasTemplate = rasTemplate, spp = spp,
+    function(column, dtList, rasTemplate, spp = spp) {
+      createStack(dtList = dtList, rasTemplate = rasTemplate, column = column, spp = spp)
+    }
+  )
 }
 
 createStack <- function(dtList, rasTemplate, column = "estblishprob", spp) {
   i <- 0
   # mclapply(mc.cores = length(dtList),
   outList <- lapply(
-    dtList, rasTemplate = rasTemplate, column = column, spp = spp,
+    dtList,
+    rasTemplate = rasTemplate, column = column, spp = spp,
     function(dt, rasTemplate, column, spp) {
       i <<- i + 1
       print(paste(column, " ", spp[i]))
       rasTemplate[dt$pixelID] <- dt[[column]]
       print("... Done!")
       rasTemplate
-    })
+    }
+  )
 
   .stack(outList)
 }

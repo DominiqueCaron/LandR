@@ -253,8 +253,9 @@ test_that("test large files", {
     destinationPath = dp
   )
 
-  if (is(pixelGroupMap, "RasterLayer"))
+  if (is(pixelGroupMap, "RasterLayer")) {
     pixelGroupMap <- terra::rast(pixelGroupMap)
+  }
 
   seed <- 1234
   set.seed(seed)
