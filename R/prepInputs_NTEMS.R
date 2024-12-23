@@ -6,12 +6,13 @@ utils::globalVariables(c(
 #'
 #' @param year stack of species layers rasters
 #' @param disturbedCode value assigned to pixels that are forest per FAO definition but not in LCC year
+#' @param resampleMethod method used when resampling LCC layers to match `rasterToMatch`
 #' @param ... passed to `prepInputs`
 #'
 #' @return a `SpatRaster` with corrected forest pixels
 #'
 #' @export
-prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, ...) {
+prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, resampleMethod = "near", ...) {
   if (year > 2019 || year < 1984) {
     stop("LCC for this year is unavailable")
   }
@@ -34,7 +35,7 @@ prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, ...) {
   ## 220 = broadleaf; 230 = mixedwood
   lccURL <- paste0("https://opendata.nfis.org/downloads/forest_change/CA_forest_VLCE2_", year, ".zip")
   lccTF <- paste0("CA_forest_VLCE2_", year, ".tif")
-  lcc <- prepInputs(url = lccURL, targetFile = lccTF, method = "near", ...)
+  lcc <- prepInputs(url = lccURL, targetFile = lccTF, method = resampleMethod, ...)
   ## unlink this file as it is 24 GB
   toUnlink <- ifelse(is.null(dots$destinationPath), lccTF,
                      file.path(dots$destinationPath, lccTF))
@@ -43,7 +44,7 @@ prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, ...) {
   ## 1 is forest, 2 is disturbed forest
   ## do not pass dots, or the filename is passed and is overwritten
   fao <- prepInputs(url = "https://opendata.nfis.org/downloads/forest_change/CA_FAO_forest_2019.zip",
-                    method = "near", destinationPath = dots$destinationPath, cropTo = lcc,
+                    method = resampleMethod, destinationPath = dots$destinationPath, cropTo = lcc,
                     maskTo = lcc, projectTo = lcc)
 
   ## 10 is not a class in use - make it disturbed forest
