@@ -485,7 +485,7 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
     maskWithRTM = maskWithRTM,
     method = method,
     datatype = datatype,
-    writeTo = writeTo,
+    # writeTo = writeTo, # no point here ... as it is removed later
     destinationPath = destinationPath,
     url = ageURL,
     fun = ageFun,
@@ -519,6 +519,9 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
   }
 
   attr(standAgeMap, "imputedPixID") <- imputedPixID
+  if (!is.null(writeTo)) {
+    standAgeMap <- writeTo(standAgeMap, writeTo)
+  }
   return(standAgeMap)
 }
 
