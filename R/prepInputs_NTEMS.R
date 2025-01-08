@@ -58,7 +58,11 @@ prepInputs_NTEMS_LCC_FAO <- function(year = 2010, disturbedCode = 1, resampleMet
   lccDat[, fao := values(fao, mat = FALSE)[pixelID]]
   lccDat <- lccDat[!is.na(fao) & fao == 2]
 
+  fns <- Filenames(lcc)
   lcc[lccDat$pixelID] <- disturbedCode
+  if (nzchar(fns)) {
+    lcc <- writeTo(lcc, writeTo = fns)
+  }
   rm(lccDat)
   gc()
 
