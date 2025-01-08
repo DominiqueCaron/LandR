@@ -518,10 +518,10 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
     imputedPixID <- attr(standAgeMap, "imputedPixID")
   }
 
-  attr(standAgeMap, "imputedPixID") <- imputedPixID
   if (!is.null(writeTo)) {
     standAgeMap <- writeTo(standAgeMap, writeTo)
   }
+  attr(standAgeMap, "imputedPixID") <- imputedPixID
   return(standAgeMap)
 }
 
