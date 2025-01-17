@@ -1512,7 +1512,7 @@ makeCohortDataFiles <- function(pixelCohortData, columnsForPixelGroups, speciesE
                                 pixelGroupBiomassClass, pixelGroupAgeClass, minAgeForGrouping = 0,
                                 rmImputedPix = FALSE, imputedPixID, pixelFateDT) {
   ## make ecoregioGroup a factor (again) and remove unnecessary cols.
-  # refactor because the "_34" and "_35" ones are still levels
+  ## refactor because the "_34" and "_35" ones are still levels
   pixelCohortData[, ecoregionGroup := factor(as.character(ecoregionGroup))]
   cols <- intersect(
     c(
@@ -1523,21 +1523,20 @@ makeCohortDataFiles <- function(pixelCohortData, columnsForPixelGroups, speciesE
   )
   set(pixelCohortData, j = cols, value = NULL)
 
-
-  # Round ages to nearest pixelGroupAgeClass
+  ## Round ages to nearest pixelGroupAgeClass
   pixelCohortData[
     age > minAgeForGrouping,
     age := asInteger(age / pixelGroupAgeClass) *
       as.integer(pixelGroupAgeClass)
   ]
 
-  # Round Biomass to nearest pixelGroupBiomassClass
+  ## Round Biomass to nearest pixelGroupBiomassClass
   message(blue("Round B to nearest P(sim)$pixelGroupBiomassClass"))
   pixelCohortData[ # age > minAgeForGrouping,
     , B := asInteger(B / pixelGroupBiomassClass) * as.integer(pixelGroupBiomassClass)
   ]
 
-  # Remove B == 0 cohorts after young removals
+  ## Remove B == 0 cohorts after young removals
   message(green("  -- Removing cohorts with B = 0 and age > 0 -- these were likely poor predictions from updateYoungBiomasses"))
   whBEqZeroAgeGT0 <- which(pixelCohortData$B == 0 & pixelCohortData$age > 0)
 
@@ -1557,7 +1556,7 @@ makeCohortDataFiles <- function(pixelCohortData, columnsForPixelGroups, speciesE
   )
 
   pixelCohortData <- pixelCohortData2
-  # # Set B to 0 if age is 0
+  ## Set B to 0 if age is 0
   # whAgeZero <- which(pixelCohortData$age == 0)
   # if (length(whAgeZero)) {
   #   message(green("    -- There were", length(whAgeZero), "pixels with age = 0; forcing B to zero"))
@@ -1608,7 +1607,7 @@ makeCohortDataFiles <- function(pixelCohortData, columnsForPixelGroups, speciesE
     )
   }
 
-  # Lost some ecoregionGroups -- refactor
+  ## Lost some ecoregionGroups -- refactor
   pixelCohortData[, ecoregionGroup := factor(as.character(ecoregionGroup))]
 
   cd <- pixelCohortData[, .SD, .SDcols = c("pixelIndex", columnsForPixelGroups())]
