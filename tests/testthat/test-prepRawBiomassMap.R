@@ -2,6 +2,8 @@ testthat::test_that("test prepRawBiomassMap", {
   testthat::skip_on_cran() ## not necessary, but here in case LandR goes to CRAN
   testthat::skip_on_ci()
 
+  skip_if_not_installed("withr")
+
   withr::local_package("reproducible")
   withr::local_package("SpaDES.tools")
   withr::local_package("terra")

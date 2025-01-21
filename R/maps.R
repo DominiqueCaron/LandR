@@ -792,7 +792,7 @@ loadkNNSpeciesLayers <- function(dPath, rasterToMatch = NULL, studyArea = NULL, 
   }
 
   ## get all online file names
-  if (RCurl::url.exists(url)) { ## ping the website first
+  if (suppressWarnings(RCurl::url.exists(url))) { ## ping the website first
     ## is it a google drive url?
     if (grepl("drive.google.com", url)) {
       if (requireNamespace("googledrive", quietly = TRUE)) {
@@ -807,7 +807,9 @@ loadkNNSpeciesLayers <- function(dPath, rasterToMatch = NULL, studyArea = NULL, 
         stop("package 'googledrive' needs to be installed to access google drive files.")
       }
     } else {
-      fileURLs <- RCurl::getURL(url, dirlistonly = TRUE, .opts = list(followlocation = TRUE))
+      fileURLs <- suppressWarnings({
+        RCurl::getURL(url, dirlistonly = TRUE, .opts = list(followlocation = TRUE))
+      }) ## WARNING: partial argument match of 'length' to 'length.out'
       fileNames <- XML::getHTMLLinks(fileURLs)
     }
     fileNames <- grep("(Species|SpeciesGroups)_.*\\.tif$", fileNames, value = TRUE)
