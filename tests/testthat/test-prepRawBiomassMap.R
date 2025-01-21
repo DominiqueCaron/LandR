@@ -54,9 +54,9 @@ testthat::test_that("test prepRawBiomassMap", {
     )
   })
 
-  expect_false(crs(studyArea) == crs(rawBiomassMap))
-  expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
-  expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
+  testthat::expect_false(crs(studyArea) == crs(rawBiomassMap))
+  testthat::expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
+  testthat::expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
 
   ## use SA for cropping/masking, proj with RTM
   ## new args
@@ -80,11 +80,11 @@ testthat::test_that("test prepRawBiomassMap", {
     maskWithRTM = FALSE
   )
 
-  expect_true(st_crs(studyArea) == st_crs(rawBiomassMap))
-  expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
-  expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
-  expect_false(all(is.na(rawBiomassMap[]) == is.na(RTM[])))
-  expect_false(all(is.na(rawBiomassMap2[]) == is.na(RTM[])))
+  testthat::expect_true(st_crs(studyArea) == st_crs(rawBiomassMap))
+  testthat::expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
+  testthat::expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
+  testthat::expect_false(all(is.na(rawBiomassMap[]) == is.na(RTM[])))
+  testthat::expect_false(all(is.na(rawBiomassMap2[]) == is.na(RTM[])))
 
   ## use RTM for everything
   ## new args
@@ -108,7 +108,7 @@ testthat::test_that("test prepRawBiomassMap", {
     cacheTags = "test",
     to = RTM
   ) ## for some reason when not interactive the masking doesn't happen if only supplying `to`
-  expect_true(all(is.na(rawBiomassMap[]) == is.na(RTM[])))
+  testthat::expect_true(all(is.na(rawBiomassMap[]) == is.na(RTM[])))
 
   ## old args
   reproducible::clearCache(userTags = "test", ask = FALSE)
@@ -122,7 +122,7 @@ testthat::test_that("test prepRawBiomassMap", {
     # useSAcrs = TRUE    ## due to reproducible #331 we can't reproduce this.
   )
 
-  expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
-  expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
-  expect_true(all(is.na(rawBiomassMap2[]) == is.na(RTM[]))) ## see reproducible #330
+  testthat::expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
+  testthat::expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
+  testthat::expect_true(all(is.na(rawBiomassMap2[]) == is.na(RTM[]))) ## see reproducible #330
 })
