@@ -7,7 +7,7 @@ testthat::test_that("test prepRawBiomassMap", {
   withr::local_package("terra")
   withr::local_package("sf")
 
-  dPath <- file.path(tempdir(), "inputs")
+  dPath <- withr::local_tempdir("inputs")
 
   withr::local_options(list(
     reproducible.destinationPath = dPath,
@@ -90,7 +90,7 @@ testthat::test_that("test prepRawBiomassMap", {
   #                                    studyAreaName = "test",
   #                                    cacheTags = "test",
   #                                    to = RTM,
-  #                                    projectTo = crs(studyArea))   ## this is failing; reported issue #331-reproducible
+  #                                    projectTo = crs(studyArea))   ## see reproducible #331
 
   reproducible::clearCache(userTags = "test", ask = FALSE)
   rawBiomassMap <- prepRawBiomassMap(
@@ -117,10 +117,10 @@ testthat::test_that("test prepRawBiomassMap", {
     studyArea = studyArea,
     rasterToMatch = RTM,
     maskWithRTM = TRUE # ,
-    # useSAcrs = TRUE    ## due to issue #331-reproducible we can't reproduce this.
+    # useSAcrs = TRUE    ## due to reproducible #331 we can't reproduce this.
   )
 
   expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
   expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
-  # expect_true(all(is.na(rawBiomassMap2[]) == is.na(RTM[])))    ### May 25 2023, reported as issue #330 on reproducible
+  expect_true(all(is.na(rawBiomassMap2[]) == is.na(RTM[]))) ## see reproducible #330
 })
