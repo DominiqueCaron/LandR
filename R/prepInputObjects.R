@@ -485,7 +485,7 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
     maskWithRTM = maskWithRTM,
     method = method,
     datatype = datatype,
-    writeTo = writeTo,
+    # writeTo = writeTo, # no point here ... as it is removed later
     destinationPath = destinationPath,
     url = ageURL,
     fun = ageFun,
@@ -518,6 +518,9 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
     imputedPixID <- attr(standAgeMap, "imputedPixID")
   }
 
+  if (!is.null(writeTo)) {
+    standAgeMap <- writeTo(standAgeMap, writeTo)
+  }
   attr(standAgeMap, "imputedPixID") <- imputedPixID
   return(standAgeMap)
 }
@@ -575,17 +578,24 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
       Args$writeTo <- .suffix("rawBiomassMap.tif", paste0("_", studyAreaName))
     }
   }
+
+  Args2 <- list()
   if (is.null(Args$overwrite)) {
-    Args$overwrite <- TRUE
+    Args2$overwrite <- TRUE
   }
   if (is.null(Args$userTags)) {
-    Args$userTags <- c(cacheTags, "rawBiomassMap")
+    Args2$userTags <- c(cacheTags, "rawBiomassMap")
   }
   if (is.null(Args$omitArgs)) {
-    Args$omitArgs <- c("destinationPath", "targetFile", "userTags", "stable")
+    Args2$omitArgs <- c("destinationPath", "targetFile", "userTags", "stable")
   }
 
-  rawBiomassMap <- Cache(do.call, what = prepInputs, args = Args)
+  if (is.null(Args2$quick)) {
+    Args2$quick <- c("writeTo")
+  }
+
+  rawBiomassMap <- Cache(do.call(prepInputs, args = Args), quick = Args2$quick,
+                                 omitArgs = Args2$omitArgs, userTags = Args2$userTags)
 
   return(rawBiomassMap)
 }
