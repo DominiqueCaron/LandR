@@ -28,7 +28,7 @@ test_that("test .compareRas, .compareCRS -- rasters only", {
     url = url, destinationPath = tempdir(),
     fun = "raster::raster", targetFile = targetFile
   )
-  ras2 <- raster::projectRaster(ras, crs = crs("EPSG:2169", proj = TRUE))
+  ras2 <- raster::projectRaster(ras, crs = raster::crs("EPSG:2169", proj = TRUE))
   expect_true(.compareRas(ras, ras))
   expect_true(.compareRas(ras, ras, ras))
   expect_error(.compareRas(ras, ras, ras2))
