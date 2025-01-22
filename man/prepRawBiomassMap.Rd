@@ -30,5 +30,4 @@ a \code{rawBiomassMap} raster
 }
 \description{
 Create the \code{rawBiomassMap} raster containing biomass estimates for \code{pixelCohortData}.
-Wrapper on \code{\link[reproducible:prepInputs]{reproducible::prepInputs()}} that will rasterize fire polygons.
 }
