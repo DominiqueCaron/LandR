@@ -22,8 +22,8 @@ test_that("test download kNN SpeciesLayers with kNN website - all species", {
   skip_if_not(interactive())
   skip_if_not_installed(c("curl", "googledrive", "httr", "RCurl", "withr", "XML"))
 
-  cPath <- withr::local_tempdir("cache")
-  dPath <- withr::local_tempdir("inputs")
+  cPath <- withr::local_tempdir("cache_")
+  dPath <- withr::local_tempdir("inputs_")
 
   withr::local_options(list(reproducible.cachePath = cPath))
   withr::local_seed(123)
@@ -104,8 +104,8 @@ test_that("test download kNN SpeciesLayers with kNN website - three species", {
   skip_if_not(interactive())
   skip_if_not_installed(c("googledrive", "RCurl", "withr", "XML"))
 
-  cPath <- withr::local_tempdir("cache")
-  dPath <- withr::local_tempdir("inputs")
+  cPath <- withr::local_tempdir("cache_")
+  dPath <- withr::local_tempdir("inputs_")
 
   withr::local_options(reproducible.cachePath = cPath)
 
@@ -167,8 +167,8 @@ test_that("test download kNN SpeciesLayers bad website - three species", {
   skip_if_not(interactive())
   skip_if_not_installed(c("googledrive", "RCurl", "withr", "XML"))
 
-  cPath <- withr::local_tempdir("cache")
-  dPath <- withr::local_tempdir("inputs")
+  cPath <- withr::local_tempdir("cache_")
+  dPath <- withr::local_tempdir("inputs_")
 
   withr::local_seed(123)
 

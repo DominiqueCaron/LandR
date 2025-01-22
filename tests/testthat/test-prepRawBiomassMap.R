@@ -9,7 +9,7 @@ testthat::test_that("test prepRawBiomassMap", {
   withr::local_package("terra")
   withr::local_package("sf")
 
-  dPath <- withr::local_tempdir("inputs")
+  dPath <- withr::local_tempdir("inputs_")
 
   withr::local_options(list(
     reproducible.destinationPath = dPath,
@@ -33,8 +33,8 @@ testthat::test_that("test prepRawBiomassMap", {
   ## use SA for cropping/masking, not proj
   ## new args
   reproducible::clearCache(userTags = "test", ask = FALSE)
-  rawBiomassMap <- suppressWarnings({
-    prepRawBiomassMap(
+  testthat::expect_warning({
+  rawBiomassMap <- prepRawBiomassMap(
       url = biomassURL,
       studyAreaName = "test",
       cacheTags = "test",
@@ -42,17 +42,17 @@ testthat::test_that("test prepRawBiomassMap", {
       maskTo = studyArea,
       projectTo = NA
     )
-  })
+  }, regexp = "CRS do not match") ## prepInputs crs warning
 
   ## old args
-  rawBiomassMap2 <- suppressWarnings({
-    prepRawBiomassMap(
+  testthat::expect_warning({
+    rawBiomassMap2 <- prepRawBiomassMap(
       url = biomassURL,
       studyAreaName = "test",
       cacheTags = "test",
       studyArea = studyArea
     )
-  })
+  }, regexp = "CRS do not match") ## prepInputs crs warning
 
   testthat::expect_false(crs(studyArea) == crs(rawBiomassMap))
   testthat::expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
