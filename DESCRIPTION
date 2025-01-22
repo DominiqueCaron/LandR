@@ -79,6 +79,7 @@ Suggests:
     rmarkdown,
     roxygen2,
     R.utils,
+    SpaDES.core,
     spelling,
     testthat,
     withr,
