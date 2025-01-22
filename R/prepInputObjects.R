@@ -528,12 +528,10 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 #' Create `rawBiomassMap`
 #'
 #' Create the `rawBiomassMap` raster containing biomass estimates for `pixelCohortData`.
-#' Wrapper on [reproducible::prepInputs()] that will rasterize fire polygons.
 #'
 #' @template studyAreaName
 #'
 #' @template cacheTags
-#' @importFrom httr2 request
 #'
 #' @param ... arguments passed to [reproducible::prepInputs()] and [reproducible::Cache()]. If the following arguments
 #'   are not provided, the following values will be used:
@@ -553,8 +551,9 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 #'
 #' @export
 prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
-  if (requireNamespace("httr2"))
+  if (requireNamespace("httr2")) {
     httr2::request
+  }
   Args <- list(...)
   if (is.null(Args$url)) {
     Args$url <- paste0(
@@ -602,7 +601,7 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
   }
 
   rawBiomassMap <- Cache(do.call(prepInputs, args = Args), quick = Args2$quick,
-                                 omitArgs = Args2$omitArgs, userTags = Args2$userTags)
+                         omitArgs = Args2$omitArgs, userTags = Args2$userTags)
 
   return(rawBiomassMap)
 }
