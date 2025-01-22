@@ -201,7 +201,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
     # specDat2[, Bbins := cut(B, breaks = 10)]
     # specDat2[, Bsamples := round((.N/nrow(specDat2))*sampleSize), by = Bbins]
     # specDat2[Bsamples < 1, Bsamples := 1]
-    # sampleIDs <- specDat2[, sample(.I, unique(Bsamples), replace = FALSE), by = Bbins]$V1
+    # sampleIDs <- specDat2[, sample(.I, unique(Bsamples), replace = FALSE), by = Bbins][["V1"]]
     # set(specDat2, NULL, c("Bbins", "Bsamples"), NULL)
 
     sampleIDs <- sample(seq_len(nrow(specDat2)), size = sampleSize)
@@ -1671,7 +1671,7 @@ modifySpeciesAndSpeciesEcoregionTable <- function(speciesEcoregion, speciesTable
 
   speciesTable[, growthCurveSource := "estimated"]
   if (nrow(speciesTable[is.na(inflationFactor), ]) > 0) {
-    missing <- speciesTable[is.na(inflationFactor)]$species
+    missing <- speciesTable[is.na(inflationFactor)][["species"]]
     message("averaging traits for these species: ", paste(missing, collapse = ", "))
     ## note that inflationFactor is dependent on longevity, which is not adjusted
     averageOfEstimated <- speciesTable[

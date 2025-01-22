@@ -129,7 +129,7 @@ utils::globalVariables(c(
 #'       forest <- which(!is.na(pixelGroupMap[]))
 #'       src <- which(!is.na(spMap[[spppChar]][]))
 #'       recvable <- which(!is.na(receivable[]))
-#'       rcvd <- output[speciesCode == sppp]$pixelIndex
+#'       rcvd <- output[speciesCode == sppp][["pixelIndex"]]
 #'
 #'       spMap[[spppChar]][forest] <- 0
 #'       spMap[[spppChar]][recvable] <- 2

@@ -1581,7 +1581,7 @@ makeCohortDataFiles <- function(pixelCohortData, columnsForPixelGroups, speciesE
   }
 
   message(blue("Removing some pixels because their species * ecoregionGroup combination has no age or B data to estimate ecoregion traits:"))
-  # message(blue(paste(sort(unique(pixelCohortData[!ecoregionGroup %in% ecoregionsWeHaveParametersFor]$ecoregionGroup)), collapse = ", ")))
+  # message(blue(paste(sort(unique(pixelCohortData[!ecoregionGroup %in% ecoregionsWeHaveParametersFor][["ecoregionGroup]])), collapse = ", ")))
   cols <- c("speciesCode", "ecoregionGroup")
   messageDF(
     colour = "blue",

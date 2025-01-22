@@ -27,7 +27,7 @@ convertUnwantedLCC2 <- function(classesToReplace = 34:36, rstLCC, nIterations = 
                                 invalidClasses = NA) {
   lccDT <- data.table(pixelIndex = 1:ncell(rstLCC), lcc = as.vector(rstLCC))
 
-  theUnwantedPixels <- lccDT[!is.na(lcc) & lcc %in% classesToReplace]$pixelIndex
+  theUnwantedPixels <- lccDT[!is.na(lcc) & lcc %in% classesToReplace][["pixelIndex"]]
   # lccShort <- lccDT[pixelIndex %in% theUnwantedPixels] #keep for joining
   lccOut <- data.table(
     "pixelIndex" = integer(0), lcc = integer(0),

@@ -583,9 +583,9 @@ assertPixelCohortDataValid <- function(standCohortData,
       )
     }
 
-    test2 <- standCohortData[, sum(relativeAbundObsrvd), by = .(rep, year, pixelIndex)]$V1 |>
+    test2 <- standCohortData[, sum(relativeAbundObsrvd), by = .(rep, year, pixelIndex)][["V1"]] |>
       unique()
-    test3 <- standCohortData[, sum(relativeAbund), by = .(rep, year, pixelIndex)]$V1 |>
+    test3 <- standCohortData[, sum(relativeAbund), by = .(rep, year, pixelIndex)][["V1"]] |>
       unique()
 
     ## need to round, because some values "appear" to be 1, but probably have v. small decimals.

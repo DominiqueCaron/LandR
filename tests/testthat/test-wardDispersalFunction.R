@@ -184,8 +184,8 @@ test_that("test Ward dispersal seeding algorithm", {
       expect_true(all(is.na(joined$pixelIndex[tooFar])))
 
       testDists[[dis]] <- sapply(unique(output$speciesCode), function(spCode) {
-        env$effDist <- unique(joined[speciesCode == spCode]$seeddistance_eff)
-        env$maxDist <- unique(joined[speciesCode == spCode]$seeddistance_max)
+        env$effDist <- unique(joined[speciesCode == spCode][["seeddistance_eff"]])
+        env$maxDist <- unique(joined[speciesCode == spCode][["seeddistance_max"]])
         env$dist <- dis * env$cellSize
         dispersalProb <- do.call(Ward, as.list(env))
         dispersalProb <- 1 - (1 - dispersalProb)^successionTimestep
@@ -324,9 +324,9 @@ test_that("test large files", {
     a = {
       a <- hist(DistOfSuccess,
         # breaks = -125 + seq(0, max(DistOfSuccess) + 250, by = res(pixelGroupMap)[1]),
-        main = speciesTable[as.numeric(.BY)]$species
+        main = speciesTable[as.numeric(.BY)][["species"]]
       )
-      speciesTable[as.numeric(.BY)]$species
+      speciesTable[as.numeric(.BY)][["species"]]
     },
     maxDist = max(DistOfSuccess)
   ), by = "speciesCode"]
@@ -350,7 +350,7 @@ test_that("test large files", {
     forest <- which(!is.na(as.vector(pixelGroupMap[])))
     src <- which(!is.na(as.vector(spMap[[sppp]][])))
     recvable <- which(!is.na(as.vector(receivable[])))
-    rcvd <- out[speciesCode == sppp]$pixelIndex
+    rcvd <- out[speciesCode == sppp][["pixelIndex"]]
 
     spMap[[sppp]][forest] <- 0
     spMap[[sppp]][recvable] <- 2
@@ -389,7 +389,7 @@ test_that("test large files", {
   if (!(whichTest %in% 1:2)) {
     # This is a weak test -- that is often wrong with small samples -- seems to only
     #   work with full dataset
-    corr <- cor(speciesTable[match(rownames(rr), species)]$shadetolerance, rr[, "propSrcRcved"],
+    corr <- cor(speciesTable[match(rownames(rr), species)][["shadetolerance"]], rr[, "propSrcRcved"],
       method = "spearman"
     )
     expect_true(corr > 0.8)
@@ -535,6 +535,6 @@ test_that("test Ward random collection of neighbours", {
     (oo <- out[, .N, by = c("speciesCode")])
     nn <- speciesTab[out, on = "speciesCode"]
     expect_true(all(nn[, DistOfSuccess <= pmax(res(pixelGroupMap)[1], seeddistance_max)]))
-    expect_true(all(nn[, sum(DistOfSuccess == 0) == 1, by = "speciesCode"]$V1))
+    expect_true(all(nn[, sum(DistOfSuccess == 0) == 1, by = "speciesCode"][["V1"]]))
   }
 })
