@@ -1,5 +1,6 @@
 testthat::test_that("test prepRawBiomassMap", {
-  testthat::skip_on_cran() ## not necessary, but here in case LandR goes to CRAN
+  testthat::skip_if_offline()
+  testthat::skip_on_cran()
   testthat::skip_on_ci()
 
   skip_if_not_installed("withr")

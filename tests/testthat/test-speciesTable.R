@@ -1,4 +1,5 @@
 testthat::test_that("speciesTable has correct column types", {
+  testthat::skip_if_not_installed("withr")
   testthat::skip_if_offline()
 
   test_dir <- withr::local_tempdir("test_speciesTable")

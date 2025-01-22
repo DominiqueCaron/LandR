@@ -1,6 +1,7 @@
-test_that("prepInputs fire year works", {
-  skip_on_cran()
-  skip_on_ci()
+testthat::test_that("prepInputs fire year works", {
+  testthat::skip_if_offline()
+  testthat::skip_on_cran()
+  testthat::skip_on_ci()
 
   td <- withr::local_tempdir("dest_")
 
@@ -14,8 +15,8 @@ test_that("prepInputs fire year works", {
     vals = 1
   )
   furl <- "https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_poly/current_version/NFDB_poly.zip"
-  expect_no_error({
-    suppressWarnings({
+  testthat::expect_no_error({
+    testthat::suppressWarnings({
       prepInputsFireYear(
         rasterToMatch = badRTM, maskTo = badPoly,
         destinationPath = td,

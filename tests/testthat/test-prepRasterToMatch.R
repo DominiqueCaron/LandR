@@ -1,6 +1,8 @@
 test_that("prepRasterToMatch works", {
-  skip_on_cran()
-  skip_on_ci()
+  testthat::skip_on_cran()
+  testthat::skip_on_ci()
+
+  testthat::skip_if_not_installed("withr")
 
   td <- withr::local_tempdir("dest_")
 
@@ -32,7 +34,7 @@ test_that("prepRasterToMatch works", {
                       resolution = c(0.01, 0.01), vals = 1)
 
   ## warn that rasterToMatchLarge and rasterToMatch are both missing
-  expect_warning(
+  testthat::expect_warning(
     RTMs <- prepRasterToMatch(
       studyArea = studyAreaS,
       studyAreaLarge = studyAreaL,

@@ -36,7 +36,7 @@ test_that("test download kNN SpeciesLayers with kNN website - all species", {
   sppEquiv <- sppEquiv[KNN != ""]
 
   ## get all available species for 2001
-  expect_warning({
+  testthat::expect_warning({
     httr::with_config(config = httr::config(ssl_verifypeer = .sslVerify), {
       speciesLayers <- loadkNNSpeciesLayers(
         dPath = dPath,
@@ -64,11 +64,11 @@ test_that("test download kNN SpeciesLayers with kNN website - all species", {
     "Needleleaf_Spp"
   )
 
-  expect_true(all(expectedSpp %in% names(speciesLayers)))
-  expect_true(.compareRas(RTM, speciesLayers, res = TRUE, stopiffalse = FALSE))
+  testthat::expect_true(all(expectedSpp %in% names(speciesLayers)))
+  testthat::expect_true(.compareRas(RTM, speciesLayers, res = TRUE, stopiffalse = FALSE))
 
   ## get all available species for 2011
-  expect_warning({
+  testthat::expect_warning({
     httr::with_config(config = httr::config(ssl_verifypeer = .sslVerify), {
       speciesLayers2011 <- loadkNNSpeciesLayers(
         dPath = dPath,
@@ -95,14 +95,15 @@ test_that("test download kNN SpeciesLayers with kNN website - all species", {
     "Pinu_Spp", "Popu_Bal", "Popu_Tre",
     "Pseu_Men", "Broadleaf_Spp", "Needleleaf_Spp"
   )
-  expect_true(all(expectedSpp %in% names(speciesLayers2011)))
-  expect_true(.compareRas(RTM, speciesLayers2011, res = TRUE, stopOnError = FALSE)) ## TODO: fails
+  testthat::expect_true(all(expectedSpp %in% names(speciesLayers2011)))
+  testthat::expect_true(.compareRas(RTM, speciesLayers2011, res = TRUE, stopOnError = FALSE)) ## TODO: fails
 })
 
 test_that("test download kNN SpeciesLayers with kNN website - three species", {
-  skip_on_cran()
-  skip_if_not(interactive())
-  skip_if_not_installed(c("googledrive", "RCurl", "withr", "XML"))
+  testthat::skip_on_cran()
+  testthat::skip_if_not(interactive())
+  testthat::skip_if_not_installed(c("googledrive", "RCurl", "withr", "XML"))
+  testthat::skip_if_offline()
 
   cPath <- withr::local_tempdir("cache_")
   dPath <- withr::local_tempdir("inputs_")
@@ -137,8 +138,8 @@ test_that("test download kNN SpeciesLayers with kNN website - three species", {
   })
   ## TODO: WARNING: [readValues] raster has no values
 
-  expect_true(all(sppEquiv$KNN %in% names(speciesLayers)))
-  expect_true(.compareRas(RTM, speciesLayers, res = TRUE, stopOnError = FALSE))
+  testthat::expect_true(all(sppEquiv$KNN %in% names(speciesLayers)))
+  testthat::expect_true(.compareRas(RTM, speciesLayers, res = TRUE, stopOnError = FALSE))
 
   ## get all available species for 2011
   httr::with_config(config = httr::config(ssl_verifypeer = .sslVerify), {
@@ -159,13 +160,14 @@ test_that("test download kNN SpeciesLayers with kNN website - three species", {
   })
   ## TODO: WARNING: [readValues] raster has no values
 
-  expect_true(all(sppEquiv$KNN %in% names(speciesLayers2011)))
-  expect_true(.compareRas(RTM, speciesLayers2011, res = TRUE, stopOnError = FALSE))
+  testthat::expect_true(all(sppEquiv$KNN %in% names(speciesLayers2011)))
+  testthat::expect_true(.compareRas(RTM, speciesLayers2011, res = TRUE, stopOnError = FALSE))
 })
 
 test_that("test download kNN SpeciesLayers bad website - three species", {
   skip_if_not(interactive())
   skip_if_not_installed(c("googledrive", "RCurl", "withr", "XML"))
+  testthat::skip_if_offline()
 
   cPath <- withr::local_tempdir("cache_")
   dPath <- withr::local_tempdir("inputs_")
@@ -195,8 +197,8 @@ test_that("test download kNN SpeciesLayers bad website - three species", {
       thresh = 0
     )
   })
-  expect_true(all(sppEquiv$KNN %in% names(speciesLayers)))
-  expect_true(LandR::.compareRas(RTM, speciesLayers, res = TRUE, stopOnError = FALSE))
+  testthat::expect_true(all(sppEquiv$KNN %in% names(speciesLayers)))
+  testthat::expect_true(LandR::.compareRas(RTM, speciesLayers, res = TRUE, stopOnError = FALSE))
 
   ## get all available species for 2011
   speciesLayers2011 <- prepSpeciesLayers_KNN(
@@ -210,6 +212,6 @@ test_that("test download kNN SpeciesLayers bad website - three species", {
     sppEquivCol = sppEquivCol,
     thresh = 0
   )
-  expect_true(all(sppEquiv$KNN %in% names(speciesLayers2011)))
-  expect_true(.compareRas(RTM, speciesLayers2011, res = TRUE, stopOnError = FALSE))
+  testthat::expect_true(all(sppEquiv$KNN %in% names(speciesLayers2011)))
+  testthat::expect_true(.compareRas(RTM, speciesLayers2011, res = TRUE, stopOnError = FALSE))
 })

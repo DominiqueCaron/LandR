@@ -1,4 +1,5 @@
 testthat::test_that("test .compareRas, .compareCRS -- rasters only", {
+  testthat::skip_if_offline()
   testthat::skip_if_not_installed("withr")
 
   td <- withr::local_tempdir("dest_")
