@@ -1948,114 +1948,41 @@ vegTypeGenerator <- function(x, vegLeadingProportion = 0.8,
 
   ## use new vs old algorithm based on size of x. new one (2) is faster in most cases.
   ## enable assertions to view timings for each algorithm before deciding which to use.
-  algo <- ifelse(nrowCohortData > 3.5e6, 1, 2)
+  ## 2025-01: old algo faster for larger tables and should be used by default (see #39)
 
   pgdAndSc <- c(pixelGroupColName, "speciesCode")
   pgdAndScAndLeading <- c(pgdAndSc, leadingBasedOn)
   totalOfLeadingBasedOn <- paste0("total", leadingBasedOn)
   speciesOfLeadingBasedOn <- paste0("speciesGroup", leadingBasedOn)
-  if (algo == 1 || isTRUE(doAssertion)) {
-    # slower -- older, but simpler Eliot June 5, 2019
-    # 1. Find length of each pixelGroup -- don't include pixelGroups in "by" that have only 1 cohort: N = 1
-    cohortData1 <- copy(x)
-    systimePre1 <- Sys.time()
-    pixelGroupData1 <- cohortData1[, list(N = .N), by = pixelGroupColName]
 
-    # Calculate speciesProportion from cover or B
-    pixelGroupData1 <- cohortData1[, ..pgdAndScAndLeading][pixelGroupData1, on = pixelGroupColName]
-    set(pixelGroupData1, NULL, totalOfLeadingBasedOn, pixelGroupData1[[leadingBasedOn]])
+  ## 1. Find length of each pixelGroup -- don't include pixelGroups in "by" that have only 1 cohort: N = 1
+  cohortData1 <- copy(x)
+  systimePre1 <- Sys.time()
+  pixelGroupData1 <- cohortData1[, list(N = .N), by = pixelGroupColName]
 
-    if (identical(leadingBasedOn, "cover")) {
-      pixelGroupData1[N != 1, (totalOfLeadingBasedOn) := sum(cover, na.rm = TRUE), by = pixelGroupColName]
-      pixelGroupData1 <- pixelGroupData1[, list(sum(cover, na.rm = TRUE), totalcover[1]), by = pgdAndSc]
-    } else {
-      pixelGroupData1[N != 1, (totalOfLeadingBasedOn) := sum(B, na.rm = TRUE), by = pixelGroupColName]
-      pixelGroupData1 <- pixelGroupData1[, list(sum(B, na.rm = TRUE), totalB[1]), by = pgdAndSc]
-    }
-    setnames(pixelGroupData1, old = c("V1", "V2"), new = c(speciesOfLeadingBasedOn, totalOfLeadingBasedOn))
+  ## Calculate speciesProportion from cover or B
+  pixelGroupData1 <- cohortData1[, ..pgdAndScAndLeading][pixelGroupData1, on = pixelGroupColName]
+  set(pixelGroupData1, NULL, totalOfLeadingBasedOn, pixelGroupData1[[leadingBasedOn]])
 
-    set(pixelGroupData1, NULL, "speciesProportion", pixelGroupData1[[speciesOfLeadingBasedOn]] /
-      pixelGroupData1[[totalOfLeadingBasedOn]])
-    systimePost1 <- Sys.time()
-
-    setorderv(pixelGroupData1, pixelGroupColName)
+  if (identical(leadingBasedOn, "cover")) {
+    pixelGroupData1[N != 1, (totalOfLeadingBasedOn) := sum(cover, na.rm = TRUE), by = pixelGroupColName]
+    pixelGroupData1 <- pixelGroupData1[, list(sum(cover, na.rm = TRUE), totalcover[1]), by = pgdAndSc]
+  } else {
+    pixelGroupData1[N != 1, (totalOfLeadingBasedOn) := sum(B, na.rm = TRUE), by = pixelGroupColName]
+    pixelGroupData1 <- pixelGroupData1[, list(sum(B, na.rm = TRUE), totalB[1]), by = pgdAndSc]
   }
+  setnames(pixelGroupData1, old = c("V1", "V2"), new = c(speciesOfLeadingBasedOn, totalOfLeadingBasedOn))
 
-  if (algo == 2 || isTRUE(doAssertion)) {
-    # Replacement algorithm to calculate speciesProportion
-    #  Logic is similar to above --
-    #  1. sort by pixelGroup
-    #  2. calculate N, use this to repeat itself (instead of a join above)
-    #  3. calculate speciesProportion, noting to calculate with by only if N > 1, otherwise
-    #     it is a simpler non-by calculation
-    cohortData2 <- copy(x)
-    systimePre2 <- Sys.time()
-    setkeyv(cohortData2, pgdAndSc)
-    # setorderv(x, pixelGroupColName)
-    pixelGroupData2 <- cohortData2[, list(N = .N), by = pixelGroupColName]
-    cohortData2 <- cohortData2[, ..pgdAndScAndLeading]
+  set(pixelGroupData1, NULL, "speciesProportion", pixelGroupData1[[speciesOfLeadingBasedOn]] /
+    pixelGroupData1[[totalOfLeadingBasedOn]])
+  systimePost1 <- Sys.time()
 
-    N <- rep.int(pixelGroupData2$N, pixelGroupData2$N)
-    wh1 <- N == 1
-    set(cohortData2, which(wh1), totalOfLeadingBasedOn, cohortData2[[leadingBasedOn]][wh1])
-    if (identical(leadingBasedOn, "cover")) {
-      totalBNot1 <- cohortData2[!wh1, list(N = .N, totalcover = sum(cover, na.rm = TRUE)), by = pixelGroupColName]
-    } else {
-      totalBNot1 <- cohortData2[!wh1, list(N = .N, totalB = sum(B, na.rm = TRUE)), by = pixelGroupColName]
-    }
-    totalBNot1 <- rep.int(totalBNot1[[totalOfLeadingBasedOn]], totalBNot1[["N"]])
-    set(cohortData2, which(!wh1), totalOfLeadingBasedOn, totalBNot1)
+  setorderv(pixelGroupData1, pixelGroupColName)
 
-    b <- cohortData2[, list(N = .N), by = pgdAndSc]
-    b <- rep.int(b[["N"]], b[["N"]])
-    GT1 <- (b > 1)
-    if (any(GT1)) {
-      pixelGroupData2List <- list()
-      cohortData2[GT1, speciesProportion := sum(B, na.rm = TRUE) / totalB[1], by = pgdAndSc]
-      cohortData2[!GT1, speciesProportion := B / totalB]
-      # pixelGroupData2List[[2]] <- cohortData2[!GT1]
-      # pixelGroupData2 <- rbindlist(pixelGroupData2List)
-    } else {
-      # cols <- c(pixelGroupColName, "speciesCode", "speciesProportion")
-      set(cohortData2, NULL, "speciesProportion", cohortData2[[leadingBasedOn]] /
-        cohortData2[[totalOfLeadingBasedOn]])
-      # pixelGroupData2[[NROW(pixelGroupData2) + 1]] <- cohortData2[!GT1, ..cols]
-    }
-    pixelGroupData2 <- cohortData2
-    systimePost2 <- Sys.time()
-  }
+  pixelGroupData <- pixelGroupData1
+  rm(pixelGroupData1)
 
-  if (isTRUE(doAssertion)) {
-    ## slower -- older, but simpler Eliot June 5, 2019
-    ## TODO: these algorithm tests should be deleted after a while. See date on prev line.
-    if (!exists("oldAlgoVTM", envir = .pkgEnv)) .pkgEnv$oldAlgoVTM <- 0
-    if (!exists("newAlgoVTM", envir = .pkgEnv)) .pkgEnv$newAlgoVTM <- 0
-    .pkgEnv$oldAlgoVTM <- .pkgEnv$oldAlgoVTM + (systimePost1 - systimePre1)
-    .pkgEnv$newAlgoVTM <- .pkgEnv$newAlgoVTM + (systimePost2 - systimePre2)
-    message("LandR::vegTypeMapGenerator: new algo ", .pkgEnv$newAlgoVTM)
-    message("LandR::vegTypeMapGenerator: old algo ", .pkgEnv$oldAlgoVTM)
-    setorderv(pixelGroupData2, pgdAndSc)
-    whNA <- unique(unlist(sapply(pixelGroupData2, function(xx) which(is.na(xx)))))
-    pixelGroupData1 <- pixelGroupData1[!pixelGroupData2[whNA], on = pgdAndSc]
-    setkeyv(pixelGroupData1, pgdAndSc)
-    setkeyv(pixelGroupData2, pgdAndSc)
-    aa <- pixelGroupData1[pixelGroupData2, on = pgdAndSc]
-    if (!isTRUE(all.equal(aa[["speciesProportion"]], aa[["i.speciesProportion"]]))) {
-      stop("Old algorithm in vegMapGenerator is different than new map")
-    }
-  }
-
-  if (algo == 1) {
-    pixelGroupData <- pixelGroupData1
-    rm(pixelGroupData1)
-  } else if (algo == 2) {
-    pixelGroupData <- pixelGroupData2
-    rm(pixelGroupData2)
-  }
-
-  ########################################################
-  #### Determine "mixed"
-  ########################################################
+  ## Determine "mixed" -----------------------------------
   if (mixedType == 0) {
     ## 1. sort on pixelGroup and speciesProportion, reverse so 1st row of each pixelGroup is the largest
     ## 2. Keep only first row in each pixelGroup
@@ -2066,7 +1993,7 @@ vegTypeGenerator <- function(x, vegLeadingProportion = 0.8,
     pixelGroupData3 <- pixelGroupData3[, .SD[1], by = pixelGroupColName]
     setnames(pixelGroupData3, "speciesCode", "leading")
   } else if (mixedType == 1) {
-    ## create "mixed" class #    -- Eliot May 28, 2019 -- faster than previous below
+    ## create "mixed" class (2019-05: faster than previous below)
     ## 1. anything with >= vegLeadingProportion is "pure"
     ## 2. sort on pixelGroup and speciesProportion, reverse so that 1st row of each pixelGroup is the largest
     ## 3. Keep only first row in each pixelGroup
@@ -2114,22 +2041,8 @@ vegTypeGenerator <- function(x, vegLeadingProportion = 0.8,
       speciesProportion > 1 - vegLeadingProportion)
     pixelGroupData3[, mixed := FALSE]
 
-    if (algo == 2 || isTRUE(doAssertion)) {
-      b <- pixelGroupData3[, list(N = .N), by = pixelGroupColName]
-      b <- rep.int(b[["N"]], b[["N"]])
-      GT1 <- b > 1
-
-
-      pgd3GT1 <- pixelGroupData3[GT1]
-      pgd3NGT1 <- pixelGroupData3[!GT1]
-
-      pgd3GT1[eval(mixedType2Condition), mixed := TRUE, by = pixelGroupColName]
-      pgd3GT1[, mixed := any(mixed), by = pixelGroupColName]
-      pixelGroupData3 <- rbindlist(list(pgd3NGT1, pgd3GT1))
-    } else {
-      pixelGroupData3[eval(mixedType2Condition), mixed := TRUE, by = pixelGroupColName]
-      pixelGroupData3[, mixed := any(mixed), by = pixelGroupColName]
-    }
+    pixelGroupData3[eval(mixedType2Condition), mixed := TRUE, by = pixelGroupColName]
+    pixelGroupData3[, mixed := any(mixed), by = pixelGroupColName]
 
     setorderv(pixelGroupData3, cols = c(pixelGroupColName, "speciesProportion"), order = -1L)
     set(pixelGroupData3, NULL, "speciesProportion", NULL)
