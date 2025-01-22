@@ -532,7 +532,6 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 #' @template studyAreaName
 #'
 #' @template cacheTags
-#' @importFrom httr2 request
 #'
 #' @param ... arguments passed to [reproducible::prepInputs()] and [reproducible::Cache()]. If the following arguments
 #'   are not provided, the following values will be used:

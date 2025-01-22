@@ -35,6 +35,7 @@
 #' @importFrom ggpubr theme_pubr
 #' @importFrom ggspatial annotation_north_arrow layer_spatial north_arrow_minimal
 #' @importFrom grDevices colorRampPalette dev.off png
+#' @importFrom httr2 request
 #' @importFrom lme4 glmer lmer
 #' @importFrom MuMIn r.squaredGLMM
 #' @importFrom parallel mclapply
