@@ -2,6 +2,8 @@ test_that("prepInputs fire year works", {
   skip_on_cran()
   skip_on_ci()
 
+  td <- withr::local_tempdir("dest_")
+
   badExtent <- terra::ext(-80.7421995, -75.816238, 44.3156278, 46.971853)
   badPoly <- terra::vect(badExtent)
   terra::crs(badPoly) <- "epsg:4269"
@@ -16,7 +18,7 @@ test_that("prepInputs fire year works", {
     suppressWarnings({
       prepInputsFireYear(
         rasterToMatch = badRTM, maskTo = badPoly,
-        destinationPath = tempdir(),
+        destinationPath = td,
         url = furl,
         fireField = "YEAR"
       )

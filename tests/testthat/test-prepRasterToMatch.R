@@ -1,6 +1,9 @@
 test_that("prepRasterToMatch works", {
   skip_on_cran()
   skip_on_ci()
+
+  td <- withr::local_tempdir("dest_")
+
   withr::local_package("terra")
 
   # get SAs from PredictiveEcology.org example Chapter 14
@@ -28,7 +31,7 @@ test_that("prepRasterToMatch works", {
   rtmE <- terra::rast(terra::ext(c(-105, -104, 55, 56)),
                       resolution = c(0.01, 0.01), vals = 1)
 
-  # warn that rasterToMatchLarge and rasterToMatch are both missing
+  ## warn that rasterToMatchLarge and rasterToMatch are both missing
   expect_warning(
     RTMs <- prepRasterToMatch(
       studyArea = studyAreaS,
@@ -36,7 +39,7 @@ test_that("prepRasterToMatch works", {
       rasterToMatch = NULL,
       rasterToMatchLarge = NULL,
       templateRas = rtmE,
-      destinationPath = tempdir(),
+      destinationPath = td,
       studyAreaName = "foo"
     )
   )

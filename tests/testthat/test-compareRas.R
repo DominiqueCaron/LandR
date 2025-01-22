@@ -1,6 +1,8 @@
 testthat::test_that("test .compareRas, .compareCRS -- rasters only", {
   testthat::skip_if_not_installed("withr")
 
+  td <- withr::local_tempdir("dest_")
+
   withr::local_package("reproducible")
 
   withr::local_options(list(
@@ -13,7 +15,7 @@ testthat::test_that("test .compareRas, .compareCRS -- rasters only", {
   url <- "https://github.com/tati-micheletti/host/raw/master/data/rasterTest.tif"
   targetFile <- basename(url)
 
-  ras <- prepInputs(url = url, destinationPath = tempdir(), targetFile = targetFile)
+  ras <- prepInputs(url = url, destinationPath = td, targetFile = targetFile)
   ras2 <- terra::project(ras, "EPSG:2169")
   testthat::expect_true(.compareRas(ras, ras))
   testthat::expect_true(.compareRas(ras, ras, ras))
@@ -27,7 +29,7 @@ testthat::test_that("test .compareRas, .compareCRS -- rasters only", {
 
   ## and with RasterLayer
   ras <- prepInputs(
-    url = url, destinationPath = tempdir(),
+    url = url, destinationPath = td,
     fun = "raster::raster", targetFile = targetFile
   )
   ras2 <- raster::projectRaster(ras, crs = terra::crs("EPSG:2169", proj = TRUE))

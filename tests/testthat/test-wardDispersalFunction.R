@@ -1,5 +1,5 @@
 test_that("test Ward dispersal seeding algorithm", {
-  skip_if_not_installed("googledrive")
+  skip_if_not_installed(c("googledrive", "withr"))
 
   verbose <- 0
 
@@ -15,7 +15,7 @@ test_that("test Ward dispersal seeding algorithm", {
   # keep this here for interactive testing with a larger raster
   doLarge <- if (interactive()) FALSE else FALSE
   if (doLarge) {
-    set.seed(1234)
+    withr::local_seed(1234)
     message("Doing LARGE raster test -- should take more than 4 minutes")
     reducedPixelGroupMap <- rast(
       xmin = 50, xmax = 50 + 99 * 18000,
@@ -212,14 +212,15 @@ test_that("test Ward dispersal seeding algorithm", {
 })
 
 test_that("test large files", {
-  skip_if_not_installed("googledrive")
+  skip_if_not_installed(c("googledrive", "withr"))
+
+  dp <- withr::local_tempdir("dest_")
 
   if (interactive()) {
     whichTest <- 0 # 0 for full test (slow), 1 (manual interactive) or 2 (medium)
-    dp <- switch(Sys.info()[["user"]], emcintir = "~/tmp", tempdir())
+    dp <- switch(Sys.info()[["user"]], emcintir = "~/tmp", dp)
   } else {
     whichTest <- 2
-    dp <- tempdir()
     googledrive::drive_deauth()
   }
 
@@ -257,7 +258,7 @@ test_that("test large files", {
   }
 
   seed <- 1234
-  set.seed(seed)
+  withr::local_seed(seed)
   dtSrc1 <- data.table::copy(dtSrc)
   dtRcv1 <- data.table::copy(dtRcv)
   sppKeep <- unique(dtRcv1$speciesCode)
@@ -399,6 +400,8 @@ test_that("test large files", {
 })
 
 test_that("test Ward 4 immediate neighbours", {
+  skip_if_not_installed("withr")
+
   withr::local_package("data.table")
   withr::local_package("SpaDES.tools")
 
@@ -456,7 +459,7 @@ test_that("test Ward 4 immediate neighbours", {
     )
     seed <- sample(1e6, 1)
     # seed <- 163330
-    set.seed(seed)
+    withr::local_seed(seed)
     out <- LANDISDisp(dtSrc,
       dtRcv = dtRcv, pixelGroupMap, speciesTable = speciesTab,
       successionTimestep = 1, verbose = 1, fast = FALSE
@@ -472,6 +475,8 @@ test_that("test Ward 4 immediate neighbours", {
 })
 
 test_that("test Ward random collection of neighbours", {
+  skip_if_not_installed("withr")
+
   withr::local_package("data.table")
   withr::local_package("SpaDES.tools")
 
@@ -519,7 +524,7 @@ test_that("test Ward random collection of neighbours", {
       seeddistance_max = c(100, 200, 250, 300, 250, 300, 490, 1240, 400, 500)
     )
     seed <- sample(1e6, 1)
-    set.seed(seed)
+    withr::local_seed(seed)
     out <- LANDISDisp(dtSrc,
       dtRcv = dtRcv, pixelGroupMap, speciesTable = speciesTab,
       successionTimestep = 1, verbose = 1
