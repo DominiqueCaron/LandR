@@ -1,12 +1,13 @@
-test_that("leading species transitions plots look good", {
-  skip_on_cran()
-  skip_on_ci()
-  skip_if_not_installed("dplyr")
-  skip_if_not_installed("ggalluvial")
-  skip_if_not_installed("ggrepel")
-  skip_if_not_installed("map")
-  skip_if_not_installed("memuse")
-  skip_if_not_installed("withr")
+testthat::test_that("leading species transitions plots look good", {
+  testthat::skip_on_cran()
+  testthat::skip_on_ci()
+  testthat::skip_if_not_installed("dplyr")
+  testthat::skip_if_not_installed("ggalluvial")
+  testthat::skip_if_not_installed("ggrepel")
+  testthat::skip_if_not_installed("map")
+  testthat::skip_if_not_installed("memuse")
+  testthat::skip_if_not_installed("SpaDES.core")
+  testthat::skip_if_not_installed("withr")
 
   withr::local_package("data.table")
   withr::local_package("ggplot2")
@@ -15,7 +16,7 @@ test_that("leading species transitions plots look good", {
   withr::local_package("terra")
 
   ## need ~10GB RAM to construct summary data.frames and plots
-  skip_if_not(isTRUE(Sys.meminfo()$freeram >= as.memuse(10 * 1024^3)))
+  testthat::skip_if_not(isTRUE(Sys.meminfo()$freeram >= as.memuse(10 * 1024^3)))
 
   run <- 1L
   outputDir <- file.path(
@@ -24,6 +25,8 @@ test_that("leading species transitions plots look good", {
     sprintf("rep%02d", run)
   )
 
+  testthat::skip_if_not(dir.exists(outputDir))
+
   ml <- readRDS(file.path(outputDir, "ml_preamble.rds"))
   rTM <- terra::rast(file.path(outputDir, "pixelGroupMap_year0000.tif")) |> terra::rast()
   studyArea2 <- map::studyArea(ml, 2) ## studyAreaReporting
@@ -31,8 +34,7 @@ test_that("leading species transitions plots look good", {
     sf::st_crop(ml$`ecoregionLayer (NDTxBEC)`, studyArea2)
   })
   rstNDTBEC <- terra::rasterize(NDTBEC, rTM, field = "NDTBEC") |>
-    terra::crop(studyArea2) |>
-    terra::mask(studyArea2)
+    terra::crop(studyArea2, mask = TRUE)
   rm(ml)
 
   years <- c(800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200)
