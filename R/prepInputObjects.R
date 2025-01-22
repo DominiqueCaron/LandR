@@ -533,6 +533,7 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 #' @template studyAreaName
 #'
 #' @template cacheTags
+#' @importFrom httr2 request
 #'
 #' @param ... arguments passed to [reproducible::prepInputs()] and [reproducible::Cache()]. If the following arguments
 #'   are not provided, the following values will be used:
@@ -552,6 +553,8 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 #'
 #' @export
 prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
+  if (requireNamespace("httr2"))
+    httr2::request
   Args <- list(...)
   if (is.null(Args$url)) {
     Args$url <- paste0(

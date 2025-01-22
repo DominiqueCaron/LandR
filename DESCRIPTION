@@ -65,6 +65,7 @@ Suggests:
     ggrepel,
     googledrive (>= 2.0.0),
     httr,
+    httr2,
     knitr,
     lqmm,
     MASS,
