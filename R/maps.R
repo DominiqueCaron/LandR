@@ -737,9 +737,9 @@ vegTypeMapGenerator.data.table <- function(x, pixelGroupMap, vegLeadingProportio
 #' @return A raster stack of percent cover layers by species.
 #'
 #' @export
-loadkNNSpeciesLayers <- function(dPath, rasterToMatch = NULL, studyArea = NULL, sppEquiv, year = 2001,
-                                 knnNamesCol = "KNN", sppEquivCol = "Boreal", thresh = 10, url = NULL,
-                                 ...) {
+loadkNNSpeciesLayers <- function(dPath, rasterToMatch = NULL, studyArea = NULL, sppEquiv,
+                                 year = 2001, knnNamesCol = "KNN", sppEquivCol = "Boreal",
+                                 thresh = 10, url = NULL, ...) {
   rcurl <- requireNamespace("RCurl", quietly = TRUE)
   xml <- requireNamespace("XML", quietly = TRUE)
   if (!rcurl || !xml) {
@@ -833,14 +833,15 @@ loadkNNSpeciesLayers <- function(dPath, rasterToMatch = NULL, studyArea = NULL, 
 
   ## Make sure spp names are compatible with kNN names
   kNNnames <- if (knnNamesCol %in% colnames(sppEquiv)) {
-    as.character(equivalentName(sppNameVector, sppEquiv, column = knnNamesCol, multi = TRUE))
+    equivalentName(sppNameVector, sppEquiv, column = knnNamesCol, multi = TRUE) |>
+      as.character()
   } else {
-    as.character(equivalentName(sppNameVector, sppEquivalencies_CA,
-                                column = knnNamesCol, multi = TRUE,
-                                searchColumn = sppEquivCol))
+    equivalentName(sppNameVector, sppEquivalencies_CA, column = knnNamesCol, multi = TRUE,
+                   searchColumn = sppEquivCol) |>
+      as.character()
   }
-  sppNameVector <- as.character(equivalentName(sppNameVector, sppEquiv, column = sppEquivCol,
-                                               multi = TRUE))
+  sppNameVector <- equivalentName(sppNameVector, sppEquiv, column = sppEquivCol, multi = TRUE) |>
+    as.character()
 
   ## if there are NA's, that means some species can't be found in kNN database
   if (any(is.na(kNNnames))) {
