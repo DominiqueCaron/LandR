@@ -30,7 +30,7 @@ testthat::test_that("test .compareRas, .compareCRS -- rasters only", {
     url = url, destinationPath = tempdir(),
     fun = "raster::raster", targetFile = targetFile
   )
-  ras2 <- raster::projectRaster(ras, crs = raster::crs("EPSG:2169", proj = TRUE))
+  ras2 <- raster::projectRaster(ras, crs = terra::crs("EPSG:2169", proj = TRUE))
   testthat::expect_true(.compareRas(ras, ras))
   testthat::expect_true(.compareRas(ras, ras, ras))
   testthat::expect_error(.compareRas(ras, ras, ras2))
@@ -45,7 +45,7 @@ testthat::test_that("test .compareRas, .compareCRS -- rasters only", {
 testthat::test_that("test .compareRas, .compareCRS -- vectors only", {
   f <- system.file("ex/lux.shp", package = "terra")
   v <- terra::vect(f)
-  v2 <- terra::project(v, crs(v))
+  v2 <- terra::project(v, terra::crs(v))
 
   testthat::expect_true(.compareRas(v, v))
   testthat::expect_true(.compareRas(v, v, v))
