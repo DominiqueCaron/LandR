@@ -552,7 +552,6 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 #'
 #' @export
 prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
-  httr2::request # use function for imports
   Args <- list(...)
   if (is.null(Args$url)) {
     Args$url <- paste0(
@@ -561,6 +560,9 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
       "NFI_MODIS250m_2011_kNN_Structure_Biomass_TotalLiveAboveGround_v1.tif"
     )
   }
+  # this is primary to use httr2 because it is an Imports; actually it is needed below in prepInputs
+  url <- httr2::request(Args$url)$url
+
   if (is.null(Args$useSAcrs)) {
     Args$useSAcrs <- FALSE
   }
