@@ -29,7 +29,7 @@ testthat::test_that("test download kNN SpeciesLayers with kNN website - all spec
   withr::local_seed(123)
 
   SA <- randomStudyArea(size = 10000000)
-  RTM <- rast(SA, resolution = 250)
+  RTM <- terra::rast(SA, resolution = 250, vals = 1L)
   sppEquiv <- sppEquivalencies_CA
   sppEquivCol <- "KNN"
 
@@ -113,7 +113,7 @@ testthat::test_that("test download kNN SpeciesLayers with kNN website - three sp
   withr::local_seed(123)
 
   SA <- randomStudyArea(size = 10000000)
-  RTM <- rast(SA, resolution = 250)
+  RTM <- terra::rast(SA, resolution = 250, vals = 1L)
   sppEquiv <- sppEquivalencies_CA
   sppEquivCol <- "KNN"
 
@@ -175,7 +175,7 @@ testthat::test_that("test download kNN SpeciesLayers bad website - three species
   withr::local_seed(123)
 
   SA <- randomStudyArea(size = 10000000)
-  RTM <- rast(SA, resolution = 250)
+  RTM <- terra::rast(SA, resolution = 250, vals = 1L)
   sppEquiv <- sppEquivalencies_CA
   sppEquivCol <- "KNN"
 
