@@ -16,7 +16,7 @@ testthat::test_that("prepInputs fire year works", {
   )
   furl <- "https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_poly/current_version/NFDB_poly.zip"
   testthat::expect_no_error({
-    testthat::suppressWarnings({
+    suppressWarnings({
       prepInputsFireYear(
         rasterToMatch = badRTM, maskTo = badPoly,
         destinationPath = td,

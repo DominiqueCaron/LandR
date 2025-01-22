@@ -17,10 +17,10 @@
   ifelse(sslIssue, 0L, unname(curl::curl_options("^ssl_verifypeer$")))
 })
 
-test_that("test download kNN SpeciesLayers with kNN website - all species", {
-  skip_on_cran()
-  skip_if_not(interactive())
-  skip_if_not_installed(c("curl", "googledrive", "httr", "RCurl", "withr", "XML"))
+testthat::test_that("test download kNN SpeciesLayers with kNN website - all species", {
+  testthat::skip_on_cran()
+  testthat::skip_if_not(interactive())
+  testthat::skip_if_not_installed(c("curl", "googledrive", "httr", "RCurl", "withr", "XML"))
 
   cPath <- withr::local_tempdir("cache_")
   dPath <- withr::local_tempdir("inputs_")
@@ -99,7 +99,7 @@ test_that("test download kNN SpeciesLayers with kNN website - all species", {
   testthat::expect_true(.compareRas(RTM, speciesLayers2011, res = TRUE, stopOnError = FALSE)) ## TODO: fails
 })
 
-test_that("test download kNN SpeciesLayers with kNN website - three species", {
+testthat::test_that("test download kNN SpeciesLayers with kNN website - three species", {
   testthat::skip_on_cran()
   testthat::skip_if_not(interactive())
   testthat::skip_if_not_installed(c("googledrive", "RCurl", "withr", "XML"))
@@ -164,9 +164,9 @@ test_that("test download kNN SpeciesLayers with kNN website - three species", {
   testthat::expect_true(.compareRas(RTM, speciesLayers2011, res = TRUE, stopOnError = FALSE))
 })
 
-test_that("test download kNN SpeciesLayers bad website - three species", {
-  skip_if_not(interactive())
-  skip_if_not_installed(c("googledrive", "RCurl", "withr", "XML"))
+testthat::test_that("test download kNN SpeciesLayers bad website - three species", {
+  testthat::skip_if_not(interactive())
+  testthat::skip_if_not_installed(c("googledrive", "RCurl", "withr", "XML"))
   testthat::skip_if_offline()
 
   cPath <- withr::local_tempdir("cache_")
