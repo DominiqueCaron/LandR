@@ -829,13 +829,7 @@ loadkNNSpeciesLayers <- function(dPath, rasterToMatch = NULL, studyArea = NULL, 
     sub("_v1\\.tif", "", x = _) |>
     sub(".*(Species|SpeciesGroups)_", "", x = _)
 
-  if (getRversion() < "4.0.0") {
-    if (length(allSpp) == 0) {
-      stop("Incomplete file list retrieved from server.")
-    }
-  } else {
-    stopifnot("Incomplete file list retrieved from server." = length(allSpp) > 1)
-  }
+  stopifnot("Incomplete file list retrieved from server." = length(allSpp) > 1)
 
   ## Make sure spp names are compatible with kNN names
   kNNnames <- if (knnNamesCol %in% colnames(sppEquiv)) {
