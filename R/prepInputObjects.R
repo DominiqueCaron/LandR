@@ -784,7 +784,9 @@ prepRasterToMatch <- function(studyArea, studyAreaLarge,
               paste0("_", studyAreaName))
       rasterToMatch <- Cache(postProcessTo,
                              from = rasterToMatchLarge,
-                             to = studyArea,
+                             cropTo = studyArea,
+                             maskTo = studyArea,
+                             # projectTo = rasterToMatchLarge, # needs to keep crs of original
                              method = "bilinear",
                              datatype = "INT2U",
                              # writeTo = rtmFilename, # can't save w/ terra b/c same filename as RTML
