@@ -1,5 +1,7 @@
 # LandR (development version)
 
+- `prepRawBiomassMap` - needed `overwrite = TRUE` for cases where download was corrupt
+- `prepRawBiomassMap` needs `httr2` package as remote site is failing with `download.file`
 - add functions to visualize vegetation type transitions;
 - use `writeTo` instead of `filename2` in `prepInputs()` and related calls, following changes in `reproducible`;
 - remove `rasterRead()` to use version from `reproducible`;

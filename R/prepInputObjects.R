@@ -582,10 +582,14 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
     }
   }
 
-  Args2 <- list()
   if (is.null(Args$overwrite)) {
-    Args2$overwrite <- TRUE
+    # when prepInputs below fails for some reason, often the file gets downloaded, but it is corrupted
+    #   If it didn't fail, then the `Cache` will work and not trigger a new prepInputs, so it is safe
+    #   and won't redownload
+    Args$overwrite <- TRUE
   }
+
+  Args2 <- list()
   if (is.null(Args$userTags)) {
     Args2$userTags <- c(cacheTags, "rawBiomassMap")
   }
