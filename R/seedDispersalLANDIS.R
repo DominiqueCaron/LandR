@@ -89,7 +89,8 @@ utils::globalVariables(c(
 #'   seedSource[, pixelGroup := pixelGroup + pgs / 2]
 #'
 #'   # Get a species table -- if using in Canada, can use this
-#'   speciesTable <- getSpeciesTable(dPath = tempdir())
+#'   destPath <- file.path(tempdir(), "ex_LANDISDisp")
+#'   speciesTable <- getSpeciesTable(dPath = destPath)
 #'   speciesTable <- speciesTable[Area == "BSW"]
 #'   speciesTable[, speciesCode := as.factor(LandisCode)]
 #'   speciesTable[, seeddistance_eff := SeedEffDist]

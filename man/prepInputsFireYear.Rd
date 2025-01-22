@@ -45,7 +45,7 @@ firePerimeters <- prepInputsFireYear(
     "https://cwfis.cfs.nrcan.gc.ca/downloads/",
     "nfdb/fire_poly/current_version/NFDB_poly.zip"
   ),
-  destinationPath = tempdir(),
+  destinationPath = file.path(tempdir(), "ex_prepInputsFireYear"),
   rasterToMatch = ras2match,
   earliestYear = 1930
 )

@@ -75,7 +75,7 @@ randomPoly <- vect(randomStudyArea(size = 1e7))
 randomPoly
 ras2match <- rast(res = 250, ext = ext(randomPoly), crs = crs(randomPoly))
 ras2match <- rasterize(randomPoly, ras2match)
-tempDir <- tempdir()
+tempDir <- file.path(tempdir(), "ex_prepInputsStandAgeMap")
 
 ## NOT USING FIRE PERIMETERS TO CORRECT STAND AGE
 ## rasterToMatch does not need to be provided, but can be for masking/cropping.

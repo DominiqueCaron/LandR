@@ -402,7 +402,7 @@ makePixelGroupMap <- function(pixelCohortData, rasterToMatch) {
 #' randomPoly
 #' ras2match <- rast(res = 250, ext = ext(randomPoly), crs = crs(randomPoly))
 #' ras2match <- rasterize(randomPoly, ras2match)
-#' tempDir <- tempdir()
+#' tempDir <- file.path(tempdir(), "ex_prepInputsStandAgeMap")
 #'
 #' ## NOT USING FIRE PERIMETERS TO CORRECT STAND AGE
 #' ## rasterToMatch does not need to be provided, but can be for masking/cropping.
@@ -634,7 +634,7 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
 #'     "https://cwfis.cfs.nrcan.gc.ca/downloads/",
 #'     "nfdb/fire_poly/current_version/NFDB_poly.zip"
 #'   ),
-#'   destinationPath = tempdir(),
+#'   destinationPath = file.path(tempdir(), "ex_prepInputsFireYear"),
 #'   rasterToMatch = ras2match,
 #'   earliestYear = 1930
 #' )
@@ -723,7 +723,7 @@ prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestY
 #' randomPoly
 #' ras2match <- rast(res = 250, ext = ext(randomPoly), crs = crs(randomPoly))
 #' ras2match <- rasterize(randomPoly, ras2match)
-#' tempDir <- tempdir()
+#' tempDir <- file.path(tempdir(), "ex_replaceAgeInFires")
 #'
 #' standAge <- prepInputsStandAgeMap(
 #'   destinationPath = tempDir,
