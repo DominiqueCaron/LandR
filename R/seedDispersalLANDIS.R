@@ -347,8 +347,7 @@ speciesComm <- function(num, sc) {
 #'   with same length as `dist`
 #' @param k A parameter in the kernel
 #' @param b A parameter in the kernel
-#' @param algo Either 1 or 2. 2 is faster and is default. 1 is "simpler code" as it
-#'   uses `ifelse`
+#' @param algo Either 1 or 2. 1 is "simpler code" as it uses `ifelse`; 2 is faster and is default.
 #'
 #' @name WardKernel
 #' @rdname WardKernel
