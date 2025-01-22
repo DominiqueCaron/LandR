@@ -552,6 +552,7 @@ prepInputsStandAgeMap <- function(..., ageURL = NULL,
 #' @export
 prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
   Args <- list(...)
+
   if (is.null(Args$url)) {
     Args$url <- paste0(
       "http://ftp.maps.canada.ca/pub/nrcan_rncan/Forests_Foret/",
@@ -559,7 +560,10 @@ prepRawBiomassMap <- function(studyAreaName, cacheTags, ...) {
       "NFI_MODIS250m_2011_kNN_Structure_Biomass_TotalLiveAboveGround_v1.tif"
     )
   }
-  # this is primary to use httr2 because it is an Imports; actually it is needed below in prepInputs
+
+  ## NOTE: only calling httr2::request here because listed in Imports, to satisfy R CMD check;
+  ##       httr is actually needed for reproducible::prepInputs() but it's only a Suggests there;
+  ##       see LandR#113 and discussion therein
   url <- httr2::request(Args$url)$url
 
   if (is.null(Args$useSAcrs)) {
