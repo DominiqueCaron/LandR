@@ -140,3 +140,5 @@ Collate:
     'zzz.R'
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
+Config/testthat/parallel: true
+Config/testthat/start-first: prep*
