@@ -18,9 +18,11 @@ test_that("leading species transitions plots look good", {
   skip_if_not(isTRUE(Sys.meminfo()$freeram >= as.memuse(10 * 1024^3)))
 
   run <- 1L
-  outputDir <- file.path("~/GitHub/BC_HRV/outputs",
-                         "NRD_Quesnel_scfm_hrv_FRT_res125",
-                         sprintf("rep%02d", run))
+  outputDir <- file.path(
+    "~/GitHub/BC_HRV/outputs",
+    "NRD_Quesnel_scfm_hrv_FRT_res125",
+    sprintf("rep%02d", run)
+  )
 
   ml <- readRDS(file.path(outputDir, "ml_preamble.rds"))
   rTM <- terra::rast(file.path(outputDir, "pixelGroupMap_year0000.tif")) |> terra::rast()

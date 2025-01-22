@@ -23,7 +23,6 @@ utils::globalVariables(c(
 #' @export
 assignLightProb <- function(sufficientLight, newCohortData, interpolate = TRUE,
                             doAssertion = getOption("LandR.assertions", TRUE)) {
-
   ## 2022-06-22 AMC removed the assertion and always coerce to data.frame as needed
   if (!is(sufficientLight, "data.frame") || is(sufficientLight, "data.table")) {
     warning("Coercing object 'sufficientLight' from ", is(sufficientLight)[1], " to data.frame.")
@@ -36,24 +35,32 @@ assignLightProb <- function(sufficientLight, newCohortData, interpolate = TRUE,
   ## by shade level (column) siteShade + 2 is necessary to skip the first column
   if (interpolate) {
     ## calculate floors/ceilings of shade tolerance and corresponding probs.
-    tempDT <- newCohortData[, list(shadetolerance = shadetolerance,
-                                   siteShade = siteShade,
-                                   lowShadetol = floor(shadetolerance),
-                                   highShadetol = ceiling(shadetolerance))]
-    tempDT[, `:=`(lowProb = sufficientLight[cbind(lowShadetol, siteShade + 2)],
-                  highProb = sufficientLight[cbind(highShadetol, siteShade + 2)])]
+    tempDT <- newCohortData[, list(
+      shadetolerance = shadetolerance,
+      siteShade = siteShade,
+      lowShadetol = floor(shadetolerance),
+      highShadetol = ceiling(shadetolerance)
+    )]
+    tempDT[, `:=`(
+      lowProb = sufficientLight[cbind(lowShadetol, siteShade + 2)],
+      highProb = sufficientLight[cbind(highShadetol, siteShade + 2)]
+    )]
 
     ## interpolate between floor/ceiling to find prob, then add to newCohortData
-    tempDT[, lightProb := .interpolateLightProb(x = shadetolerance, x0 = lowShadetol, x1 = highShadetol,
-                                                y0 = lowProb, y1 = highProb)]
+    tempDT[, lightProb := .interpolateLightProb(
+      x = shadetolerance, x0 = lowShadetol, x1 = highShadetol,
+      y0 = lowProb, y1 = highProb
+    )]
     newCohortData[, lightProb := tempDT$lightProb]
   } else {
     ## are there any decimals in shade tolerance trait values?
     if (!all(newCohortData$shadetolerance == round(newCohortData$shadetolerance))) {
-      stop(paste("Species shade tolerance values (in sim$species) have decimals,",
-                 "but interpolation of germination probabilities between",
-                 "shade tolerance categories in sim$sufficientLight is FALSE.\n",
-                 "Set 'interpolate = TRUE', or provide integer shadetolerance values."))
+      stop(paste(
+        "Species shade tolerance values (in sim$species) have decimals,",
+        "but interpolation of germination probabilities between",
+        "shade tolerance categories in sim$sufficientLight is FALSE.\n",
+        "Set 'interpolate = TRUE', or provide integer shadetolerance values."
+      ))
     }
 
     newCohortData[, lightProb := sufficientLight[cbind(shadetolerance, siteShade + 2)]]
@@ -86,7 +93,7 @@ assignLightProb <- function(sufficientLight, newCohortData, interpolate = TRUE,
     y <- y0
   } else {
     y <- ((y1 - y0) / (x1 - x0)) * (x - x0) + y0
-    y[is.nan(y)] <- y0[is.nan(y)]  ## as before, when shade tol. is an integer
+    y[is.nan(y)] <- y0[is.nan(y)] ## as before, when shade tol. is an integer
   }
   y
 }
@@ -131,12 +138,12 @@ asInteger <- function(x) {
 #' @export
 #' @examples
 #' \dontrun{
-#'   doEvent <- scheduleDisturbance(sim$rstCurrentBurn, time(sim), disturbanceType = "Burn")
+#' doEvent <- scheduleDisturbance(sim$rstCurrentBurn, time(sim), disturbanceType = "Burn")
 #' }
 scheduleDisturbance <- function(disturbanceLayer, currentYear) {
   if (is.null(disturbanceLayer) ||
-      is.null(disturbanceLayer@data@attributes$Year) ||
-      disturbanceLayer@data@attributes$Year != currentYear) {
+    is.null(disturbanceLayer@data@attributes$Year) ||
+    disturbanceLayer@data@attributes$Year != currentYear) {
     TRUE
   } else {
     FALSE
@@ -156,15 +163,21 @@ scheduleDisturbance <- function(disturbanceLayer, currentYear) {
 #'
 #' @examples
 #' \dontrun{
-#'   x <- sample(0:400, 1e7, replace = TRUE)
-#'   floor <- 0.3
-#'   logFloor <- log(floor)
-#'   microbenchmark::microbenchmark(
-#'     log(pmax(floor, x)),
-#'     pmax(log(floor), log(x)),
-#'     {x[x < floor] <- floor; log(x)},
-#'     {y <- log(x); y[is.infinite(y)] <- logFloor} ## fastest; TODO: implement? not a bottleneck
-#'   )
+#' x <- sample(0:400, 1e7, replace = TRUE)
+#' floor <- 0.3
+#' logFloor <- log(floor)
+#' microbenchmark::microbenchmark(
+#'   log(pmax(floor, x)),
+#'   pmax(log(floor), log(x)),
+#'   {
+#'     x[x < floor] <- floor
+#'     log(x)
+#'   },
+#'   {
+#'     y <- log(x)
+#'     y[is.infinite(y)] <- logFloor
+#'   } ## fastest; TODO: implement? not a bottleneck
+#' )
 #' }
 .logFloor <- function(x, floor = 0.3) {
   log(pmax(floor, x))

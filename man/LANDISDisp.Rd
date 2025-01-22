@@ -117,7 +117,8 @@ if (require("googledrive")) {
   seedSource[, pixelGroup := pixelGroup + pgs / 2]
 
   # Get a species table -- if using in Canada, can use this
-  speciesTable <- getSpeciesTable(dPath = tempdir())
+  destPath <- file.path(tempdir(), "ex_LANDISDisp")
+  speciesTable <- getSpeciesTable(dPath = destPath)
   speciesTable <- speciesTable[Area == "BSW"]
   speciesTable[, speciesCode := as.factor(LandisCode)]
   speciesTable[, seeddistance_eff := SeedEffDist]
@@ -164,18 +165,22 @@ if (require("googledrive")) {
       spMap[[spppChar]][rcvd] <- 3
       spMap[[spppChar]][intersect(src, rcvd)] <- 4
 
-      levels(spMap[[spppChar]]) <- data.frame(ID = 0:4,
-                                              type = c("OtherForest", "Source", "Didn't receive",
-                                                       "Received", "Src&Rcvd"))
+      levels(spMap[[spppChar]]) <- data.frame(
+        ID = 0:4,
+        type = c(
+          "OtherForest", "Source", "Didn't receive",
+          "Received", "Src&Rcvd"
+        )
+      )
     }
     Plot(spMap, cols = "Set2")
 
     # A summary
     rr <- apply(rast(spMap)[[-1]][] + 1, 2, tabulate)
-    rownames(rr) <- raster::levels(spMap[[2]])[[1]][,"type"][1:NROW(rr)]
+    rownames(rr) <- raster::levels(spMap[[2]])[[1]][, "type"][1:NROW(rr)]
     # next line only works if there are some places that are both source and potential to receive
     # rr <- rbind(rr, propSrcRcved = round(rr[5,]/ (rr[5,]+rr[2,]), 2))
- }
+  }
 }
 
 }

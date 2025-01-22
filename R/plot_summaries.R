@@ -30,16 +30,23 @@ plotLeadingSpecies <- function(studyAreaName, climateScenario, Nreps, years, out
   if (requireNamespace("qs", quietly = TRUE)) {
     if (is.null(treeType)) {
       treeType <- data.frame(
-        leading = as.integer(c(seq_along(length(treeSpecies[["Species"]])),
-                               paste0(length(treeSpecies[["Species"]]) + 1,
-                                      seq_along(length(treeSpecies[["Species"]]))))),
+        leading = as.integer(c(
+          seq_along(length(treeSpecies[["Species"]])),
+          paste0(
+            length(treeSpecies[["Species"]]) + 1,
+            seq_along(length(treeSpecies[["Species"]]))
+          )
+        )),
         landcover = c(treeSpecies[["Species"]], paste0("Mixed_", treeSpecies[["Species"]])),
-        leadingType = c(tolower(treeSpecies[["Type"]]),
-                        rep("mixed", length(treeSpecies[["Species"]]))),
+        leadingType = c(
+          tolower(treeSpecies[["Type"]]),
+          rep("mixed", length(treeSpecies[["Species"]]))
+        ),
         stringsAsFactors = FALSE
       )
       treeType$newClass <- ifelse(treeType$leadingType == "deciduous", 1,
-                                  ifelse(treeType$leadingType == "conifer", 0, 0.5))
+        ifelse(treeType$leadingType == "conifer", 0, 0.5)
+      )
     }
 
     # 1. for each rep within a scenario, calculate difference -->
@@ -50,19 +57,28 @@ plotLeadingSpecies <- function(studyAreaName, climateScenario, Nreps, years, out
       resultsDir <- file.path(outputDir, runName, sprintf("rep%02d", rep))
 
       bothYears <- lapply(years, function(year) {
-        cohortData <- qs::qread(file = file.path(resultsDir, paste0("cohortData_", year, "_year", year, ".qs")))
-        pixelGroupMap <- rasterRead(file.path(resultsDir, paste0("pixelGroupMap_", year, "_year", year, ".tif")))
+        cohortData <- resultsDir |>
+          file.path(paste0("cohortData_", year, "_year", year, ".qs")) |>
+          qs::qread()
+        pixelGroupMap <- resultsDir |>
+          file.path(paste0("pixelGroupMap_", year, "_year", year, ".tif")) |>
+          rasterRead()
 
         cohortDataReduced <- cohortData[, list(sumBio = sum(B, na.rm = TRUE)),
-                                        by = c("speciesCode", "pixelGroup")]
+          by = c("speciesCode", "pixelGroup")
+        ]
 
         biomassStack <- .stack(lapply(treeSpecies[["Species"]], function(tSp) {
-          message(paste0("[", studyAreaName, "_", climateScenario, "]: creating biomass map for ",
-                         tSp, " in year ", year, " [rep ", rep, "]"))
-          r <- SpaDES.tools::rasterizeReduced(reduced = cohortDataReduced[speciesCode == tSp, ],
-                                              fullRaster = pixelGroupMap,
-                                              newRasterCols = "sumBio",
-                                              mapcode = "pixelGroup")
+          message(paste0(
+            "[", studyAreaName, "_", climateScenario, "]: creating biomass map for ",
+            tSp, " in year ", year, " [rep ", rep, "]"
+          ))
+          r <- SpaDES.tools::rasterizeReduced(
+            reduced = cohortDataReduced[speciesCode == tSp, ],
+            fullRaster = pixelGroupMap,
+            newRasterCols = "sumBio",
+            mapcode = "pixelGroup"
+          )
           r[is.na(r[])] <- 0
           r[is.na(pixelGroupMap)] <- NA
           return(r)
@@ -97,8 +113,10 @@ plotLeadingSpecies <- function(studyAreaName, climateScenario, Nreps, years, out
       }
 
       stopifnot(
-        all(min(leadingStackChange[], na.rm = TRUE) >= -1,
-            max(leadingStackChange[], na.rm = TRUE) <= 1)
+        all(
+          min(leadingStackChange[], na.rm = TRUE) >= -1,
+          max(leadingStackChange[], na.rm = TRUE) <= 1
+        )
       )
 
       leadingStackChange[is.na(rasterToMatch)] <- NA
@@ -107,8 +125,10 @@ plotLeadingSpecies <- function(studyAreaName, climateScenario, Nreps, years, out
     })
     names(allReps) <- paste0("rep", 1:Nreps)
 
-    fmeanLeadingChange <- file.path(outputDir, studyAreaName,
-                                    paste0("leadingChange_", studyAreaName, "_", climateScenario, ".tif"))
+    fmeanLeadingChange <- file.path(
+      outputDir, studyAreaName,
+      paste0("leadingChange_", studyAreaName, "_", climateScenario, ".tif")
+    )
     if (length(allReps) > 1) {
       allRepsStk <- .stack(allReps)
       if (is(allRepsStk, "SpatRaster")) {
@@ -122,22 +142,28 @@ plotLeadingSpecies <- function(studyAreaName, climateScenario, Nreps, years, out
     meanLeadingChange <- mask(crop(meanLeadingChange, rasterToMatch), rasterToMatch)
     writeRaster(meanLeadingChange, filename = fmeanLeadingChange, overwrite = TRUE)
 
-    maxV <- max(abs(round(min(meanLeadingChange[], na.rm = TRUE), 1)),
-                abs(round(max(meanLeadingChange[], na.rm = TRUE), 1)))
+    maxV <- max(
+      abs(round(min(meanLeadingChange[], na.rm = TRUE), 1)),
+      abs(round(max(meanLeadingChange[], na.rm = TRUE), 1))
+    )
     AT <- seq(-maxV, maxV, length.out = 12)
 
     pal <- RColorBrewer::brewer.pal(11, "RdYlBu")
     pal[6] <- "#f7f4f2"
 
-    fmeanLeadingChange_gg <- file.path(outputDir, studyAreaName, "figures",
-                                       paste0("leadingChange_", studyAreaName, "_", climateScenario, ".png"))
+    fmeanLeadingChange_gg <- file.path(
+      outputDir, studyAreaName, "figures",
+      paste0("leadingChange_", studyAreaName, "_", climateScenario, ".png")
+    )
 
     fig <- rasterVis::levelplot(
       meanLeadingChange,
       main = paste("Proportional change in leading species under", climateScenario),
       sub = list(
-        paste0(" Red: conversion to conifer\n",
-               " Blue: conversion to deciduous."),
+        paste0(
+          " Red: conversion to conifer\n",
+          " Blue: conversion to deciduous."
+        ),
         cex = 2
       ),
       margin = FALSE,

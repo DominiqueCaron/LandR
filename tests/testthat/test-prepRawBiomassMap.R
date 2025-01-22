@@ -1,20 +1,24 @@
 testthat::test_that("test prepRawBiomassMap", {
-  testthat::skip_on_cran() ## not necessary, but here in case LandR goes to CRAN
+  testthat::skip_if_offline()
+  testthat::skip_on_cran()
   testthat::skip_on_ci()
+
+  skip_if_not_installed("withr")
 
   withr::local_package("reproducible")
   withr::local_package("SpaDES.tools")
   withr::local_package("terra")
   withr::local_package("sf")
 
-  dPath <- file.path(tempdir(), "inputs")
-  opts <- options("reproducible.inputPaths" = NULL,
-                  "reproducible.overwrite" = TRUE,
-                  "reproducible.useTerra" = TRUE,
-                  "reproducible.rasterRead" = "terra::rast",
-                  "reproducible.destinationPath" = dPath)
+  dPath <- withr::local_tempdir("inputs_")
 
-  on.exit(options(opts), add = TRUE)
+  withr::local_options(list(
+    reproducible.destinationPath = dPath,
+    reproducible.inputPaths = NULL,
+    reproducible.overwrite = TRUE,
+    reproducible.rasterRead = "terra::rast",
+    reproducible.useTerra = TRUE
+  ))
 
   biomassURL <- paste0(
     "http://ftp.maps.canada.ca/pub/nrcan_rncan/Forests_Foret/",
@@ -30,50 +34,58 @@ testthat::test_that("test prepRawBiomassMap", {
   ## use SA for cropping/masking, not proj
   ## new args
   reproducible::clearCache(userTags = "test", ask = FALSE)
-  rawBiomassMap <- suppressWarnings({
-    prepRawBiomassMap(url = biomassURL,
-                      studyAreaName = "test",
-                      cacheTags = "test",
-                      cropTo = studyArea,
-                      maskTo = studyArea,
-                      projectTo = NA)
-  })
+  testthat::expect_warning({
+  rawBiomassMap <- prepRawBiomassMap(
+      url = biomassURL,
+      studyAreaName = "test",
+      cacheTags = "test",
+      cropTo = studyArea,
+      maskTo = studyArea,
+      projectTo = NA
+    )
+  }, regexp = "CRS do not match") ## prepInputs crs warning
 
   ## old args
-  rawBiomassMap2 <- suppressWarnings({
-    prepRawBiomassMap(url = biomassURL,
-                      studyAreaName = "test",
-                      cacheTags = "test",
-                      studyArea = studyArea)
-  })
+  testthat::expect_warning({
+    rawBiomassMap2 <- prepRawBiomassMap(
+      url = biomassURL,
+      studyAreaName = "test",
+      cacheTags = "test",
+      studyArea = studyArea
+    )
+  }, regexp = "CRS do not match") ## prepInputs crs warning
 
-  expect_false(crs(studyArea) == crs(rawBiomassMap))
-  expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
-  expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
+  testthat::expect_false(crs(studyArea) == crs(rawBiomassMap))
+  testthat::expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
+  testthat::expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
 
   ## use SA for cropping/masking, proj with RTM
   ## new args
   reproducible::clearCache(userTags = "test", ask = FALSE)
-  rawBiomassMap <- prepRawBiomassMap(url = biomassURL,
-                                     studyAreaName = "test",
-                                     cacheTags = "test",
-                                     cropTo = studyArea,
-                                     maskTo = studyArea,
-                                     projectTo = RTM)
+  rawBiomassMap <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    cropTo = studyArea,
+    maskTo = studyArea,
+    projectTo = RTM
+  )
 
   ## old args
-  rawBiomassMap2 <- prepRawBiomassMap(url = biomassURL,
-                                      studyAreaName = "test",
-                                      cacheTags = "test",
-                                      studyArea = studyArea,
-                                      rasterToMatch = RTM,
-                                      maskWithRTM = FALSE)
+  rawBiomassMap2 <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    studyArea = studyArea,
+    rasterToMatch = RTM,
+    maskWithRTM = FALSE
+  )
 
-  expect_true(st_crs(studyArea) == st_crs(rawBiomassMap))
-  expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
-  expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
-  expect_false(all(is.na(rawBiomassMap[]) == is.na(RTM[])))
-  expect_false(all(is.na(rawBiomassMap2[]) == is.na(RTM[])))
+  testthat::expect_true(st_crs(studyArea) == st_crs(rawBiomassMap))
+  testthat::expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
+  testthat::expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
+  testthat::expect_false(all(is.na(rawBiomassMap[]) == is.na(RTM[])))
+  testthat::expect_false(all(is.na(rawBiomassMap2[]) == is.na(RTM[])))
 
   ## use RTM for everything
   ## new args
@@ -81,32 +93,37 @@ testthat::test_that("test prepRawBiomassMap", {
   #                                    studyAreaName = "test",
   #                                    cacheTags = "test",
   #                                    to = RTM,
-  #                                    projectTo = crs(studyArea))   ## this is failing; reported issue #331-reproducible
+  #                                    projectTo = crs(studyArea))   ## see reproducible #331
 
   reproducible::clearCache(userTags = "test", ask = FALSE)
-  rawBiomassMap <- prepRawBiomassMap(url = biomassURL,
-                                     studyAreaName = "test",
-                                     cacheTags = "test",
-                                     to = RTM)   ## for some reason when not interactive the masking doesn't happen if only supplying `to`
+  rawBiomassMap <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    to = RTM
+  ) ## for some reason when not interactive the masking doesn't happen if only supplying `to`
 
-  rawBiomassMap <- prepRawBiomassMap(url = biomassURL,
-                                     studyAreaName = "test",
-                                     cacheTags = "test",
-                                     to = RTM)   ## for some reason when not interactive the masking doesn't happen if only supplying `to`
-  expect_true(all(is.na(rawBiomassMap[]) == is.na(RTM[])))
+  rawBiomassMap <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    to = RTM
+  ) ## for some reason when not interactive the masking doesn't happen if only supplying `to`
+  testthat::expect_true(all(is.na(rawBiomassMap[]) == is.na(RTM[])))
 
   ## old args
   reproducible::clearCache(userTags = "test", ask = FALSE)
-  rawBiomassMap2 <- prepRawBiomassMap(url = biomassURL,
-                                      studyAreaName = "test",
-                                      cacheTags = "test",
-                                      studyArea = studyArea,
-                                      rasterToMatch = RTM,
-                                      maskWithRTM = TRUE #,
-                                      # useSAcrs = TRUE    ## due to issue #331-reproducible we can't reproduce this.
-                                      )
+  rawBiomassMap2 <- prepRawBiomassMap(
+    url = biomassURL,
+    studyAreaName = "test",
+    cacheTags = "test",
+    studyArea = studyArea,
+    rasterToMatch = RTM,
+    maskWithRTM = TRUE # ,
+    # useSAcrs = TRUE    ## due to reproducible #331 we can't reproduce this.
+  )
 
-  expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
-  expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
-  # expect_true(all(is.na(rawBiomassMap2[]) == is.na(RTM[])))    ### May 25 2023, reported as issue #330 on reproducible
+  testthat::expect_true(compareGeom(rawBiomassMap, rawBiomassMap2, rowcol = TRUE, res = TRUE, stopOnError = FALSE))
+  testthat::expect_false(any(rawBiomassMap[] != rawBiomassMap2[], na.rm = TRUE))
+  testthat::expect_true(all(is.na(rawBiomassMap2[]) == is.na(RTM[]))) ## see reproducible #330
 })

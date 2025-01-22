@@ -49,7 +49,7 @@ projectTo <- utils::getFromNamespace("projectTo", "reproducible")
 speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, minPctCover = 10) {
   studyAreaED <- Cache(
     prepInputs,
-    url =  "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/district/ecodistrict_shp.zip",
+    url = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/district/ecodistrict_shp.zip",
     destinationPath = dPath,
     # fun = quote(SA_ERIntersect(x = targetFilePath, studyArea)),
     overwrite = FALSE
@@ -61,7 +61,7 @@ speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, 
   on.exit(options(opts), add = TRUE)
   studyAreaER <- Cache(
     prepInputs,
-    url =  "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/region/ecodistrict_shp.zip",
+    url = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/region/ecodistrict_shp.zip",
     destinationPath = dPath,
     fun = "terra::vect",
     overwrite = TRUE

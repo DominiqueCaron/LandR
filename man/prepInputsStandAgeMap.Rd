@@ -75,32 +75,41 @@ randomPoly <- vect(randomStudyArea(size = 1e7))
 randomPoly
 ras2match <- rast(res = 250, ext = ext(randomPoly), crs = crs(randomPoly))
 ras2match <- rasterize(randomPoly, ras2match)
-tempDir <- tempdir()
+tempDir <- file.path(tempdir(), "ex_prepInputsStandAgeMap")
 
 ## NOT USING FIRE PERIMETERS TO CORRECT STAND AGE
 ## rasterToMatch does not need to be provided, but can be for masking/cropping.
-standAge <- prepInputsStandAgeMap(destinationPath = tempDir,
-                                  rasterToMatch = ras2match,
-                                  fireURL = NA)   ## or NULL
+standAge <- prepInputsStandAgeMap(
+  destinationPath = tempDir,
+  rasterToMatch = ras2match,
+  fireURL = NA
+) ## or NULL
 attr(standAge, "imputedPixID")
 
 ## USING FIRE PERIMETERS TO CORRECT STAND AGE
 ## ideally, get the firePerimenters layer first
 firePerimeters <- Cache(prepInputsFireYear,
-                        url = paste0("https://cwfis.cfs.nrcan.gc.ca/downloads",
-                        "/nfdb/fire_poly/current_version/NFDB_poly.zip"),
-                        destinationPath = tempDir,
-                        rasterToMatch = ras2match)
+  url = paste0(
+    "https://cwfis.cfs.nrcan.gc.ca/downloads",
+    "/nfdb/fire_poly/current_version/NFDB_poly.zip"
+  ),
+  destinationPath = tempDir,
+  rasterToMatch = ras2match
+)
 
-standAge <- prepInputsStandAgeMap(destinationPath = tempDir,
-                                  firePerimeters = firePerimeters,
-                                  rasterToMatch = ras2match)
+standAge <- prepInputsStandAgeMap(
+  destinationPath = tempDir,
+  firePerimeters = firePerimeters,
+  rasterToMatch = ras2match
+)
 attr(standAge, "imputedPixID")
 
 ## not providing firePerimeters is still possible, but will be deprecated
 ## in this case 'rasterToMatch' MUST be provided
-standAge <- prepInputsStandAgeMap(destinationPath = tempDir,
-                                  rasterToMatch = ras2match)
+standAge <- prepInputsStandAgeMap(
+  destinationPath = tempDir,
+  rasterToMatch = ras2match
+)
 attr(standAge, "imputedPixID")
 }
 }
