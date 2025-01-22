@@ -851,15 +851,16 @@ prepRasterToMatch <- function(studyArea, studyAreaLarge,
         file.path(destinationPath, "rasterToMatch.tif"),
         paste0("_", studyAreaName)
       )
-      rasterToMatch <- Cache(postProcessTo,
-        from = rasterToMatchLarge,
-                             cropTo = studyArea,
-                             maskTo = studyArea,
-                             # projectTo = rasterToMatchLarge, # needs to keep crs of original
-        method = "bilinear",
-        datatype = "INT2U",
-        # writeTo = rtmFilename, # can't save w/ terra b/c same filename as RTML
-        overwrite = TRUE,
+      rasterToMatch <- Cache(
+        postProcessTo(
+          from = rasterToMatchLarge,
+          cropTo = studyArea, # needs to keep crs of original; can't use `to`
+          maskTo = studyArea, # needs to keep crs of original; can't use `to`
+          method = "bilinear",
+          datatype = "INT2U",
+          # writeTo = rtmFilename, # can't save w/ terra b/c same filename as RTML
+          overwrite = TRUE
+        ),
         userTags = c(cacheTags, "rasterToMatch"),
         omitArgs = c(
           "destinationPath", "targetFile", "userTags", "stable",
