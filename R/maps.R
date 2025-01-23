@@ -432,8 +432,8 @@ vegTypeMapGenerator.data.table <- function(x, pixelGroupMap, vegLeadingProportio
     pixelGroupData4[, speciesProportion := speciesGroupB / totalB]
     b2 <- Sys.time()
     message(b2 - b1)
-    all.equal(pixelGroupData4[, .(pixelGroup, speciesCode, totalB)], pixelGroupData[
-      , .(pixelGroup, speciesCode, totalB)])
+    all.equal(pixelGroupData4[, .(pixelGroup, speciesCode, totalB)],
+              pixelGroupData[, .(pixelGroup, speciesCode, totalB)])
   }
 
   if (mixedType == 0) {
