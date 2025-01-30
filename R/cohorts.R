@@ -816,8 +816,8 @@ nonForestedPixels <- function(speciesLayers, omitNonTreedPixels, forestedLCCClas
   if (omitNonTreedPixels) {
     if (is.null(forestedLCCClasses)) {
       stop(
-        "No P(sim)$forestedLCCClasses provided, but P(sim)$omitNonTreedPixels is TRUE.\n",
-        "Please provide a vector of forested classes in P(sim)$forestedLCCClasses"
+        "No `forestedLCCClasses` provided, but `omitNonTreedPixels` is TRUE.\n",
+        "Please provide a vector of forested classes in `forestedLCCClasses`"
       )
     }
     lccPixelsRemoveTF <- !(as.vector(rstLCC[]) %in% forestedLCCClasses)
