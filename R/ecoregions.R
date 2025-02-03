@@ -24,11 +24,11 @@ utils::globalVariables(c(
 ecoregionProducer <- function(ecoregionMaps, ecoregionName = NULL, rasterToMatch) {
   .requireNamespace("fasterize", stopOnFALSE = TRUE)
 
-  # change the coordinate reference for all spatialpolygons
+  ## change the coordinate reference for all spatialpolygons
   message("ecoregionProducer 1: ", Sys.time())
   # ecoregionMapInStudy <- intersect(ecoregionMapFull, fixErrors(aggregate(studyArea)))
 
-  # Alternative
+  ## alternative
   rstEcoregion <- list()
   rtmNAs <- is.na(as.vector(rasterToMatch[])) | as.vector(rasterToMatch[]) == 0
   for (erm in seq(ecoregionMaps)) {
@@ -43,13 +43,15 @@ ecoregionProducer <- function(ecoregionMaps, ecoregionName = NULL, rasterToMatch
     }
     rstEcoregion[[erm]][rtmNAs] <- NA
   }
-  rstEcoregionNAs <- do.call(`|`, lapply(rstEcoregion, function(x) is.na(as.vector(x[])) | as.vector(x[]) == 0))
+  rstEcoregionNAs <- do.call(`|`, lapply(rstEcoregion, function(x) {
+    is.na(as.vector(x[])) | as.vector(x[]) == 0
+  }))
   NAs <- rtmNAs | rstEcoregionNAs
   a <- lapply(rstEcoregion, function(x) as.vector(x[])[!NAs])
   b <- as.data.table(a)
   b[, (names(b)) := lapply(.SD, function(x) paddedFloatToChar(x, max(nchar(x), na.rm = TRUE)))]
 
-  # Take the first 2 columns, whatever their names, in case they are given something
+  ## take the first 2 columns, whatever their names, in case they are given something
   ecoregionValues <- factor(paste(b[[1]], b[[2]], sep = "_"))
 
   rstEcoregion <- rasterRead(rstEcoregion[[1]])
@@ -114,11 +116,12 @@ makeEcoregionDT <- function(pixelCohortData, speciesEcoregion) {
 #' @export
 makeEcoregionMap <- function(ecoregionFiles, pixelCohortData) {
   pixelData <- unique(pixelCohortData, by = "pixelIndex")
-  pixelData[, ecoregionGroup := factor(as.character(ecoregionGroup))] # resorts them in order
+  pixelData[, ecoregionGroup := factor(as.character(ecoregionGroup))] ## resorts them in order
 
   ecoregionMap <- rasterRead(ecoregionFiles$ecoregionMap)
 
-  ## suppress this message call no non-missing arguments to min; returning Inf min(x@data@values, na.rm = TRUE)
+  ## suppress this message call no non-missing arguments to min;
+  ## returning Inf min(x@data@values, na.rm = TRUE)
   suppressWarnings(ecoregionMap[pixelData$pixelIndex] <- as.integer(pixelData$ecoregionGroup))
   levels(ecoregionMap) <- data.frame(
     ID = seq(levels(pixelData$ecoregionGroup)),
@@ -131,16 +134,21 @@ makeEcoregionMap <- function(ecoregionFiles, pixelCohortData) {
 
 #' Create Stacks of the `speciesEcoregion` content
 #'
-#' This will output a list of `RasterStack` objects. Each `RasterStack` show raster maps
-#' of one of the columns listed in `columns` and each `RasterLayer` will be one species.
+#' Each `RasterStack` show raster maps of one of the columns listed in `columns`
+#' and each `RasterLayer` will be one species.
 #'
 #' @template ecoregionMap
+#'
 #' @template speciesEcoregion
-#' @param columns The columns to use in the `speciesEcoregion` data.table.
-#'   Default is `c("establishprob", "maxB", "maxANPP")`
+#'
+#' @param columns The columns to use in the `speciesEcoregion` table.
+#'                Default is `c("establishprob", "maxB", "maxANPP")`
+#'
+#' @returns list of `RasterStack` or `SpatRaster` objects
+#'
 speciesEcoregionStack <- function(ecoregionMap, speciesEcoregion,
                                   columns = c("establishprob", "maxB", "maxANPP")) {
-  # stack of SEP
+  ## stack of SEP
   # Require(c("data.table", "PredictiveEcology/pemisc", "raster"))
   # bm2011 <- biomassMaps2011
   # speciesEcoregion <- bm2011$speciesEcoregion
@@ -167,17 +175,16 @@ speciesEcoregionStack <- function(ecoregionMap, speciesEcoregion,
 
 createStack <- function(dtList, rasTemplate, column = "estblishprob", spp) {
   i <- 0
-  # mclapply(mc.cores = length(dtList),
   outList <- lapply(
     dtList,
     rasTemplate = rasTemplate, column = column, spp = spp,
-    function(dt, rasTemplate, column, spp) {
-      i <<- i + 1
-      print(paste(column, " ", spp[i]))
-      rasTemplate[dt$pixelID] <- dt[[column]]
-      print("... Done!")
-      rasTemplate
-    }
+      FUN = function(dt, rasTemplate, column, spp) {
+        i <<- i + 1
+        print(paste(column, " ", spp[i]))
+        rasTemplate[dt$pixelID] <- dt[[column]]
+        print("... Done!")
+        rasTemplate
+      }
   )
 
   .stack(outList)

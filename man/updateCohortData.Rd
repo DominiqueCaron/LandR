@@ -106,6 +106,7 @@ Does the following:
 \item assign the new \code{pixelGroup} to the pixels that have new cohort;
 \item update the \code{pixelGroup} map.
 }
+
 Note that if \code{newPixelCohortData} is generated after a disturbance
 it must contain a \code{type} column indicating the origin of the cohorts
 (e.g. "survivor", "serotiny", "resprouting"). "Survivor" cohorts will

@@ -18,12 +18,11 @@ utils::globalVariables(c(
 #' There are some checks internally for consistency.
 #'
 #' Does the following:
-#' \enumerate{
-#'   \item add *new cohort* (not survivor) data into `cohortData`;
-#'   \item assign initial `B` and `age` for new cohort;
-#'   \item assign the new `pixelGroup` to the pixels that have new cohort;
-#'   \item update the `pixelGroup` map.
-#' }
+#' 1. add *new cohort* (not survivor) data into `cohortData`;
+#' 2. assign initial `B` and `age` for new cohort;
+#' 3. assign the new `pixelGroup` to the pixels that have new cohort;
+#' 4. update the `pixelGroup` map.
+#'
 #' Note that if `newPixelCohortData` is generated after a disturbance
 #'   it must contain a `type` column indicating the origin of the cohorts
 #'   (e.g. "survivor", "serotiny", "resprouting"). "Survivor" cohorts will
@@ -817,8 +816,8 @@ nonForestedPixels <- function(speciesLayers, omitNonTreedPixels, forestedLCCClas
   if (omitNonTreedPixels) {
     if (is.null(forestedLCCClasses)) {
       stop(
-        "No P(sim)$forestedLCCClasses provided, but P(sim)$omitNonTreedPixels is TRUE.\n",
-        "Please provide a vector of forested classes in P(sim)$forestedLCCClasses"
+        "No `forestedLCCClasses` provided, but `omitNonTreedPixels` is TRUE.\n",
+        "Please provide a vector of forested classes in `forestedLCCClasses`"
       )
     }
     lccPixelsRemoveTF <- !(as.vector(rstLCC[]) %in% forestedLCCClasses)

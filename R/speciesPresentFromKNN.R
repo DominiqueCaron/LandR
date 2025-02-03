@@ -7,7 +7,7 @@ projectTo <- utils::getFromNamespace("projectTo", "reproducible")
 
 #' Make a species factor raster
 #'
-#' This will download all KNN layers in (Boreal) Forest of Canada, and make
+#' This will download all KNN layers in Forests of Canada, and make
 #' a factor raster at resolution provided by `res` (larger is faster).
 #'
 #' @param year Default (and only implemented) is 2011. This will download the 2011 KNN data layers
@@ -36,7 +36,7 @@ projectTo <- utils::getFromNamespace("projectTo", "reproducible")
 #'   zipFn <- gsub(".tif", ".zip", fn)
 #'   zip(files = dir(pattern = fn), zipFn)
 #'   out <- googledrive::drive_put(zipFn)
-#'   driveID <- "1Oj78jJBeha5L6XDBBdWDAfimgNjYc9UD"
+#'   driveID <- "1J8fN7clZeqjd7yhiDWi13uoCBL8OensF" #Note: the older file (cropped to boreal forest) is hosted at "1Oj78jJBeha5L6XDBBdWDAfimgNjYc9UD"
 #'
 #'   # Get species list
 #'   sa <- LandR::randomStudyArea(size = 1e11)
@@ -46,7 +46,7 @@ projectTo <- utils::getFromNamespace("projectTo", "reproducible")
 #'
 #' @export
 #' @rdname speciesPresent
-speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, minPctCover = 10) {
+speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, minPctCover = 10) { 
   studyAreaED <- Cache(
     prepInputs,
     url = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/district/ecodistrict_shp.zip",
@@ -54,9 +54,7 @@ speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, 
     # fun = quote(SA_ERIntersect(x = targetFilePath, studyArea)),
     overwrite = FALSE
   )
-
-  bf <- Cache(prepInputs, url = borealForestURL, fun = "forestOutline")
-
+  
   opts <- options("reproducible.useTerra" = TRUE)
   on.exit(options(opts), add = TRUE)
   studyAreaER <- Cache(
@@ -66,15 +64,17 @@ speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, 
     fun = "terra::vect",
     overwrite = TRUE
   )
-  sa <- maskTo(studyAreaER, bf)
-  sa <- projectTo(sa, sf::st_crs(bf))
-
+  
+  templateCRS <- reproducible::prepInputs(url = "https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/files-fichiers/lpr_000a21a_e.zip",
+                                          destinationPath = dPath)
+  sa <- projectTo(studyAreaER, terra::crs(templateCRS))
+  
   allForestedStk <- Cache(loadAndAggregateKNN, dPath, res, sa)
-  allForestedStk <- round(allForestedStk, 0)
+  allForestedStk <- round(allForestedStk, 0) 
   allForestedStk[allForestedStk <= minPctCover] <- 0
-
+  
   numSp <- sum(allForestedStk > 0)
-
+  
   mat <- terra::values(allForestedStk)
   dt <- as.data.table(mat)
   dt[, pixel := seq_len(.N)]
@@ -83,7 +83,7 @@ speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, 
   setorderv(dt2, c("pixel", "variable"))
   dt3 <- dt2[, list(allPres = paste(variable, collapse = "__")), by = "pixel"]
   dt3[, allPresFac := factor(allPres)]
-
+  
   # Create a new empty rast
   speciesPres <- terra::rast(allForestedStk[[1]])
   # fill it with the integer values
@@ -91,15 +91,16 @@ speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, 
   names <- unique(dt3$allPresFac)
   numerics <- as.integer(names)
   # assign the levels
-  levels(speciesPres) <- data.frame(ID = numerics, spGroup = names)
-
+  levels(speciesPres) <- data.frame(ID = numerics, category = names)
+  
+  
   return(c(speciesPres, numSp))
 }
 
-#' Get species list in a given study area for boreal forest of Canada
+#' Get species list in a given study area for a forest in Canada
 #'
 #' `speciesInStudyArea` defaults to use a url of a dataset uploaded to Google Drive that is
-#' from Canadian Boreal Forests, but a different factor raster can be passed e.g.,
+#' from Canadian Forests, but a different factor raster can be passed e.g.,
 #' from `speciesPresentFromKNN`.
 #'
 #' @template studyArea
@@ -109,6 +110,10 @@ speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, 
 #' @param speciesPresentRas A factor raster where the character string is a string of
 #'   species names, separated by 2 underscores, sorted alphabetically. Can be produced
 #'   with `speciesPresentFromKNN`
+#'   
+#' @param sppEquivCol An optional column from `LandR::sppEquivalencies_CA`. 
+#'   If passed the KNN species will be returned according to this naming convention.
+#'   
 #' @param dPath Passed to `destinationPath` in `preProcess`.
 #'
 #' @return A named list of length 2: `speciesRas` is a factor `RasterLayer`
@@ -116,41 +121,36 @@ speciesPresentFromKNN <- function(year = 2011, dPath = asPath("."), res = 2000, 
 #' species on the `speciesRas`, for convenience.
 #'
 #' @export
-#' @rdname speciesPresent
-speciesInStudyArea <- function(studyArea, url = NULL, speciesPresentRas = NULL,
+speciesInStudyArea <- function(studyArea, url = NULL, speciesPresentRas = NULL, sppEquivCol = NULL,
                                dPath = getOption("reproducible.destinationPath")) {
   if (is.null(speciesPresentRas)) {
     if (is.null(url)) {
-      url <- "https://drive.google.com/file/d/1Oj78jJBeha5L6XDBBdWDAfimgNjYc9UD/"
+      url <- "https://drive.google.com/file/d/1J8fN7clZeqjd7yhiDWi13uoCBL8OensF"
     }
     speciesPres <- preProcess(url = url, destinationPath = dPath)
     speciesPresRas <- rasterRead(speciesPres$targetFilePath)
-  }
-
-  bb <- postProcess(x = speciesPresRas, studyArea = studyArea)
-
-  if (is(speciesPresRas, "RasterLayer")) {
-    rasLevs <- raster::levels(speciesPresRas)[[1]]
   } else {
-    rasLevs <- terra::cats(speciesPresRas)[[1]]
+    speciesPresRas <- speciesPresentRas
   }
-
-  ## NOTE: 'idCol' was 'ID' with raster package; newer terra is it 'value'
-  idCol <- grep("id", ignore.case = TRUE, value = TRUE, colnames(rasLevs))
-  if (length(idCol) == 0) {
-    idCol <- grep("value", ignore.case = TRUE, value = TRUE, colnames(rasLevs))
-  }
-
-  rasLevs <- rasLevs[rasLevs[[idCol]] %in% na.omit(as.vector(bb[])), ]
-  levels(bb) <- rasLevs
-
-  if (is(speciesPresRas, "RasterLayer")) {
-    bb <- raster::deratify(bb)
-  }
-
-  speciesCommunities <- na.omit(factorValues2(bb, as.vector(bb[]), att = "category"))
+  
+  bb <- postProcess(x = speciesPresRas, studyArea = studyArea)
+  
+  rasLevs <- as.data.table(levels(bb))
+  # if (is(speciesPresRas, "RasterLayer")) {
+  #   bb <- raster::deratify(bb)
+  # }
+  
+  speciesCommunities <- na.omit(rasLevs[ID %in% as.vector(bb[[1]])]$category)
   species <- as.character(speciesCommunities)
-  species <- unique(unlist(strsplit(species, "__")))
+  species <- unique(unlist(strsplit(species, "__"))) 
+  
+  if (!is.null(sppEquivCol) & is.null(speciesPresentRas)) {
+    sppEquiv <- LandR::sppEquivalencies_CA
+    species <- unique(sppEquiv[KNN %in% species, .SD, ][[sppEquivCol]] )
+    species <- species[!species == ""]
+  } 
+  
+    
   return(list(speciesRas = bb, speciesList = species))
 }
 
@@ -166,8 +166,8 @@ forestOutline <- function(x) {
   bf8 <- terra::buffer(bf7, -6000)
 }
 
-## TODO: randomized URL changes
-borealForestURL <- "https://d278fo2rk9arr5.cloudfront.net/downloads/boreal.zip"
+# ## TODO: randomized URL changes
+# borealForestURL <- "https://d278fo2rk9arr5.cloudfront.net/downloads/boreal.zip"
 
 #' @keywords internal
 SA_ERIntersect <- function(x, studyArea) {
@@ -179,8 +179,8 @@ SA_ERIntersect <- function(x, studyArea) {
 }
 
 #' @keywords internal
-loadAndAggregateKNN <- function(dPath, res, sa) {
-  ll <- terra::rast(loadkNNSpeciesLayers(dPath))
-  llCoarse <- terra::aggregate(ll, res / 250)
-  postProcessTerra(from = llCoarse, to = sa, method = "near")
+loadAndAggregateKNN <- function(dPath, res, sa) { 
+  ll <- loadkNNSpeciesLayers(dPath, sppEquiv = LandR::sppEquivalencies_CA, sppEquivCol = "KNN")
+  llCoarse <- terra::aggregate(ll, res / 250) 
+  postProcessTo(from = llCoarse, to = sa, method = "near")
 }
