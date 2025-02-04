@@ -807,8 +807,7 @@ convertUnwantedLCC <- function(classesToReplace = 34:36, rstLCC,
 #'   species cover data, or a non-forested land-cover class
 #'
 #' @export
-nonForestedPixels <- function(speciesLayers, omitNonTreedPixels, forestedLCCClasses,
-                              rstLCC) {
+nonForestedPixels <- function(speciesLayers, omitNonTreedPixels, forestedLCCClasses, rstLCC) {
   # pixelsToRm <- rowSums(!is.na(sim$speciesLayers[])) == 0 # keep
   pixelsToRm <- is.na(as.vector(speciesLayers[[1]][])) # seems to be OK because seem to be NA on each layer for a given pixel
 
