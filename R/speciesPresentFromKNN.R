@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  "allPres", "allPresFac", "pixel", "variable"
+  "allPres", "allPresFac", "KNN", "pixel", "variable"
 ))
 
 maskTo <- utils::getFromNamespace("maskTo", "reproducible")
