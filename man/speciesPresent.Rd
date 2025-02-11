@@ -43,9 +43,12 @@ if (requireNamespace("googledrive", quietly = TRUE)) {
   zipFn <- gsub(".tif", ".zip", fn)
   zip(files = dir(pattern = fn), zipFn)
   out <- googledrive::drive_put(zipFn)
-  driveID <- "1J8fN7clZeqjd7yhiDWi13uoCBL8OensF" #Note: the older file (cropped to boreal forest) is hosted at "1Oj78jJBeha5L6XDBBdWDAfimgNjYc9UD"
 
-  # Get species list
+  ## Note: previous file (cropped to boreal forest)
+  ## available ot "1Oj78jJBeha5L6XDBBdWDAfimgNjYc9UD"
+  driveID <- "1J8fN7clZeqjd7yhiDWi13uoCBL8OensF"
+
+  ## Get species list
   sa <- LandR::randomStudyArea(size = 1e11)
   species <- LandR::speciesInStudyArea(sa)
 }
