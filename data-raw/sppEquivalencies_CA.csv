@@ -3,12 +3,12 @@ abieamab,ABIE.AMA,Abie_ama,Abie_Ama,Abie amab,Abies amabilis,Ama fir,Amabilis fi
 abiebals,ABIE.BAL,Abie_bal,Abie_Bal,Abie bals,Abies balsamea,Bal fir,Balsam fir,Balsam fir leading,,Abie_Bal,FALSE,Conifer,balsam fir,,SprcFrLrch,Bb,Fb,BF,ABIE_BAL,SAB
 ,,Abie_con,,Abie conc,Abies concolor,Whi fir,White fir,White fir leading,,,FALSE,Conifer,,,SprcFrLrch,,,,ABIE_CON,
 abiegran,ABIE.GRA,Abie_gra,Abie_Gra,Abie gran,Abies grandis,Gra fir,Grand fir,Grand fir leading,,,FALSE,Conifer,grand fir,,SprcFrLrch,Bg,,,ABIE_GRA,
-abielasi,ABIE.LAS,Abie_las,Abie_Las,Abie lasi,Abies lasiocarpa,S-alp Fir,Subalpine fir,Subalpine fir leading,,Abie_Las,FALSE,Conifer,subalpine fir,,SprcFrLrch,Bl,Fa,,ABIE_LAS,
+abielasi,ABIE.LAS,Abie_las,Abie_Las,Abie lasi,Abies lasiocarpa,Subalp fir,Subalpine fir,Subalpine fir leading,,Abie_Las,FALSE,Conifer,subalpine fir,,SprcFrLrch,Bl,Fa,,ABIE_LAS,
 ,,Abie_mag,,Abie magn,Abies magnifica var shastensis,Sh red fir,Shasta red fir,Shasta red fir leading,,,FALSE,Conifer,,,SprcFrLrch,,,,ABIE_MAG,
-,,Abie_pic,,Abie pice,,Fir-Sp,Fir-Spruce,Fir-Spruce mix,Abies pice in CASFRI is a Spruce-balsam fir or Balsam fir-spruce mix,,FALSE,Conifer,,,SprcFrLrch,,,,ABIE_PIC,
+,,Abie_pic,,Abie pice,,Fir-Spruce,Fir-Spruce,Fir-Spruce mix,Abies pice in CASFRI is a Spruce-balsam fir or Balsam fir-spruce mix,,FALSE,Conifer,,,SprcFrLrch,,,,ABIE_PIC,
 ,,Abie_pro,,Abie proc,Abies procera,Nob fir,Noble fir,Noble fir leading,,,FALSE,Conifer,,,SprcFrLrch,Bn,,,ABIE_PRO,
-,,Abie_sp,Abie_Spp,Abie spp,Abies spp.,Fir,Fir,Fir leading,,,FALSE,Conifer,subalpine fir,,SprcFrLrch,B,,,ABIE_SP,
-,,Acer_cir,Acer_Cir,Acer circ,Acer circinatum,Vin map,Vine maple,Vine maple leading,,,TRUE,Deciduous,vine maple,,CedrMplOther,Mv,,,ACER_CIR,
+,,Abie_sp,Abie_Spp,Abie spp,Abies spp.,Fir spp,Fir,Fir leading,,,FALSE,Conifer,subalpine fir,,SprcFrLrch,B,,,ABIE_SP,
+,,Acer_cir,Acer_Cir,Acer circ,Acer circinatum,Vine map,Vine maple,Vine maple leading,,,TRUE,Deciduous,vine maple,,CedrMplOther,Mv,,,ACER_CIR,
 ,,Acer_fre,,Acer free,Acer X freemanii,Frmn map,Freeman maple,Freeman maple leading,,,TRUE,Deciduous,,,CedrMplOther,,,,ACER_FRE,
 ,,Acer_gla,,Acer glab,Acer glabrum,Dg map,Douglas maple,Douglas maple leading,,,TRUE,Deciduous,,,CedrMplOther,Mr,,,ACER_GLA,
 acermacr,ACER.MAC,Acer_mac,Acer_Mac,Acer macr,Acer macrophyllum,BL map,Bigleaf maple,Bigleaf maple leading,,,TRUE,Deciduous,,,CedrMplOther,Mb,,,ACER_MAC,
@@ -79,7 +79,7 @@ fraxamer,FRAX.AME,Frax_ame,Frax_Ame,Frax amer,Fraxinus americana,Am ash,American
 ,,Lari_kae,Lari_Kae,Lari kaem,Larix kaempferi,Jp larch,Japanese larch,Japanese larch leading,,,FALSE,Conifer,,,CedrMplOther,,,,LARI_KAE,
 larilari,LARI.LAR,Lari_lar,Lari_Lar,Lari lari,Larix laricina,Tamarack,Tamarack,Tamarack leading,,Lari_Lar,FALSE,Conifer,tamarack larch,,SprcFrLrch,Lt,Lt,TL,LARI_LAR,MEL
 larilyal,,Lari_lya,Lari_Lya,Lari lyal,Larix lyallii,Alp larch,Alpine larch,Alpine larch leading,,Lari_Lya,FALSE,Conifer,alpine larch,,CedrMplOther,La,La,,LARI_LYA,
-lariocci,LARI.OCC,Lari_occ,Lari_Occ,Lari occi,Larix occidentalis,We larch,Western larch,Western larch leading,,Lari_Occ,FALSE,Conifer,western larch,,SprcFrLrch,Lw,Lw,,LARI_OCC,
+lariocci,LARI.OCC,Lari_occ,Lari_Occ,Lari occi,Larix occidentalis,W larch,Western larch,Western larch leading,,Lari_Occ,FALSE,Conifer,western larch,,SprcFrLrch,Lw,Lw,,LARI_OCC,
 ,,Lari_sib,,Lari sibi,Larix sibirica,Sib larch,Siberian larch,Siberian larch leading,,,FALSE,Conifer,,,CedrMplOther,,,,LARI_SIB,
 ,,Lari_sp,Lari_Spp,Lari spp,Larix spp.,Larch,Larch,Larch leading,,Lari_Spp,FALSE,Conifer,,,SprcFrLrch,,,,LARI_SP,
 ,,Lari_sp,,Lari x mar,Larix x marschlinsii,Dunk larch,Dunkeld larch,Dunkeld larch leading,,,FALSE,Conifer,,,CedrMplOther,,,,LARI_SP,
@@ -112,7 +112,7 @@ pinuconcon,PINU.CON.CON,Pinu_con,,Pinu cont,Pinus contorta var. contorta,Sh pine
 ,PINU.CON.LAT,Pinu_con,Pinu_Con,Pinu cont,Pinus contorta,Lg pine,Lodgepole pine,Lodgepole pine leading,Pinus contorta latifolia is a synonym of var. latifolia,Pinu_Con,FALSE,Conifer,lodgepole pine,C3,LdgJkPine,Pli,Pl,,PINU_CON,
 pinuflex,,Pinu_fle,Pinu_Fle,Pinu flex,Pinus flexilis,Lim pine,Limber pine,Limber pine leading,,,FALSE,Conifer,,,CedrMplOther,Pf,Pf,,PINU_FLE,
 ,,Pinu_lam,,Pinu lamb,Pinus lambertiana,Sug pine,Sugar pine,Sugar pine leading,,,FALSE,Conifer,,,CedrMplOther,,,,PINU_LAM,
-,,Pinu_mon,Pinu_Mon,Pinu mont,Pinus monticola,We white pine,Western white pine,Western white pine leading,,Pinu_Mon,FALSE,Conifer,,,CedrMplOther,Pxj,,,PINU_MON,
+,,Pinu_mon,Pinu_Mon,Pinu mont,Pinus monticola,W wh pine,Western white pine,Western white pine leading,,Pinu_Mon,FALSE,Conifer,,,CedrMplOther,Pxj,,,PINU_MON,
 ,,Pinu_mur,,Pinu murx,Pinus x murraybanksiana,LgXJk pine,Lodgepole x jack pine,Lodgepole x jack pine leading,Also known as Murraybanks Pine,,FALSE,Conifer,,,CedrMplOther,,,,PINU_MUR,
 ,,Pinu_nig,,Pinu nigr,Pinus nigra,Pl pine,Black pine,Black pine leading,,,FALSE,Conifer,,,CedrMplOther,,,,PINU_NIG,
 pinupon,PINU.PON,Pinu_pon,Pinu_Pon,Pinu pond,Pinus ponderosa,Pon pine,Ponderosa pine,Ponderosa pine leading,,,FALSE,Conifer,ponderosa pine,C7,DgFrPoPine,Py,,,PINU_PON,
@@ -120,7 +120,7 @@ pinupon,PINU.PON,Pinu_pon,Pinu_Pon,Pinu pond,Pinus ponderosa,Pon pine,Ponderosa 
 pinuresi,PINU.RES,Pinu_res,Pinu_Res,Pinu resi,Pinus resinosa,Rd pine,Red pine,Red pine leading,,Pinu_Res,FALSE,Conifer,red pine,C5,RdWhPine,,,RP,PINU_RES,PIR
 ,,Pinu_rig,Pinu_Rig,Pinu rigi,Pinus rigida,Pitch pine,Pitch pine,Pitch pine leading,,,FALSE,Conifer,,,CedrMplOther,,,,PINU_RIG,PID
 ,,Pinu_sp,Pinu_Spp,Pinu spp,Pinus spp.,Pine,Pine,Pine leading,,Pinu_Spp,FALSE,Conifer,,,CedrMplOther,,,,PINU_SP,
-pinustro,PINU.STR,Pinu_str,Pinu_Str,Pinu stro,Pinus strobus,E white pine,Eastern white pine,Eastern white pine leading,,,FALSE,Conifer,eastern white pine,C5,RdWhPine,Pw,,,PINU_STR,PIB
+pinustro,PINU.STR,Pinu_str,Pinu_Str,Pinu stro,Pinus strobus,E wh pine,Eastern white pine,Eastern white pine leading,,,FALSE,Conifer,eastern white pine,C5,RdWhPine,Pw,,,PINU_STR,PIB
 ,,Pinu_syl,Pinu_Syl,Pinu sylv,Pinus sylvestris,Scot pine,Scotch pine,Scotch pine leading,,,FALSE,Conifer,,,CedrMplOther,,,SP,PINU_SYL,PIS
 ,,Plan_occ,Plat_Occ,Plan occi,Platanus occidentalis,Sycamore,American sycamore,American sycamore leading,,,TRUE,Deciduous,,,CedrMplOther,,,,PLAN_OCC,PLO
 ,,Popu_ang,,Popu angu,Populus angustifolia,Nar cottonwood,Narrowleaf cottonwood,Narrowleaf cottonwood leading,,,TRUE,Deciduous,,,PopBrch,,,,POPU_ANG,
@@ -171,12 +171,12 @@ querrubr,QUER.RUB,Quer_rub,Quer_Rub,Quer rubr,Quercus rubra,N rd oak,Northern re
 ,,Sali_sp,Sali_Spp,Sali spp,Salix spp.,Willow,Willow,Willow leading,,,TRUE,Deciduous,willow,,CedrMplOther,W,,,SALI_SP,SAL
 ,,Sass_alb,Sass_Alb,Sass albi,Sassafras albidum,Sassafras,Sassafras,Sassafras leading,,,TRUE,Deciduous,,,CedrMplOther,,,,SASS_ALB,
 ,,Sequ_gig,,Sequ giga,Sequoadendron giganteum,G sequoia,Giant sequoia,Giant sequoia leading,,,FALSE,Conifer,,,CedrMplOther,,,,SEQU_GIG,
-,,Sequ_sem,,Sequ semp,Sequoia sempervirens,C redwood,Coast redwood,Coast redwood leading,,,FALSE,Conifer,,,CedrMplOther,,,,SEQU_SEM,
+,,Sequ_sem,,Sequ semp,Sequoia sempervirens,Co redwood,Coast redwood,Coast redwood leading,,,FALSE,Conifer,,,CedrMplOther,,,,SEQU_SEM,
 ,,Sorb_auc,Sorb_Ame,Sorb aucu,Sorbus americana,Am mtn-ash,American mountainash,American mountainash leading,,,TRUE,Deciduous,,,CedrMplOther,,,,SORB_AUC,SOA
 ,,Sorb_auc,Sorb_Ame,Sorb aucu,Sorbus aucuparia,Rowan,Rowan,Rowan leading,,,TRUE,Deciduous,,,CedrMplOther,,,,SORB_AUC,
 ,,Sorb_dec,Sorb_Dec,,Sorbus decora,N mtn-ash,Northern mountain ash,Northern mountain ash leading,,,TRUE,Deciduous,,,CedrMplOther,,,,SORB_DEC,SOD
 ,,Sorb_sp,Sorb_Spp,,,Mtn-ash,Mountain ash,Mountain ash leading,,,TRUE,Deciduous,,,CedrMplOther,,,,SORB_SP,
-,,Taxu_bre,,Taxu brev,Taxus brevifolia,P yew,Pacific yew,Pacific yew leading,,,FALSE,Conifer,,,CedrMplOther,Tw,,,TAXU_BRE,
+,,Taxu_bre,,Taxu brev,Taxus brevifolia,Pa yew,Pacific yew,Pacific yew leading,,,FALSE,Conifer,,,CedrMplOther,Tw,,,TAXU_BRE,
 ,,Thuj_jun,Juni_Vir,Thuj juni,Juniperus virginiana,E redcedar,Eastern redcedar,Eastern redcedar leading,Not clear why CASFRI name doesn't match,,FALSE,Conifer,eastern redcedar,,CedrMplOther,,,,THUJ_JUN,
 thujocci,,Thuj_occ,Thuj_Occ,Thuj occi,Thuja occidentalis,E whcedar,Eastern white-cedar,Eastern white-cedar leading,,,FALSE,Conifer,eastern white-cedar,,CedrMplOther,,,EC,THUJ_OCC,THO
 thujplic,THUJ.PLI,Thuj_pli,Thuj_Pli,Thuj plic,Thuja plicata,W redced,Western redcedar,Western redcedar leading,,,FALSE,Conifer,western redcedar,,CedrMplOther,Cw,,,THUJ_PLI,
