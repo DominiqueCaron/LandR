@@ -726,23 +726,22 @@ prepInputsFireYear <- function(..., rasterToMatch, fireField = "YEAR", earliestY
 #'
 #' @examples
 #' \dontrun{
-#' library(SpaDES.tools)
-#' library(terra)
-#' library(reproducible)
-#' randomPoly <- vect(randomStudyArea(size = 1e7))
+#' randomPoly <- terra::vect(SpaDES.tools::randomStudyArea(size = 1e7))
 #' randomPoly
-#' ras2match <- rast(res = 250, ext = ext(randomPoly), crs = crs(randomPoly))
-#' ras2match <- rasterize(randomPoly, ras2match)
+#' ras2match <- terra::rast(resolution = 250,
+#'                          ext = terra::ext(randomPoly),
+#'                          crs = terra::crs(randomPoly))
+#' ras2match <- terra::rasterize(randomPoly, ras2match)
 #' tempDir <- file.path(tempdir(), "ex_replaceAgeInFires")
 #'
-#' standAge <- prepInputsStandAgeMap(
+#' standAge <- reproducible::prepInputsStandAgeMap(
 #'   destinationPath = tempDir,
 #'   rasterToMatch = ras2match,
 #'   fireURL = NA
 #' ) ## or NULL
 #' attr(standAge, "imputedPixID")
 #'
-#' firePerimeters <- Cache(prepInputsFireYear,
+#' firePerimeters <- reproducible::Cache(prepInputsFireYear,
 #'   url = paste0(
 #'     "https://cwfis.cfs.nrcan.gc.ca/downloads",
 #'     "/nfdb/fire_poly/current_version/NFDB_poly.zip"
