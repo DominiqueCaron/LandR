@@ -8,8 +8,8 @@ Description: Utilities for 'LandR' suite of landscape simulation models.
 URL: 
     https://landr.predictiveecology.org,
     https://github.com/PredictiveEcology/LandR
-Date: 2024-06-06
-Version: 1.1.4
+Date: 2025-02-20
+Version: 1.1.5.9034
 Authors@R: c(
     person("Eliot J B", "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0002-6914-8316")),
@@ -33,15 +33,16 @@ Imports:
     ggpubr,
     ggspatial,
     grDevices,
+    httr2,
     lme4,
     methods,
     MuMIn (>= 1.42.5),
     parallel,
     pemisc (>= 0.0.4.9011),
-    quickPlot,
+    quickPlot (>= 1.0.2.9001),
     raster,
     RColorBrewer,
-    reproducible (>= 2.0.8),
+    reproducible,
     sf,
     sp,
     SpaDES.tools (>= 2.0.4),
@@ -57,14 +58,19 @@ Suggests:
     BioSIM,
     covr,
     curl,
+    dplyr,
     fasterize,
     future,
     future.apply,
+    ggalluvial,
+    ggrepel,
     googledrive (>= 2.0.0),
     httr,
     knitr,
     lqmm,
+    map,
     MASS,
+    memuse,
     parallelly,
     qs,
     rasterVis,
@@ -74,6 +80,7 @@ Suggests:
     rmarkdown,
     roxygen2,
     R.utils,
+    SpaDES.core,
     spelling,
     testthat,
     withr,
@@ -108,6 +115,7 @@ Collate:
     'ecoregions.R'
     'ecozones.R'
     'fireSeverity.R'
+    'lccMapGenerator.R'
     'light-shade.R'
     'makeDummyInputs.R'
     'maps.R'
@@ -116,6 +124,7 @@ Collate:
     'nullClimate.R'
     'overlayLCCs.R'
     'partitionBiomass.R'
+    'plot-transitions.R'
     'plot_summaries.R'
     'plotting.R'
     'prepEcoregions.R'
@@ -132,5 +141,8 @@ Collate:
     'terra-raster-utils.R'
     'wildfire.R'
     'zzz.R'
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
+Config/testthat/parallel: true
+Config/testthat/start-first: prep*

@@ -136,7 +136,6 @@ BioSIM_getWindMonthly <- function(dem, years, months, climModel = "GCM4", rcp = 
 
     # Make RasterStack
     browser() ## TODO: pull in Eliot's code from mpbClimateData
-
   } else {
     stop("Package BioSIM not installed. Use `installBioSIM()` to install it.")
   }
@@ -163,11 +162,12 @@ BioSIM_getWindMonthly <- function(dem, years, months, climModel = "GCM4", rcp = 
 BioSIM_getMPBSLR <- function(dem, years, SLR = "R", climModel = "GCM4", rcp = "RCP45") {
   if (requireNamespace("BioSIM", quietly = TRUE)) {
     SLR2use <- switch(SLR,
-                      S = "Safranyik_p_34",
-                      L = "Logan_P_2b",
-                      R = "CT_Survival",
-                      G = "Geo_prod_pL2b_pS34_pC",
-                      stop("SLR must be one of 'S', 'L', 'R', 'G'."))
+      S = "Safranyik_p_34",
+      L = "Logan_P_2b",
+      R = "CT_Survival",
+      G = "Geo_prod_pL2b_pS34_pC",
+      stop("SLR must be one of 'S', 'L', 'R', 'G'.")
+    )
 
     locations <- BioSIM_extractPoints(dem)
 

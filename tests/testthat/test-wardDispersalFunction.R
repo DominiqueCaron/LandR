@@ -1,5 +1,5 @@
 test_that("test Ward dispersal seeding algorithm", {
-  skip_if_not_installed("googledrive")
+  skip_if_not_installed(c("googledrive", "withr"))
 
   verbose <- 0
 
@@ -15,7 +15,7 @@ test_that("test Ward dispersal seeding algorithm", {
   # keep this here for interactive testing with a larger raster
   doLarge <- if (interactive()) FALSE else FALSE
   if (doLarge) {
-    set.seed(1234)
+    withr::local_seed(1234)
     message("Doing LARGE raster test -- should take more than 4 minutes")
     reducedPixelGroupMap <- rast(
       xmin = 50, xmax = 50 + 99 * 18000,
@@ -45,10 +45,9 @@ test_that("test Ward dispersal seeding algorithm", {
 
   reducedPixelGroupMap <- SpaDES.tools::randomPolygons(reducedPixelGroupMap, numTypes = pgs)
   Sum_of_species <- rast(reducedPixelGroupMap)
-  td <- file.path(tempdir(), "test_Ward_dispersal")
+  td <- withr::local_tempdir("test_Ward_dispersal")
   withr::defer({
     reproducible::clearCache(ask = FALSE)
-    unlink(td, recursive = TRUE)
   })
   speciesTable <- reproducible::Cache(getSpeciesTable, dPath = td)
   speciesTable <- speciesTable[Area == "BSW"]
@@ -185,8 +184,8 @@ test_that("test Ward dispersal seeding algorithm", {
       expect_true(all(is.na(joined$pixelIndex[tooFar])))
 
       testDists[[dis]] <- sapply(unique(output$speciesCode), function(spCode) {
-        env$effDist <- unique(joined[speciesCode == spCode]$seeddistance_eff)
-        env$maxDist <- unique(joined[speciesCode == spCode]$seeddistance_max)
+        env$effDist <- unique(joined[speciesCode == spCode][["seeddistance_eff"]])
+        env$maxDist <- unique(joined[speciesCode == spCode][["seeddistance_max"]])
         env$dist <- dis * env$cellSize
         dispersalProb <- do.call(Ward, as.list(env))
         dispersalProb <- 1 - (1 - dispersalProb)^successionTimestep
@@ -213,14 +212,15 @@ test_that("test Ward dispersal seeding algorithm", {
 })
 
 test_that("test large files", {
-  skip_if_not_installed("googledrive")
+  skip_if_not_installed(c("googledrive", "withr"))
+
+  dp <- withr::local_tempdir("dest_")
 
   if (interactive()) {
     whichTest <- 0 # 0 for full test (slow), 1 (manual interactive) or 2 (medium)
-    dp <- switch(Sys.info()[["user"]], emcintir = "~/tmp", tempdir())
+    dp <- switch(Sys.info()[["user"]], emcintir = "~/tmp", dp)
   } else {
     whichTest <- 2
-    dp <- tempdir()
     googledrive::drive_deauth()
   }
 
@@ -253,11 +253,12 @@ test_that("test large files", {
     destinationPath = dp
   )
 
-  if (is(pixelGroupMap, "RasterLayer"))
+  if (is(pixelGroupMap, "RasterLayer")) {
     pixelGroupMap <- terra::rast(pixelGroupMap)
+  }
 
   seed <- 1234
-  set.seed(seed)
+  withr::local_seed(seed)
   dtSrc1 <- data.table::copy(dtSrc)
   dtRcv1 <- data.table::copy(dtRcv)
   sppKeep <- unique(dtRcv1$speciesCode)
@@ -323,9 +324,9 @@ test_that("test large files", {
     a = {
       a <- hist(DistOfSuccess,
         # breaks = -125 + seq(0, max(DistOfSuccess) + 250, by = res(pixelGroupMap)[1]),
-        main = speciesTable[as.numeric(.BY)]$species
+        main = speciesTable[as.numeric(.BY)][["species"]]
       )
-      speciesTable[as.numeric(.BY)]$species
+      speciesTable[as.numeric(.BY)][["species"]]
     },
     maxDist = max(DistOfSuccess)
   ), by = "speciesCode"]
@@ -349,7 +350,7 @@ test_that("test large files", {
     forest <- which(!is.na(as.vector(pixelGroupMap[])))
     src <- which(!is.na(as.vector(spMap[[sppp]][])))
     recvable <- which(!is.na(as.vector(receivable[])))
-    rcvd <- out[speciesCode == sppp]$pixelIndex
+    rcvd <- out[speciesCode == sppp][["pixelIndex"]]
 
     spMap[[sppp]][forest] <- 0
     spMap[[sppp]][recvable] <- 2
@@ -388,7 +389,7 @@ test_that("test large files", {
   if (!(whichTest %in% 1:2)) {
     # This is a weak test -- that is often wrong with small samples -- seems to only
     #   work with full dataset
-    corr <- cor(speciesTable[match(rownames(rr), species)]$shadetolerance, rr[, "propSrcRcved"],
+    corr <- cor(speciesTable[match(rownames(rr), species)][["shadetolerance"]], rr[, "propSrcRcved"],
       method = "spearman"
     )
     expect_true(corr > 0.8)
@@ -399,6 +400,8 @@ test_that("test large files", {
 })
 
 test_that("test Ward 4 immediate neighbours", {
+  skip_if_not_installed("withr")
+
   withr::local_package("data.table")
   withr::local_package("SpaDES.tools")
 
@@ -456,7 +459,7 @@ test_that("test Ward 4 immediate neighbours", {
     )
     seed <- sample(1e6, 1)
     # seed <- 163330
-    set.seed(seed)
+    withr::local_seed(seed)
     out <- LANDISDisp(dtSrc,
       dtRcv = dtRcv, pixelGroupMap, speciesTable = speciesTab,
       successionTimestep = 1, verbose = 1, fast = FALSE
@@ -472,6 +475,8 @@ test_that("test Ward 4 immediate neighbours", {
 })
 
 test_that("test Ward random collection of neighbours", {
+  skip_if_not_installed("withr")
+
   withr::local_package("data.table")
   withr::local_package("SpaDES.tools")
 
@@ -519,7 +524,7 @@ test_that("test Ward random collection of neighbours", {
       seeddistance_max = c(100, 200, 250, 300, 250, 300, 490, 1240, 400, 500)
     )
     seed <- sample(1e6, 1)
-    set.seed(seed)
+    withr::local_seed(seed)
     out <- LANDISDisp(dtSrc,
       dtRcv = dtRcv, pixelGroupMap, speciesTable = speciesTab,
       successionTimestep = 1, verbose = 1
@@ -530,6 +535,6 @@ test_that("test Ward random collection of neighbours", {
     (oo <- out[, .N, by = c("speciesCode")])
     nn <- speciesTab[out, on = "speciesCode"]
     expect_true(all(nn[, DistOfSuccess <= pmax(res(pixelGroupMap)[1], seeddistance_max)]))
-    expect_true(all(nn[, sum(DistOfSuccess == 0) == 1, by = "speciesCode"]$V1))
+    expect_true(all(nn[, sum(DistOfSuccess == 0) == 1, by = "speciesCode"][["V1"]]))
   }
 })

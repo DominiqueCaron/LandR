@@ -26,10 +26,10 @@ jobs:
           - {os: windows-latest, nosuggests: false, r: 'devel'}
           - {os: windows-latest, nosuggests: false, r: 'release'}
           - {os: windows-latest, nosuggests: false, r: 'oldrel'}
-          - {os: ubuntu-20.04,   nosuggests: false, r: 'devel'}
-          - {os: ubuntu-20.04,   nosuggests: false, r: 'release'}
-          - {os: ubuntu-20.04,   nosuggests: true,  r: 'release'}
-          - {os: ubuntu-20.04,   nosuggests: false, r: 'oldrel'}
+          - {os: ubuntu-latest,   nosuggests: false, r: 'devel'}
+          - {os: ubuntu-latest,   nosuggests: false, r: 'release'}
+          - {os: ubuntu-latest,   nosuggests: true,  r: 'release'}
+          - {os: ubuntu-latest,   nosuggests: false, r: 'oldrel'}
 
     env:
       _R_CHECK_DEPENDS_ONLY_: ${{ matrix.config.nosuggests }}
@@ -41,7 +41,7 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: PredictiveEcology/actions/install-spatial-deps@v0.1
+      - uses: PredictiveEcology/actions/install-spatial-deps@v0.2
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -58,7 +58,10 @@ jobs:
             any::XML
             BioSIM=?ignore
             fastshp=?ignore
+            map=?ignore
             NLMR=?ignore
+            rgdal=?ignore
+            rgeos=?ignore
             PredictiveEcology/quickPlot@development
             PredictiveEcology/reproducible@development
             PredictiveEcology/Require@development
@@ -71,6 +74,9 @@ jobs:
           remotes::install_github("RNCan/BioSimClient_R")
           remotes::install_github("s-u/fastshp")
           remotes::install_github("ropensci/NLMR")
+          install.packages("rgdal", repos = "https://predictiveecology.r-universe.dev")
+          install.packages("rgeos", repos = "https://predictiveecology.r-universe.dev")
+          remotes::install_github("PredictiveEcology/map@development")
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2

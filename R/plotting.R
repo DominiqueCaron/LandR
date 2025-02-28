@@ -28,15 +28,16 @@ utils::globalVariables(c(
 #' @export
 plotVTM <- function(speciesStack = NULL, vtm = NULL, vegLeadingProportion = 0.8,
                     sppEquiv, sppEquivCol, colors, title = "Leading vegetation types") {
-
   if (is(speciesStack, "RasterBrick")) {
     speciesStack <- raster::stack(speciesStack)
   }
 
   colorsEN <- equivalentName(names(colors), sppEquiv, "EN_generic_short")
-  colDT <- data.table(cols = colors, species = colorsEN,
-                      speciesOrig = names(colors),
-                      speciesOrigOrder = seq(colors))
+  colDT <- data.table(
+    cols = colors, species = colorsEN,
+    speciesOrig = names(colors),
+    speciesOrigOrder = seq(colors)
+  )
   mixedString <- "Mixed"
   hasMixed <- isTRUE(mixedString %in% names(colors))
   if (hasMixed) {
@@ -52,13 +53,14 @@ plotVTM <- function(speciesStack = NULL, vtm = NULL, vegLeadingProportion = 0.8,
   if (is.null(vtm)) {
     if (!is.null(speciesStack)) {
       vtm <- Cache(vegTypeMapGenerator,
-                   x = speciesStack,
-                   vegLeadingProportion = vegLeadingProportion,
-                   mixedType = 2,
-                   sppEquiv = sppEquiv,
-                   sppEquivCol = sppEquivCol,
-                   colors = colors,
-                   doAssertion = getOption("LandR.assertions", TRUE))
+        x = speciesStack,
+        vegLeadingProportion = vegLeadingProportion,
+        mixedType = 2,
+        sppEquiv = sppEquiv,
+        sppEquivCol = sppEquivCol,
+        colors = colors,
+        doAssertion = getOption("LandR.assertions", TRUE)
+      )
     } else {
       stop(
         "plotVTM requires either a speciesStack of percent cover or a vegetation type map (vtm)."
@@ -93,8 +95,9 @@ plotVTM <- function(speciesStack = NULL, vtm = NULL, vegLeadingProportion = 0.8,
 
     df$species <- speciesEN
 
-    if (hasMixed)
+    if (hasMixed) {
       df[whMixed, species := mixedString]
+    }
 
     df <- colDT[df, on = "species"] # merge color and species
   } else {
@@ -112,8 +115,10 @@ plotVTM <- function(speciesStack = NULL, vtm = NULL, vegLeadingProportion = 0.8,
     guides(fill = guide_legend(reverse = TRUE)) +
     scale_fill_manual(values = cols2, drop = FALSE) +
     geom_bar(position = "stack") +
-    theme(legend.text = element_text(size = 6), legend.title = element_blank(),
-          axis.text = element_text(size = 6))
+    theme(
+      legend.text = element_text(size = 6), legend.title = element_blank(),
+      axis.text = element_text(size = 6)
+    )
 
   Plot(initialLeadingPlot, title = title)
 
@@ -133,15 +138,21 @@ plotVTM <- function(speciesStack = NULL, vtm = NULL, vegLeadingProportion = 0.8,
   names(labs) <- colDT$speciesOrig
 
   vtmPlot <- if (is(vtm, "RasterLayer")) {
-     ggplot() + geom_raster(data = vtm)
+    ggplot() +
+      geom_raster(data = vtm)
   } else {
-    ggplot() + geom_spatraster(data = vtm)
+    ggplot() +
+      geom_spatraster(data = vtm)
   }
   vtmPlot <- vtmPlot +
-    scale_fill_manual(values = cols2,  labels = labs,
-                        na.value = "grey80") +
-    theme(legend.text = element_text(size = 6), legend.title = element_blank(),
-          axis.text = element_text(size = 6))
+    scale_fill_manual(
+      values = cols2, labels = labs,
+      na.value = "grey80"
+    ) +
+    theme(
+      legend.text = element_text(size = 6), legend.title = element_blank(),
+      axis.text = element_text(size = 6)
+    )
 
   Plot(vtmPlot, title = title)
 }
@@ -209,34 +220,43 @@ sppColors <- function(sppEquiv, sppEquivCol, newVals = NULL, palette) {
   sppColorNames <- c(na.omit(unique(sppEquiv[[sppEquivCol]])), newVals)
 
   sppColors <- NULL
-  sppColors <- if (is.character(palette))
+  sppColors <- if (is.character(palette)) {
     if (palette %in% rownames(RColorBrewer::brewer.pal.info)) {
       colorPalette <- colorRampPalette(colors = RColorBrewer::brewer.pal(n = 7, name = palette))
       colorPalette(length(sppColorNames))
     }
+  }
 
-  if (is.null(sppColors))
+  if (is.null(sppColors)) {
     stop("Currently palette must be one of the RColorBrewer::brewer.pal names")
+  }
 
   names(sppColors) <- sppColorNames
   sppColors
 }
 
 plotFunction <- function(ras, studyArea, limits = NULL) {
-  if (is.null(limits))
+  if (is.null(limits)) {
     limits <- range(as.vector(ras[]), na.rm = TRUE)
+  }
   ggplot() +
     layer_spatial(ras, aes(fill = stat(band1))) +
     layer_spatial(data = studyArea, fill = "transparent", colour = "black") +
-    annotation_north_arrow(style = north_arrow_minimal,
-                           height = unit(1, "cm"), width = unit(1, "cm"),
-                           location = "tr", which_north = "true") +
+    annotation_north_arrow(
+      style = north_arrow_minimal,
+      height = unit(1, "cm"), width = unit(1, "cm"),
+      location = "tr", which_north = "true"
+    ) +
     theme_pubr(legend = "bottom") +
     theme(plot.margin = unit(c(0, 0, 0, 0), units = "mm")) +
-    scale_fill_distiller(palette = "Greys", na.value = "transparent",
-                         direction = 1,
-                         breaks = seq(limits[1], limits[2], length.out = 6),
-                         limits = limits) +
-    labs(x = "longitude", y = "latitude", fill = "Cover",
-         title = sub("\\.|_", " ", names(ras)))
+    scale_fill_distiller(
+      palette = "Greys", na.value = "transparent",
+      direction = 1,
+      breaks = seq(limits[1], limits[2], length.out = 6),
+      limits = limits
+    ) +
+    labs(
+      x = "longitude", y = "latitude", fill = "Cover",
+      title = sub("\\.|_", " ", names(ras))
+    )
 }

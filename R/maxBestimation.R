@@ -1,7 +1,7 @@
 utils::globalVariables(c(
-  "..colsPred", "..colsResp", "..envCols", "..predictorVars",  "..responseVar", "..targetCovar",
+  "..colsPred", "..colsResp", "..envCols", "..predictorVars", "..responseVar", "..targetCovar",
   "full.name", "growthCurveSource", "inflationFactor", "lower", "mANPPproportion", "model",
-  "pred1",  "quant", "upper", "x", "y"
+  "pred1", "quant", "upper", "x", "y"
 ))
 
 #' FUNCTIONS TO FIT NON-LINEAR MODELS TO ESTIMATE MAXB
@@ -111,7 +111,6 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
                          sampleSize = 3000, Ntries = 2000, maxCover = 1L, models = c("CR", "Logistic"),
                          modelOutputsPrev = NULL, randomStarts = FALSE, lowerBounds = TRUE,
                          upperBounds = TRUE, nbWorkers = 1L) {
-
   ## Checks ------------------------
 
   if (any(!models %in% c("CR", "Logistic"))) {
@@ -129,8 +128,10 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
   predsNeeded <- c(predictorVars, "age")
   notFound <- predsNeeded[!predsNeeded %in% colnames(predictorVarsData)]
   if (length(notFound)) {
-    stop("The following predictors were not found in predictorVarsData$", sp, ": ",
-         paste(notFound, collapse = ", "))
+    stop(
+      "The following predictors were not found in predictorVarsData$", sp, ": ",
+      paste(notFound, collapse = ", ")
+    )
   }
 
   if (isFALSE(is(sppVarsB, "data.table"))) {
@@ -178,9 +179,12 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
   colsResp <- setdiff(names(sppVarsB), c("x", "y"))
   specDat2 <- predictorVarsData[, ..colsPred][sppVarsB[, ..colsResp], on = c("pixelIndex")]
 
-  if (any(is.na(specDat2)))
-    message(magenta("Found NA's in species biomass or maxB model predictors.",
-                    "These lines will be removed"))
+  if (any(is.na(specDat2))) {
+    message(magenta(
+      "Found NA's in species biomass or maxB model predictors.",
+      "These lines will be removed"
+    ))
+  }
   specDat2 <- specDat2[complete.cases(specDat2)]
   # specDat2 <- split(specDat, by = "speciesCode")[[1]]
   # specDat2[, age := exp(logAge)]
@@ -197,7 +201,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
     # specDat2[, Bbins := cut(B, breaks = 10)]
     # specDat2[, Bsamples := round((.N/nrow(specDat2))*sampleSize), by = Bbins]
     # specDat2[Bsamples < 1, Bsamples := 1]
-    # sampleIDs <- specDat2[, sample(.I, unique(Bsamples), replace = FALSE), by = Bbins]$V1
+    # sampleIDs <- specDat2[, sample(.I, unique(Bsamples), replace = FALSE), by = Bbins][["V1"]]
     # set(specDat2, NULL, c("Bbins", "Bsamples"), NULL)
 
     sampleIDs <- sample(seq_len(nrow(specDat2)), size = sampleSize)
@@ -215,7 +219,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
     cols <- names(which(sapply(trainData, is.numeric)))
     newRow <- trainData[, lapply(.SD, mean), .SDcols = cols]
     cols <- setdiff(names(trainData), cols)
-    newRowFact <- trainData[, lapply(.SD, function(x)  {
+    newRowFact <- trainData[, lapply(.SD, function(x) {
       xTemp <- as.numeric(as.factor(x))
       meanX <- round(mean(xTemp))
       unique(x[xTemp == meanX])
@@ -262,7 +266,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
   ## smaller p lead to reaching the asymptote faster
 
   ## maximum observed biomass across full dataset
-  ObsMaxB <- max(specDat2$B, na.rm = TRUE)   ## maximum across whole data for the focal species
+  ObsMaxB <- max(specDat2$B, na.rm = TRUE) ## maximum across whole data for the focal species
 
   ## this is probably a bad way of estimating rates, because its a space-for-time across a
   ## potentially very large area
@@ -358,27 +362,33 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
       # linEqn = list(parse(text = lnEqn)),  ## below
       # plim = c(min = 1.1, max = 80),   ## Eliot's
       plim = c(min = 1, max = 20), ## higher values lead to reaching A slower
-      Alim = c(min = ObsMaxB * 0.3, max = ObsMaxB * 0.9),  ## Eliot's
+      Alim = c(min = ObsMaxB * 0.3, max = ObsMaxB * 0.9), ## Eliot's
       # klim = c(min = 0.0001, max = 0.13)  ## Eliot's
-      klim = c(min = 0.05, max = 0.2)    ## higher values lead to reaching A faster
+      klim = c(min = 0.05, max = 0.2) ## higher values lead to reaching A faster
       # klim = c(min = min(rateEstimates), max = max(rateEstimates))
     )
 
-    paramRanges <- modelParams[c("Alim"
-                                 , "klim"
-                                 , "plim")]
+    paramRanges <- modelParams[c(
+      "Alim",
+      "klim",
+      "plim"
+    )]
 
     ## starting values
     if (randomStarts) {
-      starts <- data.table(A = runif(Ntries, paramRanges$Alim[["min"]], paramRanges$Alim[["max"]]),
-                           k = runif(Ntries, paramRanges$klim[["min"]], paramRanges$klim[["max"]]),
-                           p = runif(Ntries, paramRanges$plim[["min"]], paramRanges$plim[["max"]]))
+      starts <- data.table(
+        A = runif(Ntries, paramRanges$Alim[["min"]], paramRanges$Alim[["max"]]),
+        k = runif(Ntries, paramRanges$klim[["min"]], paramRanges$klim[["max"]]),
+        p = runif(Ntries, paramRanges$plim[["min"]], paramRanges$plim[["max"]])
+      )
     } else {
       ## instead of drawing randomly, explore parameter space
       message(blue("Using starting values exploring parameter space. 'Ntries' will be ignored"))
-      starts <- list(A = seq(paramRanges$Alim[["min"]], paramRanges$Alim[["max"]], length.out = 10),
-                     k = seq(paramRanges$klim[["min"]], paramRanges$klim[["max"]], length.out = 10),
-                     p = seq(paramRanges$plim[["min"]], paramRanges$plim[["max"]], length.out = 10))
+      starts <- list(
+        A = seq(paramRanges$Alim[["min"]], paramRanges$Alim[["max"]], length.out = 10),
+        k = seq(paramRanges$klim[["min"]], paramRanges$klim[["max"]], length.out = 10),
+        p = seq(paramRanges$plim[["min"]], paramRanges$plim[["max"]], length.out = 10)
+      )
       starts <- as.data.table(expand.grid(starts))
     }
 
@@ -388,7 +398,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
     for (pred in predictorVarsCombos) {
       lnEqn <- paste("A ~", paste(pred, collapse = " + "))
       # lnEqn <- paste("A ~ 1") ## testing
-      modelParams$linEqn <- list(lnEqn)  ## don't parse/eval: mem leak! keep as character - .fitNLMwCovariates converts to formula
+      modelParams$linEqn <- list(lnEqn) ## don't parse/eval: mem leak! keep as character - .fitNLMwCovariates converts to formula
 
       message(blue("using ", lnEqn))
 
@@ -420,16 +430,18 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
       # preds <- trainData[, lapply(.SD, mean), .SDcols = pred]
       # trainData2 <- cbind(trainData2, preds)
       # browser()
-      modelOutputsPrev$CR$mllsOuter <- .fitNLMwCovariates(data = trainData,
-                                                          # data = trainData2,  ## for testing
-                                                          maxCover = maxCover,
-                                                          nonLinModelQuoted = modelParams$nonLinEqn,
-                                                          linModelQuoted = modelParams$linEqn,
-                                                          starts = starts,
-                                                          lower = lowerLims,
-                                                          upper = upperLims,
-                                                          mllsOuterPrev = modelOutputsPrev$CR$mllsOuter,
-                                                          nbWorkers = nbWorkers)
+      modelOutputsPrev$CR$mllsOuter <- .fitNLMwCovariates(
+        data = trainData,
+        # data = trainData2,  ## for testing
+        maxCover = maxCover,
+        nonLinModelQuoted = modelParams$nonLinEqn,
+        linModelQuoted = modelParams$linEqn,
+        starts = starts,
+        lower = lowerLims,
+        upper = upperLims,
+        mllsOuterPrev = modelOutputsPrev$CR$mllsOuter,
+        nbWorkers = nbWorkers
+      )
     }
   }
 
@@ -443,7 +455,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
       # plim = c(min = 0.001, max = 1), ## Eliot's
       plim = c(min = min(rateEstimates), max = max(rateEstimates)),
       Alim = c(min = ObsMaxB * 0.3, max = ObsMaxB * 0.9),
-      klim <- c(min = min(kLogEstimates), max = max(kLogEstimates))
+      klim = c(min = min(kLogEstimates), max = max(kLogEstimates))
     )
     # modelParams$klim <- c(min = 10, max = max(modelParams$Alim)) ## Eliot's
 
@@ -451,15 +463,19 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
 
     ## starting values
     if (randomStarts) {
-      starts <- data.table(A = runif(Ntries, paramRanges$Alim[["min"]], paramRanges$Alim[["max"]]),
-                           k = runif(Ntries, paramRanges$klim[["min"]], paramRanges$klim[["max"]]),
-                           p = runif(Ntries, paramRanges$plim[["min"]], paramRanges$plim[["max"]]))
+      starts <- data.table(
+        A = runif(Ntries, paramRanges$Alim[["min"]], paramRanges$Alim[["max"]]),
+        k = runif(Ntries, paramRanges$klim[["min"]], paramRanges$klim[["max"]]),
+        p = runif(Ntries, paramRanges$plim[["min"]], paramRanges$plim[["max"]])
+      )
     } else {
       message(blue("Using starting values exploring parameter space. 'Ntries' will be ignored"))
       ## instead of drawing randomly, explore parameter space
-      starts <- list(A = seq(paramRanges$Alim[["min"]], paramRanges$Alim[["max"]], length.out = 20),
-                     k = seq(paramRanges$klim[["min"]], paramRanges$klim[["max"]], length.out = 10),
-                     p = seq(paramRanges$plim[["min"]], paramRanges$plim[["max"]], length.out = 10))
+      starts <- list(
+        A = seq(paramRanges$Alim[["min"]], paramRanges$Alim[["max"]], length.out = 20),
+        k = seq(paramRanges$klim[["min"]], paramRanges$klim[["max"]], length.out = 10),
+        p = seq(paramRanges$plim[["min"]], paramRanges$plim[["max"]], length.out = 10)
+      )
       starts <- as.data.table(expand.grid(starts))
     }
 
@@ -477,15 +493,17 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
 
       message(blue("using", lnEqn))
 
-      modelOutputsPrev$Logistic$mllsOuter <- .fitNLMwCovariates(data = trainData,
-                                                                maxCover = maxCover,
-                                                                nonLinModelQuoted = modelParams$nonLinEqn,
-                                                                linModelQuoted = modelParams$linEqn,
-                                                                starts = starts,
-                                                                lower = lowerLims,
-                                                                upper = upperLims,
-                                                                mllsOuterPrev = modelOutputsPrev$Logistic$mllsOuter,
-                                                                nbWorkers = nbWorkers)
+      modelOutputsPrev$Logistic$mllsOuter <- .fitNLMwCovariates(
+        data = trainData,
+        maxCover = maxCover,
+        nonLinModelQuoted = modelParams$nonLinEqn,
+        linModelQuoted = modelParams$linEqn,
+        starts = starts,
+        lower = lowerLims,
+        upper = upperLims,
+        mllsOuterPrev = modelOutputsPrev$Logistic$mllsOuter,
+        nbWorkers = nbWorkers
+      )
     }
   }
   return(modelOutputsPrev)
@@ -533,7 +551,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
   if (requireNamespace("bbmle", quietly = TRUE)) {
     linModelQuoted <- lapply(linModelQuoted, as.formula, env = .GlobalEnv) # .GlobalEnv keeps object small. don't eval/parse!
     nonLinModelQuoted <- as.formula(nonLinModelQuoted, env = .GlobalEnv)
-    data <- data[complete.cases(data),]
+    data <- data[complete.cases(data), ]
 
     if (!is.null(starts)) {
       if (isFALSE(is(starts, "data.frame"))) {
@@ -551,7 +569,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
       }
 
       if (max(data$cover, na.rm = TRUE) > maxCover ||
-          min(data$cover, na.rm = TRUE) < 0) {
+        min(data$cover, na.rm = TRUE) < 0) {
         stop("data$cover must be scaled between 0 and 'maxCover'")
       }
     }
@@ -593,7 +611,6 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
       if (.Platform$OS.type == "unix") {
         cl <- parallel::makeForkCluster(nbWorkers)
       } else {
-
         if (!requireNamespace("parallelly", quietly = TRUE)) {
           stop("Package parallelly not installed. Install using `install.packages('parallelly')`.")
         }
@@ -617,9 +634,9 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
     }
 
     mle2Args <- list(
-      "minuslogl" = nonLinModelQuoted
-      , "data" = data
-      , "parameters" = linModelQuoted
+      "minuslogl" = nonLinModelQuoted,
+      "data" = data,
+      "parameters" = linModelQuoted
       # , "method" = "L-BFGS-B"
       # , skip.hessian = TRUE
       # , control = list(maxit = 10000)
@@ -637,7 +654,8 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
       MARGIN = 1,
       mle2Args = mle2Args,
       simplify = FALSE,
-      FUN = .mllWrapper)
+      FUN = .mllWrapper
+    )
 
     mllAICs <- sapply(mll, FUN = function(mll) {
       if (inherits(mll, c("error", "try-error"))) {
@@ -648,7 +666,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
     })
 
     if (any(!is.na(mllAICs))) {
-      bestModel <- last(which.min(mllAICs))  ## takes simpler model in case there are more than 1 min(AIC) (first to be fitted)
+      bestModel <- last(which.min(mllAICs)) ## takes simpler model in case there are more than 1 min(AIC) (first to be fitted)
       aicTry <- mllAICs[bestModel]
 
       if (aicTry < aicPrev) {
@@ -660,10 +678,11 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
         aicPrev <- aicTry
         mllKeep <- mll[[bestModel]]
       }
-
     } else {
-      warning("Could not converge. Try increasing Ntries or changing paramRanges values.",
-              "See output for last error message")
+      warning(
+        "Could not converge. Try increasing Ntries or changing paramRanges values.",
+        "See output for last error message"
+      )
       if (!exists("mllKeep", inherits = FALSE)) {
         mllKeep <- mll[[1]]
       }
@@ -756,16 +775,22 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
   if (!is.null(X)) {
     mle2Args$start <- as.list(X)
   }
-  mll <- tryCatch({
-    R.utils::withTimeout({
-      suppressWarnings({
-        mll <- do.call(bbmle::mle2, mle2Args)
-      }
+  mll <- tryCatch(
+    {
+      R.utils::withTimeout(
+        {
+          suppressWarnings({
+            mll <- do.call(bbmle::mle2, mle2Args)
+          })
+        },
+        timeout = 5
       )
-    }, timeout = 5)
-  }, TimeoutException = function(ex) {
-    stop("Convergence timed-out.")
-  }, error = function(e) e)
+    },
+    TimeoutException = function(ex) {
+      stop("Convergence timed-out.")
+    },
+    error = function(e) e
+  )
 
   # put new tryCatch outside of TimeoutException function for readability
   # if (inherits(mll, c("error", "try-error"))) {
@@ -801,7 +826,7 @@ fitNLMModels <- function(sp = NULL, predictorVarsData, sppVarsB, predictorVars,
 #'   biomass. One of "CR" (Chapman-Richards) or "Logistic".
 #'
 #' @export
-extractMaxB <- function(mll, newdata, average = FALSE, model = c("CR", "Logistic"))  {
+extractMaxB <- function(mll, newdata, average = FALSE, model = c("CR", "Logistic")) {
   if (requireNamespace("bbmle", quietly = TRUE)) {
     if (is.null(dim(newdata))) {
       stop("newdata should have at least two dimensions and be coercible to a data.table")
@@ -814,7 +839,7 @@ extractMaxB <- function(mll, newdata, average = FALSE, model = c("CR", "Logistic
     cols <- paramNames[["origCoefNames"]]
     newdata <- newdata[, ..cols]
     newdata <- cbind(rep(1L, nrow(newdata)), newdata)
-    setnames(newdata, "V1", grep("Intercept", paramNames[["mllCoefNames"]],value = TRUE))
+    setnames(newdata, "V1", grep("Intercept", paramNames[["mllCoefNames"]], value = TRUE))
 
     if (average) {
       newdata <- suppressWarnings(sapply(newdata, mean))
@@ -908,15 +933,19 @@ ggplotMLL_maxB <- function(mll, data, maxCover = 1L, xCovar = "age",
   ## make sure lists follow the same order
   nonLinModelQuoted <- nonLinModelQuoted[names(mll)]
   linModelQuoted <- linModelQuoted[names(mll)]
-  outs <- Map(f = .MLLMaxBplotData,
-              mll = mll,
-              nonLinModelQuoted = nonLinModelQuoted,
-              linModelQuoted = linModelQuoted,
-              MoreArgs = list(data = data,
-                              maxCover = maxCover,
-                              averageCovariates = averageCovariates,
-                              observedAge = observedAge,
-                              plotCIs = plotCIs))
+  outs <- Map(
+    f = .MLLMaxBplotData,
+    mll = mll,
+    nonLinModelQuoted = nonLinModelQuoted,
+    linModelQuoted = linModelQuoted,
+    MoreArgs = list(
+      data = data,
+      maxCover = maxCover,
+      averageCovariates = averageCovariates,
+      observedAge = observedAge,
+      plotCIs = plotCIs
+    )
+  )
 
   allPlotData <- rbindlist(lapply(outs, function(out) out$plotData), idcol = "model")
   allConfInts <- rbindlist(lapply(outs, function(out) out$confIntervals), idcol = "model")
@@ -924,18 +953,24 @@ ggplotMLL_maxB <- function(mll, data, maxCover = 1L, xCovar = "age",
   ## combos of covariate values. take the min(lower) and max(lower)
 
   ## extract average predicted maxB across ages
-  maxBmean <- Map(f = function(mll, df) extractMaxB(mll, df, average = TRUE),
-                  mll = mll,
-                  df = lapply(outs, function(out) out$plotData))
+  maxBmean <- Map(
+    f = function(mll, df) extractMaxB(mll, df, average = TRUE),
+    mll = mll,
+    df = lapply(outs, function(out) out$plotData)
+  )
 
   ## extract quantiles of maxB for maximum age used in plots (the asymptotes of each quantile)
   maxBfittedQuants <- allPlotData[age == max(age),
-                                  list(value = quantile(pred1, probs = c(0.05, 0.25, 0.5, 0.75, 0.95)),
-                                       quant = c("5%", "25%", "50%", "75%", "95%")),
-                                  by = model]
+    list(
+      value = quantile(pred1, probs = c(0.05, 0.25, 0.5, 0.75, 0.95)),
+      quant = c("5%", "25%", "50%", "75%", "95%")
+    ),
+    by = model
+  ]
 
   subtitle <- paste(paste("average maxB =", maxBmean, paste0("(", names(maxBmean), ")")),
-                    collapse = "\n")
+    collapse = "\n"
+  )
   gg1 <- ggplot() +
     geom_point(data = data, aes(x = get(xCovar), y = B, color = cover)) +
     scale_color_distiller(palette = "Greens", direction = 1) +
@@ -944,45 +979,67 @@ ggplotMLL_maxB <- function(mll, data, maxCover = 1L, xCovar = "age",
 
   if (nrow(allConfInts) && averageCovariates) {
     gg1 <- gg1 +
-      geom_ribbon(data = allConfInts,
-                  aes(x = get(xCovar), ymin = lower, ymax = upper),
-                  fill = "grey", alpha = 0.5)
+      geom_ribbon(
+        data = allConfInts,
+        aes(x = get(xCovar), ymin = lower, ymax = upper),
+        fill = "grey", alpha = 0.5
+      )
   }
 
   lineCols <- RColorBrewer::brewer.pal(5, "Blues")
   gg1 <- gg1 +
-    stat_summary(data = allPlotData,
-                 mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                 fun = mean, geom = "line",
-                 linewidth = 1, colour = lineCols[3]) +
-    stat_summary(data = allPlotData,
-                 mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                 fun = quantile, fun.args = list(probs = 0.05),
-                 geom = "line", linewidth = 1, colour = lineCols[1]) +
-    stat_summary(data = allPlotData,
-                 mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                 fun = quantile, fun.args = list(probs = 0.25),
-                 geom = "line", linewidth = 1, colour = lineCols[2]) +
-    stat_summary(data = allPlotData,
-                 mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                 fun = quantile, fun.args = list(probs = 0.75),
-                 geom = "line", linewidth = 1, colour = lineCols[4]) +
-    stat_summary(data = allPlotData,
-                 mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                 fun = quantile, fun.args = list(probs = 0.95),
-                 geom = "line", linewidth = 1, colour = lineCols[5])
+    stat_summary(
+      data = allPlotData,
+      mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+      fun = mean, geom = "line",
+      linewidth = 1, colour = lineCols[3]
+    ) +
+    stat_summary(
+      data = allPlotData,
+      mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+      fun = quantile, fun.args = list(probs = 0.05),
+      geom = "line", linewidth = 1, colour = lineCols[1]
+    ) +
+    stat_summary(
+      data = allPlotData,
+      mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+      fun = quantile, fun.args = list(probs = 0.25),
+      geom = "line", linewidth = 1, colour = lineCols[2]
+    ) +
+    stat_summary(
+      data = allPlotData,
+      mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+      fun = quantile, fun.args = list(probs = 0.75),
+      geom = "line", linewidth = 1, colour = lineCols[4]
+    ) +
+    stat_summary(
+      data = allPlotData,
+      mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+      fun = quantile, fun.args = list(probs = 0.95),
+      geom = "line", linewidth = 1, colour = lineCols[5]
+    )
 
   gg1 <- gg1 +
-    geom_hline(yintercept = maxBfittedQuants[quant == "5%", value], colour = lineCols[1],
-               linetype = "dashed", linewidth = 1) +
-    geom_hline(yintercept = maxBfittedQuants[quant == "25%", value], colour = lineCols[2],
-               linetype = "dashed", linewidth = 1) +
-    geom_hline(yintercept = maxBfittedQuants[quant == "50%", value], colour = lineCols[3],
-               linetype = "dashed", linewidth = 1) +
-    geom_hline(yintercept = maxBfittedQuants[quant == "75%", value], colour = lineCols[4],
-               linetype = "dashed", linewidth = 1) +
-    geom_hline(yintercept = maxBfittedQuants[quant == "95%", value], colour = lineCols[5],
-               linetype = "dashed", linewidth = 1)
+    geom_hline(
+      yintercept = maxBfittedQuants[quant == "5%", value], colour = lineCols[1],
+      linetype = "dashed", linewidth = 1
+    ) +
+    geom_hline(
+      yintercept = maxBfittedQuants[quant == "25%", value], colour = lineCols[2],
+      linetype = "dashed", linewidth = 1
+    ) +
+    geom_hline(
+      yintercept = maxBfittedQuants[quant == "50%", value], colour = lineCols[3],
+      linetype = "dashed", linewidth = 1
+    ) +
+    geom_hline(
+      yintercept = maxBfittedQuants[quant == "75%", value], colour = lineCols[4],
+      linetype = "dashed", linewidth = 1
+    ) +
+    geom_hline(
+      yintercept = maxBfittedQuants[quant == "95%", value], colour = lineCols[5],
+      linetype = "dashed", linewidth = 1
+    )
 
 
   gg1
@@ -1033,24 +1090,26 @@ ggplotMLL_maxB <- function(mll, data, maxCover = 1L, xCovar = "age",
     cols <- c("age", .getMaxBCoefs(mll)[[2]])
     missingCols <- setdiff(c("B", cols), names(data))
     if (length(missingCols)) {
-      stop("The following colums were not found in data: ",
-           paste(missingCols, collapse = ", "))
+      stop(
+        "The following colums were not found in data: ",
+        paste(missingCols, collapse = ", ")
+      )
     }
 
     df <- data[, ..cols]
 
     if (!observedAge) {
-      ageVals <- round(seq(min(df$age), max(df$age)*1.5, length.out = 100), 0)
+      ageVals <- round(seq(min(df$age), max(df$age) * 1.5, length.out = 100), 0)
       ageCover <- data.table(cover = maxCover, age = ageVals)
     }
 
     if (averageCovariates) {
       if (exists("ageCover")) {
         df <- df[, as.list(colMeans(.SD)), .SDcols = cols]
-        cols <- setdiff(cols, c("cover", "age"))   ## remove cover/age for binding
+        cols <- setdiff(cols, c("cover", "age")) ## remove cover/age for binding
         df <- cbind(ageCover, df[, ..cols])
       } else {
-        cols <- setdiff(cols, c("cover", "age"))   ## remove cover/age for averaging others
+        cols <- setdiff(cols, c("cover", "age")) ## remove cover/age for averaging others
         df[, (cols) := as.list(colMeans(.SD)), .SDcols = cols]
       }
     } else {
@@ -1060,11 +1119,13 @@ ggplotMLL_maxB <- function(mll, data, maxCover = 1L, xCovar = "age",
         ## age/cover combination
         cols <- setdiff(cols, c("cover", "age"))
         df <- apply(ageCover, 1, function(x) {
-          cbind(data.table(cover = x["cover"], age = x["age"]),
-                df[, ..cols])
+          cbind(
+            data.table(cover = x["cover"], age = x["age"]),
+            df[, ..cols]
+          )
         })
         df <- rbindlist(df)
-        df <- df[, lapply(.SD, round, digits = 2)]   ## round to reduce size
+        df <- df[, lapply(.SD, round, digits = 2)] ## round to reduce size
         df <- unique(df)
       } else {
         df[, cover := maxCover]
@@ -1092,13 +1153,20 @@ ggplotMLL_maxB <- function(mll, data, maxCover = 1L, xCovar = "age",
       ## generate new parameter values from a multivariate normal distribution
       ## see https://stats.stackexchange.com/questions/221426/95-confidence-intervals-on-prediction-of-censored-binomial-model-estimated-usin
       ## and Bolker's book Ecological Models and Data in R (here the solve(hessian)) is suggested as an alternative if using optim)
-      newparams <- tryCatch({
-        R.utils::withTimeout({
-          MASS::mvrnorm(10000, mu = bbmle::coef(mll), Sigma = solve(mll@details$hessian))
-        }, timeout = 300) ## 5min
-      }, TimeoutException = function(ex) {
-        stop("Convergence timed-out.")
-      }, error = function(e) e) ## may not work if matrix isn't postive definite
+      newparams <- tryCatch(
+        {
+          R.utils::withTimeout(
+            {
+              MASS::mvrnorm(10000, mu = bbmle::coef(mll), Sigma = solve(mll@details$hessian))
+            },
+            timeout = 300
+          ) ## 5min
+        },
+        TimeoutException = function(ex) {
+          stop("Convergence timed-out.")
+        },
+        error = function(e) e
+      ) ## may not work if matrix isn't postive definite
 
       if (is(newparams, "error") && any(grepl("not positive definite", newparams))) {
         if (!requireNamespace("lqmm", quietly = TRUE)) {
@@ -1114,13 +1182,20 @@ ggplotMLL_maxB <- function(mll, data, maxCover = 1L, xCovar = "age",
           if (!requireNamespace("MASS", quietly = TRUE)) {
             stop("Package MASS not installed. Install using `install.packages('MASS')`.")
           }
-          newparams <- tryCatch({
-            R.utils::withTimeout({
-              MASS::mvrnorm(10000, mu = bbmle::coef(mll), Sigma = SigmaMatrix)
-            }, timeout = 300) ## 5min
-          }, TimeoutException = function(ex) {
-            stop("Convergence timed-out.")
-          }, error = function(e) e)
+          newparams <- tryCatch(
+            {
+              R.utils::withTimeout(
+                {
+                  MASS::mvrnorm(10000, mu = bbmle::coef(mll), Sigma = SigmaMatrix)
+                },
+                timeout = 300
+              ) ## 5min
+            },
+            TimeoutException = function(ex) {
+              stop("Convergence timed-out.")
+            },
+            error = function(e) e
+          )
         }
       }
 
@@ -1237,8 +1312,10 @@ partialggplotMLL_maxB <- function(mll, data, targetCovar = "cover", maxCover = 1
     stop("mll must be a named list")
   }
 
-  if (any(!vapply(mll, FUN = function(x) is(x, "mle2"),
-                  FUN.VALUE = logical(1)))) {
+  if (any(!vapply(mll,
+    FUN = function(x) is(x, "mle2"),
+    FUN.VALUE = logical(1)
+  ))) {
     stop("mll must be a list of mle2 outputs or an mle2 output")
   }
 
@@ -1261,16 +1338,20 @@ partialggplotMLL_maxB <- function(mll, data, targetCovar = "cover", maxCover = 1
   ## make sure lists follow the same order
   nonLinModelQuoted <- nonLinModelQuoted[names(mll)]
   linModelQuoted <- linModelQuoted[names(mll)]
-  outs <- Map(f = .MLLMaxBPartialPlotData,
-              mll = mll,
-              nonLinModelQuoted = nonLinModelQuoted,
-              linModelQuoted = linModelQuoted,
-              MoreArgs = list(data = data,
-                              targetCovar = targetCovar,
-                              maxCover = maxCover,
-                              fun = fun,
-                              fixMaxCover = fixMaxCover,
-                              plotCIs = plotCIs))
+  outs <- Map(
+    f = .MLLMaxBPartialPlotData,
+    mll = mll,
+    nonLinModelQuoted = nonLinModelQuoted,
+    linModelQuoted = linModelQuoted,
+    MoreArgs = list(
+      data = data,
+      targetCovar = targetCovar,
+      maxCover = maxCover,
+      fun = fun,
+      fixMaxCover = fixMaxCover,
+      plotCIs = plotCIs
+    )
+  )
 
   allPlotData <- rbindlist(lapply(outs, function(out) out$plotData), idcol = "model")
   allConfInts <- rbindlist(lapply(outs, function(out) out$confIntervals), idcol = "model")
@@ -1278,72 +1359,103 @@ partialggplotMLL_maxB <- function(mll, data, targetCovar = "cover", maxCover = 1
   if (showQuantiles != "none") {
     ## extract quantiles of maxB for maximum age used in plots (the asymptotes of each quantile)
     maxBfittedQuants <- allPlotData[age == max(age),
-                                    list(value = quantile(pred1, probs = c(0.05, 0.25, 0.5, 0.75, 0.95, 1.0)),
-                                         quant = c("5%", "25%", "50%", "75%", "95%", "100%")),
-                                    by = model]
+      list(
+        value = quantile(pred1, probs = c(0.05, 0.25, 0.5, 0.75, 0.95, 1.0)),
+        quant = c("5%", "25%", "50%", "75%", "95%", "100%")
+      ),
+      by = model
+    ]
   }
 
   gg1 <- ggplot() +
-    geom_point(data = data,
-               aes(x = get(xCovar), y = B, color = get(targetCovar))) +
+    geom_point(
+      data = data,
+      aes(x = get(xCovar), y = B, color = get(targetCovar))
+    ) +
     scale_color_distiller(palette = "Greens", direction = 1) +
     theme_classic() +
     labs(title = plotTitle, color = targetCovar, x = xCovar)
 
   if (nrow(allConfInts)) {
     gg1 <- gg1 +
-      geom_ribbon(data = allConfInts,
-                  aes(x = get(xCovar), ymin = lower, ymax = upper),
-                  fill = "grey", alpha = 0.5)
+      geom_ribbon(
+        data = allConfInts,
+        aes(x = get(xCovar), ymin = lower, ymax = upper),
+        fill = "grey", alpha = 0.5
+      )
   }
 
   lineCols <- RColorBrewer::brewer.pal(5, "Blues")
 
   if (showQuantiles == "none") {
     gg1 <- gg1 +
-      stat_summary(data = allPlotData,
-                   mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                   fun = mean, geom = "line",
-                   linewidth = 1, colour = lineCols[3])
+      stat_summary(
+        data = allPlotData,
+        mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+        fun = mean, geom = "line",
+        linewidth = 1, colour = lineCols[3]
+      )
   }
   if (showQuantiles == "allQuantiles") {
     gg1 <- gg1 +
-      stat_summary(data = allPlotData,
-                   mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                   fun = quantile, fun.args = list(probs = 0.05),
-                   geom = "line", linewidth = 1, colour = lineCols[1]) +
-      stat_summary(data = allPlotData,
-                   mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                   fun = quantile, fun.args = list(probs = 0.25),
-                   geom = "line", linewidth = 1, colour = lineCols[2]) +
-      stat_summary(data = allPlotData,
-                   mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                   fun = quantile, fun.args = list(probs = 0.75),
-                   geom = "line", linewidth = 1, colour = lineCols[4]) +
-      stat_summary(data = allPlotData,
-                   mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                   fun = quantile, fun.args = list(probs = 0.95),
-                   geom = "line", linewidth = 1, colour = lineCols[5]) +
-      geom_hline(yintercept = maxBfittedQuants[quant == "5%", value], colour = lineCols[1],
-                 linetype = "dashed", linewidth = 1) +
-      geom_hline(yintercept = maxBfittedQuants[quant == "25%", value], colour = lineCols[2],
-                 linetype = "dashed", linewidth = 1) +
-      geom_hline(yintercept = maxBfittedQuants[quant == "50%", value], colour = lineCols[3],
-                 linetype = "dashed", linewidth = 1) +
-      geom_hline(yintercept = maxBfittedQuants[quant == "75%", value], colour = lineCols[4],
-                 linetype = "dashed", linewidth = 1) +
-      geom_hline(yintercept = maxBfittedQuants[quant == "95%", value], colour = lineCols[5],
-                 linetype = "dashed", linewidth = 1)
+      stat_summary(
+        data = allPlotData,
+        mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+        fun = quantile, fun.args = list(probs = 0.05),
+        geom = "line", linewidth = 1, colour = lineCols[1]
+      ) +
+      stat_summary(
+        data = allPlotData,
+        mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+        fun = quantile, fun.args = list(probs = 0.25),
+        geom = "line", linewidth = 1, colour = lineCols[2]
+      ) +
+      stat_summary(
+        data = allPlotData,
+        mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+        fun = quantile, fun.args = list(probs = 0.75),
+        geom = "line", linewidth = 1, colour = lineCols[4]
+      ) +
+      stat_summary(
+        data = allPlotData,
+        mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+        fun = quantile, fun.args = list(probs = 0.95),
+        geom = "line", linewidth = 1, colour = lineCols[5]
+      ) +
+      geom_hline(
+        yintercept = maxBfittedQuants[quant == "5%", value], colour = lineCols[1],
+        linetype = "dashed", linewidth = 1
+      ) +
+      geom_hline(
+        yintercept = maxBfittedQuants[quant == "25%", value], colour = lineCols[2],
+        linetype = "dashed", linewidth = 1
+      ) +
+      geom_hline(
+        yintercept = maxBfittedQuants[quant == "50%", value], colour = lineCols[3],
+        linetype = "dashed", linewidth = 1
+      ) +
+      geom_hline(
+        yintercept = maxBfittedQuants[quant == "75%", value], colour = lineCols[4],
+        linetype = "dashed", linewidth = 1
+      ) +
+      geom_hline(
+        yintercept = maxBfittedQuants[quant == "95%", value], colour = lineCols[5],
+        linetype = "dashed", linewidth = 1
+      )
   }
 
   if (showQuantiles == "maximum") {
     gg1 <- gg1 +
-      stat_summary(data = allPlotData,
-                   mapping = aes(x = get(xCovar), y = pred1, linetype = model),
-                   fun = quantile, fun.args = list(probs = 1.0),
-                   geom = "line", linewidth = 1, colour = lineCols[5]) +
-      geom_hline(yintercept = maxBfittedQuants[quant == "100%", value], colour = lineCols[5],
-                 linetype = "dashed", linewidth = 1)
+      stat_summary(
+        data = allPlotData,
+        mapping = aes(x = get(xCovar), y = pred1, linetype = model),
+        fun = quantile, fun.args = list(probs = 1.0),
+        geom = "line", linewidth = 1, colour = lineCols[5]
+      ) +
+      geom_hline(
+        yintercept = maxBfittedQuants[quant == "100%", value], colour = lineCols[5],
+        linetype = "dashed", linewidth = 1
+      )
   }
 
   gg1
@@ -1396,15 +1508,19 @@ partialggplotMLL_maxB <- function(mll, data, targetCovar = "cover", maxCover = 1
     cols <- unique(c("age", targetCovar, .getMaxBCoefs(mll)[[2]]))
     missingCols <- setdiff(c("B", cols), names(data))
     if (length(missingCols)) {
-      stop("The following colums were not found in data: ",
-           paste(missingCols, collapse = ", "))
+      stop(
+        "The following colums were not found in data: ",
+        paste(missingCols, collapse = ", ")
+      )
     }
 
     df <- data[, ..cols]
 
     ## generate regular gradients of age and targetCovar values and combine them
-    ageTargetCovar <- expand.grid(age = round(seq(min(df$age), max(df$age)*1.5, length.out = 100), 0),
-                                  var = round(seq(min(df[, ..targetCovar]), max(df[, ..targetCovar]), length.out = 100), 2))
+    ageTargetCovar <- expand.grid(
+      age = round(seq(min(df$age), max(df$age) * 1.5, length.out = 100), 0),
+      var = round(seq(min(df[, ..targetCovar]), max(df[, ..targetCovar]), length.out = 100), 2)
+    )
     ageTargetCovar <- as.data.table(ageTargetCovar)
     setnames(ageTargetCovar, new = c("age", targetCovar))
 
@@ -1444,13 +1560,20 @@ partialggplotMLL_maxB <- function(mll, data, targetCovar = "cover", maxCover = 1
       ## generate new parameter values from a multivariate normal distribution
       ## see https://stats.stackexchange.com/questions/221426/95-confidence-intervals-on-prediction-of-censored-binomial-model-estimated-usin
       ## and Bolker's book Ecological Models and Data in R (here the solve(hessian)) is suggested as an alternative if using optim)
-      newparams <- tryCatch({
-        R.utils::withTimeout({
-          MASS::mvrnorm(10000, mu = bbmle::coef(mll), Sigma = solve(mll@details$hessian))
-        }, timeout = 300) ## 5min
-      }, TimeoutException = function(ex) {
-        stop("Convergence timed-out.")
-      }, error = function(e) e) ## may not work if matrix isn't postive definite
+      newparams <- tryCatch(
+        {
+          R.utils::withTimeout(
+            {
+              MASS::mvrnorm(10000, mu = bbmle::coef(mll), Sigma = solve(mll@details$hessian))
+            },
+            timeout = 300
+          ) ## 5min
+        },
+        TimeoutException = function(ex) {
+          stop("Convergence timed-out.")
+        },
+        error = function(e) e
+      ) ## may not work if matrix isn't postive definite
 
       if (is(newparams, "error") && any(grepl("not positive definite", newparams))) {
         if (!requireNamespace("lqmm", quietly = TRUE)) {
@@ -1460,25 +1583,39 @@ partialggplotMLL_maxB <- function(mll, data, targetCovar = "cover", maxCover = 1
         ## see https://stackoverflow.com/questions/69804459/multivariete-distribution-error-sigma-is-not-positive-definite
         ## note that this may be due to some variables being linear combinations of others, or bad model specification
         # https://stats.stackexchange.com/questions/30465/what-does-a-non-positive-definite-covariance-matrix-tell-me-about-my-data
-        SigmaMatrix <- tryCatch({
-          R.utils::withTimeout({
-            lqmm::make.positive.definite(solve(mll@details$hessian))
-          }, timeout = 300) ## 5min
-        }, TimeoutException = function(ex) {
-          stop("Convergence timed-out.")
-        }, error = function(e) e)
+        SigmaMatrix <- tryCatch(
+          {
+            R.utils::withTimeout(
+              {
+                lqmm::make.positive.definite(solve(mll@details$hessian))
+              },
+              timeout = 300
+            ) ## 5min
+          },
+          TimeoutException = function(ex) {
+            stop("Convergence timed-out.")
+          },
+          error = function(e) e
+        )
 
         if (isFALSE(is(SigmaMatrix, "error"))) {
           if (!requireNamespace("MASS", quietly = TRUE)) {
             stop("Package MASS not installed. Install using `install.packages('MASS')`.")
           }
-          newparams <- tryCatch({
-            R.utils::withTimeout({
-              MASS::mvrnorm(10000, mu = bbmle::coef(mll), Sigma = SigmaMatrix)
-            }, timeout = 300) ## 5min
-          }, TimeoutException = function(ex) {
-            stop("Convergence timed-out.")
-          }, error = function(e) e)
+          newparams <- tryCatch(
+            {
+              R.utils::withTimeout(
+                {
+                  MASS::mvrnorm(10000, mu = bbmle::coef(mll), Sigma = SigmaMatrix)
+                },
+                timeout = 300
+              ) ## 5min
+            },
+            TimeoutException = function(ex) {
+              stop("Convergence timed-out.")
+            },
+            error = function(e) e
+          )
         }
       }
 
@@ -1534,15 +1671,19 @@ modifySpeciesAndSpeciesEcoregionTable <- function(speciesEcoregion, speciesTable
 
   speciesTable[, growthCurveSource := "estimated"]
   if (nrow(speciesTable[is.na(inflationFactor), ]) > 0) {
-    missing <- speciesTable[is.na(inflationFactor)]$species
+    missing <- speciesTable[is.na(inflationFactor)][["species"]]
     message("averaging traits for these species: ", paste(missing, collapse = ", "))
     ## note that inflationFactor is dependent on longevity, which is not adjusted
-    averageOfEstimated <- speciesTable[!is.na(inflationFactor),
-                                       .(growthcurve = round(mean(growthcurve), digits = 2),
-                                         mortalityshape = asInteger(mean(mortalityshape)),
-                                         mANPPproportion = round(mean(mANPPproportion), digits = 2),
-                                         inflationFactor = round(mean(inflationFactor), digits = 3)),
-                                       .(hardsoft)]
+    averageOfEstimated <- speciesTable[
+      !is.na(inflationFactor),
+      .(
+        growthcurve = round(mean(growthcurve), digits = 2),
+        mortalityshape = asInteger(mean(mortalityshape)),
+        mANPPproportion = round(mean(mANPPproportion), digits = 2),
+        inflationFactor = round(mean(inflationFactor), digits = 3)
+      ),
+      .(hardsoft)
+    ]
 
     hardAverage <- averageOfEstimated[hardsoft == "hard"]
     softAverage <- averageOfEstimated[hardsoft == "soft"]
@@ -1583,8 +1724,10 @@ modifySpeciesAndSpeciesEcoregionTable <- function(speciesEcoregion, speciesTable
   newSpeciesEcoregion[, speciesCode := as.factor(speciesCode)]
   newSpeciesEcoregion[, maxB := asInteger(maxB)]
 
-  return(list("newSpeciesEcoregion" = newSpeciesEcoregion,
-              "newSpeciesTable" = speciesTable))
+  return(list(
+    "newSpeciesEcoregion" = newSpeciesEcoregion,
+    "newSpeciesTable" = speciesTable
+  ))
 }
 
 ## OLD CODE FROM ELIOT:

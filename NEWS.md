@@ -1,3 +1,19 @@
+# LandR (development version)
+
+- `prepRawBiomassMap` - needed `overwrite = TRUE` for cases where download was corrupt
+- `prepRawBiomassMap` needs `httr2` package as remote site is failing with `download.file`
+- add functions to visualize vegetation type transitions;
+- use `writeTo` instead of `filename2` in `prepInputs()` and related calls, following changes in `reproducible`;
+- remove `rasterRead()` to use version from `reproducible`;
+- `columnsForPixelGroups` is now a function (i.e., use `columnsForPixelGroups()` for consistent `pixelGroup` definitions);
+- new function `cohortDefinitionCols()` to ensure consistent cohort definitions;
+- new function `lccMapGenerator()` to calculate landcover classes from `cohortData` and `pixelGroupMap`;
+- don't delete `CA_forest_VLCE2` raster in `prepInputs_NTEMS_LCC_FAO()` (#110);
+
+# LandR 1.1.5
+
+- use INT2U instead of INT1U when writing rasters in `.overlay()` to avoid warning with larger values;
+
 # LandR 1.1.4
 
 * fix bug in `vegTypeMapGenerator()` when `mixedType = 1`;

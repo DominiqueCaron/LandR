@@ -17,15 +17,14 @@ utils::globalVariables(c(
 #' a receiving cell has lots of seed sources around it vs. a single seed source.
 #' The difference will come with a higher probability of successfully receiving a "seed".
 #'
-#' `dispersalFn` (temporarily unused as code is converted to Rcpp -- the
-#' default `dispersalFn` is hard coded within the `spiralSeedDispersal`
-#' function that uses C++) must be an expression that returns a probability
-#' distribution. Because it is a dispersal kernel, it must be a probability
-#' distribution. The expression that can take an argument named "dis" (without
-#' quotes) as this will be calculated internally and represents the distance
-#' from the initial (receiving) pixel and all active pixels within that cluster
-#' of active pixels. `SpaDES` includes the [Ward()] kernel as
-#' defined in the LANDIS-II documentation.
+#' `dispersalFn` (temporarily unused as code is converted to Rcpp -- the default `dispersalFn`
+#' is hard coded within the `spiralSeedDispersal` function that uses C++) must be an expression
+#' that returns a probability distribution.
+#' Because it is a dispersal kernel, it must be a probability distribution.
+#' The expression that can take an argument named "dis" (without quotes) as this will be
+#' calculated internally and represents the distance from the initial (receiving) pixel
+#' and all active pixels within that cluster of active pixels.
+#' \pkg{LandR} includes the [Ward()] kernel as defined in the LANDIS-II documentation.
 #'
 #' @param dtSrc data.table
 #'
@@ -38,7 +37,7 @@ utils::globalVariables(c(
 #' @param dispersalFn  An expression that can take a "dis" argument. See details.
 #'   Default is "Ward" (temporarily unused, as it is hard coded inside Rcpp function)
 #'
-#' @param plot.it  Deprecated. If TRUE, then plot the raster at every interaction,
+#' @param plot.it  Deprecated. If `TRUE`, then plot the raster at every interaction,
 #'                 so one can watch the `LANDISDisp` event grow.
 #' @param b  LANDIS Ward seed dispersal calibration coefficient (set to 0.01 in LANDIS)
 #'
@@ -66,7 +65,7 @@ utils::globalVariables(c(
 #'   library(data.table)
 #'
 #'   # keep this here for interactive testing with a larger raster
-#'   rasterTemplate <- LandR:::rasterRead(terra::ext(0, 2500, 0, 2500), res = 100)
+#'   rasterTemplate <- reproducible::rasterRead(terra::ext(0, 2500, 0, 2500), res = 100)
 #'
 #'   # make a pixelGroupMap
 #'   pgs <- 4 # make even just because of approach below requires even
@@ -90,7 +89,8 @@ utils::globalVariables(c(
 #'   seedSource[, pixelGroup := pixelGroup + pgs / 2]
 #'
 #'   # Get a species table -- if using in Canada, can use this
-#'   speciesTable <- getSpeciesTable(dPath = tempdir())
+#'   destPath <- file.path(tempdir(), "ex_LANDISDisp")
+#'   speciesTable <- getSpeciesTable(dPath = destPath)
 #'   speciesTable <- speciesTable[Area == "BSW"]
 #'   speciesTable[, speciesCode := as.factor(LandisCode)]
 #'   speciesTable[, seeddistance_eff := SeedEffDist]
@@ -118,18 +118,18 @@ utils::globalVariables(c(
 #'     spMap$pixelGroupMap <- pixelGroupMap
 #'     for (sppp in unique(output$speciesCode)) {
 #'       spppChar <- paste0("Sp_", sppp)
-#'       spMap[[spppChar]] <- LandR:::rasterRead(pixelGroupMap)
+#'       spMap[[spppChar]] <- reproducible::rasterRead(pixelGroupMap)
 #'       ss <- unique(seedSource[speciesCode == sppp], on = c("pixelGroup", "speciesCode"))
 #'       spMap[[spppChar]][pixelGroupMap[] %in% ss$pixelGroup] <- 1
 #'
-#'       receivable <- LandR:::rasterRead(pixelGroupMap)
+#'       receivable <- reproducible::rasterRead(pixelGroupMap)
 #'       srf <- unique(seedReceiveFull[speciesCode == sppp], on = c("pixelGroup", "speciesCode"))
 #'       receivable[pixelGroupMap[] %in% srf$pixelGroup] <- 1
 #'
 #'       forest <- which(!is.na(pixelGroupMap[]))
 #'       src <- which(!is.na(spMap[[spppChar]][]))
 #'       recvable <- which(!is.na(receivable[]))
-#'       rcvd <- output[speciesCode == sppp]$pixelIndex
+#'       rcvd <- output[speciesCode == sppp][["pixelIndex"]]
 #'
 #'       spMap[[spppChar]][forest] <- 0
 #'       spMap[[spppChar]][recvable] <- 2
@@ -137,32 +137,37 @@ utils::globalVariables(c(
 #'       spMap[[spppChar]][rcvd] <- 3
 #'       spMap[[spppChar]][intersect(src, rcvd)] <- 4
 #'
-#'       levels(spMap[[spppChar]]) <- data.frame(ID = 0:4,
-#'                                               type = c("OtherForest", "Source", "Didn't receive",
-#'                                                        "Received", "Src&Rcvd"))
+#'       levels(spMap[[spppChar]]) <- data.frame(
+#'         ID = 0:4,
+#'         type = c(
+#'           "OtherForest", "Source", "Didn't receive",
+#'           "Received", "Src&Rcvd"
+#'         )
+#'       )
 #'     }
 #'     Plot(spMap, cols = "Set2")
 #'
 #'     # A summary
 #'     rr <- apply(rast(spMap)[[-1]][] + 1, 2, tabulate)
-#'     rownames(rr) <- raster::levels(spMap[[2]])[[1]][,"type"][1:NROW(rr)]
+#'     rownames(rr) <- raster::levels(spMap[[2]])[[1]][, "type"][1:NROW(rr)]
 #'     # next line only works if there are some places that are both source and potential to receive
 #'     # rr <- rbind(rr, propSrcRcved = round(rr[5,]/ (rr[5,]+rr[2,]), 2))
-#'  }
+#'   }
 #' }
 #'
 LANDISDisp <- function(dtSrc, dtRcv, pixelGroupMap, speciesTable,
                        dispersalFn = Ward, b = 0.01, k = 0.95, plot.it = FALSE,
                        successionTimestep,
-                       verbose = getOption("LandR.verbose", TRUE),
-                       ...) {
-
+                       verbose = getOption("LandR.verbose", TRUE), ...) {
   if ((NROW(dtSrc) > 0) && (NROW(dtRcv) > 0)) {
     ####### Assertions #############
-    if (!( (is.numeric(dtSrc$speciesCode) && is.numeric(dtRcv$speciesCode) && is.numeric(speciesTable$speciesCode)) ||
-           (is.factor(dtSrc$speciesCode) && is.factor(dtRcv$speciesCode) && is.factor(speciesTable$speciesCode))))
-      stop("In LANDISDisp, dtSrc and dtRcv and speciesTable must each have columns for speciesCode which ",
-           "must be both integer or both factor; they are not. Please correct this.")
+    if (!((is.numeric(dtSrc$speciesCode) && is.numeric(dtRcv$speciesCode) && is.numeric(speciesTable$speciesCode)) ||
+      (is.factor(dtSrc$speciesCode) && is.factor(dtRcv$speciesCode) && is.factor(speciesTable$speciesCode)))) {
+      stop(
+        "In LANDISDisp, dtSrc and dtRcv and speciesTable must each have columns for speciesCode which ",
+        "must be both integer or both factor; they are not. Please correct this."
+      )
+    }
 
     dtSrc <- data.table::copy(dtSrc)
     dtRcv <- data.table::copy(dtRcv)
@@ -170,24 +175,31 @@ LANDISDisp <- function(dtSrc, dtRcv, pixelGroupMap, speciesTable,
 
     origClassWasNumeric <- is.numeric(speciesTable[["speciesCode"]])
     if (is(dtSrc$speciesCode, "numeric")) {
-      #if (length(unique(dtSrc$speciesCode)) != max(dtSrc$speciesCode)) {
+      # if (length(unique(dtSrc$speciesCode)) != max(dtSrc$speciesCode)) {
       # This is "numerics" that are no contiguous from 1
       set(dtSrc, NULL, c("speciesCode"), factor(dtSrc[["speciesCode"]]))
       origLevels <- levels(dtSrc[["speciesCode"]])
       speciesTable <- speciesTable[as.numeric(origLevels), ]
-      set(speciesTable, NULL, c("speciesCode"),
-          factor(speciesTable[["speciesCode"]], levels = origLevels))
-      set(dtRcv, NULL, c("speciesCode"),
-          factor(dtRcv[["speciesCode"]], levels = origLevels))
-      #}
+      set(
+        speciesTable, NULL, c("speciesCode"),
+        factor(speciesTable[["speciesCode"]], levels = origLevels)
+      )
+      set(
+        dtRcv, NULL, c("speciesCode"),
+        factor(dtRcv[["speciesCode"]], levels = origLevels)
+      )
+      # }
     }
 
     if (is.factor(dtSrc$speciesCode)) {
       if (!identical(levels(dtSrc$speciesCode), levels(dtRcv$speciesCode)) &&
-          identical(levels(dtSrc$speciesCode), levels(speciesTable$speciesCode)))
-        stop("In LANDISDisp, dtSrc$speciesCode and dtRcv$speciesCode and speciesTable$speciesCode ",
-             "are all factors (good), ",
-             "but they have different levels (bad). They must have the same factor levels.")
+        identical(levels(dtSrc$speciesCode), levels(speciesTable$speciesCode))) {
+        stop(
+          "In LANDISDisp, dtSrc$speciesCode and dtRcv$speciesCode and speciesTable$speciesCode ",
+          "are all factors (good), ",
+          "but they have different levels (bad). They must have the same factor levels."
+        )
+      }
       origLevels <- levels(dtSrc$speciesCode)
       dtSrc[, speciesCode2 := as.integer(speciesCode)]
       dtRcv[, speciesCode2 := as.integer(speciesCode)]
@@ -198,8 +210,9 @@ LANDISDisp <- function(dtSrc, dtRcv, pixelGroupMap, speciesTable,
       setnames(dtSrc, "speciesCode2", "speciesCode")
       setnames(dtRcv, "speciesCode2", "speciesCode")
       setnames(speciesTable, "speciesCode2", "speciesCode")
-      if (!"species" %in% colnames(speciesTable))
+      if (!"species" %in% colnames(speciesTable)) {
         set(speciesTable, NULL, "species", paste0("Spp_", speciesTable[["speciesCode"]]))
+      }
       setorderv(speciesTable, "speciesCode")
       setorderv(dtSrc, "speciesCode")
       setorderv(dtRcv, "speciesCode")
@@ -254,8 +267,10 @@ LANDISDisp <- function(dtSrc, dtRcv, pixelGroupMap, speciesTable,
     }
 
     #  Remove any species in dtRcv that are not available in dtSrc
-    dtRcvNew <- dtRcv[unique(dtSrc[, "speciesCode"], by = "speciesCode"), on = "speciesCode",
-                      nomatch = NULL]
+    dtRcvNew <- dtRcv[unique(dtSrc[, "speciesCode"], by = "speciesCode"),
+      on = "speciesCode",
+      nomatch = NULL
+    ]
     cellsCanRcv <- which(pgv %in% dtRcvNew$pixelGroup)
     rcvSpeciesCodes <- sort(unique(dtRcvNew$speciesCode))
     dtRcvLong <- data.table(pixelGroup = pgv[cellsCanRcv], pixelIndex = cellsCanRcv)
@@ -266,16 +281,21 @@ LANDISDisp <- function(dtSrc, dtRcv, pixelGroupMap, speciesTable,
     setorderv(dtRcvLong, c("pixelIndex", "speciesCode"))
     if (NROW(dtRcvLong)) {
       # There can be a case where a pixelGroup exists on map, with a species that is in Rcv but not in Src
-      if (anyNA(dtRcvLong[["pixelIndex"]]))
+      if (anyNA(dtRcvLong[["pixelIndex"]])) {
         dtRcvLong <- na.omit(dtRcvLong)
+      }
 
       if (verbose >= 3) {
-        message("numRcvPixels: ", length(unique(dtRcvLong$pixelIndex)),
-                "; numSrcPixels: ", max(apply(srcPixelMatrix, 2, function(x) sum(!is.na(x)))))
+        message(
+          "numRcvPixels: ", length(unique(dtRcvLong$pixelIndex)),
+          "; numSrcPixels: ", max(apply(srcPixelMatrix, 2, function(x) sum(!is.na(x))))
+        )
       }
       dtRcvLong <- spiralSeedDispersalR(speciesTable, pixelGroupMap, dtRcvLong,
-                                        srcPixelMatrix, cellSize, k, b, successionTimestep,
-                                        verbose, dispersalFn = dispersalFn)
+        srcPixelMatrix, cellSize, k, b, successionTimestep,
+        verbose,
+        dispersalFn = dispersalFn
+      )
       if (exists("origLevels", inherits = FALSE)) {
         dtRcvLong[, speciesCode := factor(origLevels[speciesCode], levels = origLevels)]
         if (origClassWasNumeric) {
@@ -284,9 +304,11 @@ LANDISDisp <- function(dtSrc, dtRcv, pixelGroupMap, speciesTable,
       }
     }
   } else {
-    dtRcvLong <- data.table(pixelIndex = integer(0), speciesCode = integer(0),
-                            DistOfSuccess = numeric(0), ReasonForStop = character(0),
-                            species = character(0))
+    dtRcvLong <- data.table(
+      pixelIndex = integer(0), speciesCode = integer(0),
+      DistOfSuccess = numeric(0), ReasonForStop = character(0),
+      species = character(0)
+    )
   }
   return(dtRcvLong[])
 }
@@ -325,17 +347,17 @@ speciesComm <- function(num, sc) {
 #'   with same length as `dist`
 #' @param k A parameter in the kernel
 #' @param b A parameter in the kernel
-#' @param algo Either 1 or 2. 2 is faster and is default. 1 is "simpler code" as it
-#'   uses `ifelse`
+#' @param algo Either 1 or 2. 1 is "simpler code" as it uses `ifelse`; 2 is faster and is default.
 #'
 #' @name WardKernel
 #' @rdname WardKernel
 Ward <- function(dist, cellSize, effDist, maxDist, k, b, algo = 2) {
   if (length(maxDist) == 1) {
-    if (length(dist) != 1)
+    if (length(dist) != 1) {
       maxDist <- rep(maxDist, length(dist))
-    else if (length(effDist) != 1)
+    } else if (length(effDist) != 1) {
       maxDist <- rep(maxDist, length(effDist))
+    }
   }
   if (length(dist) == 1) dist <- rep(dist, length(maxDist))
   if (length(effDist) == 1) effDist <- rep(effDist, length(maxDist))
@@ -351,16 +373,20 @@ Ward <- function(dist, cellSize, effDist, maxDist, k, b, algo = 2) {
     #  where a1, a2, b1, b2 are the 4 parts
     expra1 <- expression(
       exp((dista1wh - cellSize) * log(1 - k) / effDista1wh) -
-        exp(dista1wh * log(1 - k) / effDista1wh))
+        exp(dista1wh * log(1 - k) / effDista1wh)
+    )
     expra2 <- expression(
       (1 - k) * exp((dista2wh - cellSize - effDista2wh) * log(b) / maxDista2wh) -
-        (1 - k) * exp((dista2wh - effDista2wh) * log(b) / maxDista2wh))
+        (1 - k) * exp((dista2wh - effDista2wh) * log(b) / maxDista2wh)
+    )
     exprb1 <- expression(
       exp((distb1wh - cellSize) * log(1 - k) / effDistb1wh) - (1 - k) *
-        exp((distb1wh - effDistb1wh) * log(b) / maxDistb1wh))
+        exp((distb1wh - effDistb1wh) * log(b) / maxDistb1wh)
+    )
     exprb2 <- expression(
       (1 - k) * exp((distb2wh - cellSize - effDistb2wh) * log(b) / maxDistb2wh) -
-        (1 - k) * exp((distb2wh - effDistb2wh) * log(b) / maxDistb2wh))
+        (1 - k) * exp((distb2wh - effDistb2wh) * log(b) / maxDistb2wh)
+    )
 
     # Determine the indices for each one
     # Here are the 3 logicals, toplevel, then 2 nested
@@ -400,23 +426,25 @@ Ward <- function(dist, cellSize, effDist, maxDist, k, b, algo = 2) {
 
     out
   } else {
-    ifelse(cellSize <= effDist, {
-      ifelse(
-        dist <= effDist,
-        exp((dist - cellSize) * log(1 - k) / effDist) -
-          exp(dist * log(1 - k) / effDist),
-        (1 - k) * exp((dist - cellSize - effDist) * log(b) / maxDist) -
-          (1 - k) * exp((dist - effDist) * log(b) / maxDist)
-      )
-    }, {
-      ifelse(
-        dist <= cellSize,
-        exp((dist - cellSize) * log(1 - k) / effDist) - (1 - k) *
-          exp((dist - effDist) * log(b) / maxDist),
-        (1 - k) * exp((dist - cellSize - effDist) * log(b) / maxDist) -
-          (1 - k) * exp((dist - effDist) * log(b) / maxDist)
-      )
-    }
+    ifelse(cellSize <= effDist,
+      {
+        ifelse(
+          dist <= effDist,
+          exp((dist - cellSize) * log(1 - k) / effDist) -
+            exp(dist * log(1 - k) / effDist),
+          (1 - k) * exp((dist - cellSize - effDist) * log(b) / maxDist) -
+            (1 - k) * exp((dist - effDist) * log(b) / maxDist)
+        )
+      },
+      {
+        ifelse(
+          dist <= cellSize,
+          exp((dist - cellSize) * log(1 - k) / effDist) - (1 - k) *
+            exp((dist - effDist) * log(b) / maxDist),
+          (1 - k) * exp((dist - cellSize - effDist) * log(b) / maxDist) -
+            (1 - k) * exp((dist - effDist) * log(b) / maxDist)
+        )
+      }
     )
   }
 }
@@ -438,7 +466,8 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
 
   rcvFull <- dtRcvLong[, c("pixelIndex", "speciesCode")]
   rcvFull <- rcvFull[speciesTable[, c("seeddistance_max", "speciesCode")],
-                     on = "speciesCode", nomatch = NULL]
+    on = "speciesCode", nomatch = NULL
+  ]
 
   # # If there are entire rows that are NAs (quick test first -- just srcPixelMatrix --
   # #    then correct slower test inside this protected block)
@@ -484,8 +513,10 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
   # print(paste0("number cols in srcPixelMatrix: ", NCOL(srcPixelMatrix)))
 
   speciesTable <- copy(speciesTable)
-  set(speciesTable, NULL, "seeddistance_maxMinCellSize",
-      pmax(cellSize, speciesTable[["seeddistance_max"]]))
+  set(
+    speciesTable, NULL, "seeddistance_maxMinCellSize",
+    pmax(cellSize, speciesTable[["seeddistance_max"]])
+  )
   maxDis <- max(speciesTable[, "seeddistance_maxMinCellSize"])
 
   # Main matrix of distances that occur in a spiral
@@ -500,24 +531,33 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
   numSp <- NROW(speciesTable)
   spSeq <- seq(numSp)
   distsBySpCode <- as.data.table(expand.grid(dists = uniqueDists, speciesCode = speciesTable[["speciesCode"]]))
-  set(distsBySpCode, NULL, "seeddistance_max", speciesTableSmall[distsBySpCode[["speciesCode"]],
-                                                                 "seeddistance_max"])
-  set(distsBySpCode, NULL, "seeddistance_eff", speciesTableSmall[distsBySpCode[["speciesCode"]],
-                                                                 "seeddistance_eff"])
-  set(distsBySpCode, NULL, "wardProb",
-      pmin(1, dispersalFn(dist = distsBySpCode$dists, cellSize = cellSize, effDist = distsBySpCode$seeddistance_eff,
-                          maxDist = distsBySpCode$seeddistance_max, k = k, b = b)))
+  set(distsBySpCode, NULL, "seeddistance_max", speciesTableSmall[
+    distsBySpCode[["speciesCode"]],
+    "seeddistance_max"
+  ])
+  set(distsBySpCode, NULL, "seeddistance_eff", speciesTableSmall[
+    distsBySpCode[["speciesCode"]],
+    "seeddistance_eff"
+  ])
+  set(
+    distsBySpCode, NULL, "wardProb",
+    pmin(1, dispersalFn(
+      dist = distsBySpCode$dists, cellSize = cellSize, effDist = distsBySpCode$seeddistance_eff,
+      maxDist = distsBySpCode$seeddistance_max, k = k, b = b
+    ))
+  )
   set(distsBySpCode, NULL, c("seeddistance_max", "seeddistance_eff"), NULL)
   setorderv(distsBySpCode, c("dists", "speciesCode"))
 
   rcvFull <- dtRcvLong[, c("pixelIndex", "speciesCode")]
   rcvFull <- rcvFull[speciesTable[, c("seeddistance_max", "speciesCode")],
-                     on = "speciesCode", nomatch = NULL]
+    on = "speciesCode", nomatch = NULL
+  ]
   activeFullIndex <- seq.int(NROW(rcvFull))
 
   # activeIndexShrinking <- activeFullIndex
   rc1 <- rowColFromCell(pixelGroupMap, rcvFull[["pixelIndex"]])
-  colnames(rc1) <- c("row", "col")   ## terra::rowColFromCell output has no colnames
+  colnames(rc1) <- c("row", "col") ## terra::rowColFromCell output has no colnames
   rowOrig <- rc1[, "row"]
   colOrig <- rc1[, "col"]
 
@@ -567,8 +607,10 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
           if (any(tooLong, na.rm = TRUE)) {
             if (verbose >= 1) {
               tooLongFull <- curDist > rcvFull[["seeddistance_max"]]
-              set(rcvFull, which(tooLongFull & is.na(rcvFull$ReasonForStop)), "ReasonForStop",
-                  "NoneRecdBeforeMaxDistReached")
+              set(
+                rcvFull, which(tooLongFull & is.na(rcvFull$ReasonForStop)), "ReasonForStop",
+                "NoneRecdBeforeMaxDistReached"
+              )
             }
             activeFullIndex <- activeFullIndex[!tooLong]
             rowOrig <- rowOrig[!tooLong]
@@ -585,14 +627,14 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
     needNewCol <- TRUE
     if (newActiveIndex) {
       rowNow <- rowOrig
-      colNow <-  colOrig
+      colNow <- colOrig
     } else {
       if (identical(prevSpiralCol, spiralCol[i])) {
         needNewCol <- FALSE
       }
     }
 
-    row <- if (spiralRow[i] == 0) rowNow else rowNow + spiralRow[i] #spiral[i, "row"] # faster?
+    row <- if (spiralRow[i] == 0) rowNow else rowNow + spiralRow[i] # spiral[i, "row"] # faster?
     if (needNewCol) {
       col <- if (spiralCol[i] == 0) colNow else colNow + spiralCol[i]
     }
@@ -607,7 +649,7 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
 
     # lookup on src rasters
     if (newActiveIndex) {
-      activeSpeciesCode <- speciesCode#[activeFullIndex]
+      activeSpeciesCode <- speciesCode # [activeFullIndex]
     }
     srcPixelMatrixInd <- (activeSpeciesCode - 1) * nrowSrcPixelMatrix + newPixelIndex
     srcPixelValues <- srcPixelMatrix[srcPixelMatrixInd]
@@ -622,7 +664,7 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
       # The calculations for dispersal kernal are annual --
       #   so exponentiate for any other time step
       if (successionTimestep > 1) {
-        wardProbActual <- 1 - (1 - wardProbActual) ^ successionTimestep
+        wardProbActual <- 1 - (1 - wardProbActual)^successionTimestep
       }
     }
 
@@ -644,9 +686,11 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
         }
         numSuccesses <- length(oo)
         if (verbose >= 2) {
-          print(paste0(i, "; curDist: ", round(curDist, 0), "; NumSuccesses: ",
-                       numSuccesses, "; NumRows: ", NROW(na.omit(activeFullIndex)),
-                       "; NumSp: ", length(unique(speciesCode[activeFullIndex]))))
+          print(paste0(
+            i, "; curDist: ", round(curDist, 0), "; NumSuccesses: ",
+            numSuccesses, "; NumRows: ", NROW(na.omit(activeFullIndex)),
+            "; NumSp: ", length(unique(speciesCode[activeFullIndex]))
+          ))
         }
         notActiveSubIndex <- whHasSp[oo]
         if (length(notActiveSubIndex)) {
@@ -687,7 +731,6 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
           notActiveSubIndex <- integer()
           newActiveIndex <- FALSE
         }
-
       } else {
         newActiveIndex <- FALSE
       }
@@ -722,8 +765,10 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
   }
 
   speciesCodeCols <- intersect(c("species", "speciesCode"), colnames(speciesTable))
-  rcvFull <- rcvFull[speciesTable[, ..speciesCodeCols], on = "speciesCode",
-                     nomatch = NULL]
+  rcvFull <- rcvFull[speciesTable[, ..speciesCodeCols],
+    on = "speciesCode",
+    nomatch = NULL
+  ]
 
   if (verbose >= 1) {
     setattr(rcvFull, "ReasonForStop", ReasonForStop)
@@ -738,7 +783,9 @@ spiralSeedDispersalR <- function(speciesTable, pixelGroupMap, dtRcvLong,
 spiralDistances <- function(pixelGroupMap, maxDis, cellSize) {
   spiral <- which(focalMat(pixelGroupMap, maxDis, type = "circle") > 0, arr.ind = TRUE) -
     ceiling(maxDis / cellSize) - 1
-  spiral <- cbind(spiral, dists = sqrt((0 - spiral[, 1]) ^ 2 + (0 - spiral[, 2]) ^ 2))
-  spiral <- spiral[order(spiral[, "dists"], apply(abs(spiral), 1, sum),
-                         abs(spiral[, 1]), abs(spiral[, 2])), , drop = FALSE]
+  spiral <- cbind(spiral, dists = sqrt((0 - spiral[, 1])^2 + (0 - spiral[, 2])^2))
+  spiral <- spiral[order(
+    spiral[, "dists"], apply(abs(spiral), 1, sum),
+    abs(spiral[, 1]), abs(spiral[, 2])
+  ), , drop = FALSE]
 }

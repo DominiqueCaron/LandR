@@ -29,7 +29,7 @@ FireDisturbance(
 FireDisturbancePM(
   cohortData = copy(sim$cohortData),
   cohortDefinitionCols = c("pixelGroup", "age", "speciesCode"),
-  colsForPixelGroups = LandR::columnsForPixelGroups,
+  colsForPixelGroups = LandR::columnsForPixelGroups(),
   calibrate = FALSE,
   LANDISPM = TRUE,
   postFireRegenSummary = copy(sim$postFireRegenSummary),
@@ -62,7 +62,7 @@ PeatlandThermokarst(
   rasterToMatch = sim$rasterToMatch,
   species = copy(sim$species),
   speciesEcoregion = copy(sim$speciesEcoregion),
-  cohortDefinitionCols = c("pixelGroup", "speciesCode", "age"),
+  cohortDefinitionCols = LandR::cohortDefinitionCols(),
   initialB = 10L,
   inactivePixelIndex = sim$inactivePixelIndex,
   currentTime = NULL,
@@ -73,7 +73,8 @@ PeatlandThermokarst(
 \item{cohortData}{A \code{data.table} with columns: \code{pixelGroup}, \code{ecoregionGroup},
 \code{speciesCode}, and optionally \code{age}, \code{B}, \code{mortality}, \code{aNPPAct}, and \code{sumB}.}
 
-\item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts}
+\item{cohortDefinitionCols}{the columns in \code{cohortData} that define unique cohorts
+(default: \code{c("pixelGroup", "speciesCode", "age")}).}
 
 \item{calibrate}{logical. Determines whether to output \code{postFirePixelCohortData}.
 Defaults to FALSE}
@@ -170,8 +171,9 @@ Default: \code{getOption("LandR.assertions", TRUE)}.}
 
 \item{verbose}{Controls message output. Defaults to \code{getOption("LandR.verbose")}}
 
-\item{colsForPixelGroups}{character. \code{cohortData} columns used to find identical pixels in terms of
-cohort composition, and group them into \code{pixelGroups}.}
+\item{colsForPixelGroups}{character. \code{cohortData} columns used to find identical pixels in terms
+of cohort composition, and group them into \code{pixelGroups}
+(default: \code{c("ecoregionGroup", "speciesCode", "age", "B")}).}
 
 \item{LANDISPM}{logical. Should partial mortality be calculated as in LANDIS-II Dynamic Fire System v3.0.
 Must be \code{TRUE} for the time being.}
