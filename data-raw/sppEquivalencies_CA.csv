@@ -73,7 +73,7 @@ fraxamer,FRAX.AME,Frax_ame,Frax_Ame,Frax amer,Fraxinus americana,Am ash,American
 ,,Hana_vir,,Hana virg,Hamamelis virginiana,Am witchhz,American witch-hazel,American witch-hazel leading,,,TRUE,Deciduous,,,CedrMplOther,,,,HANA_VIR,,1500,other hardwood code
 ,,Jugl_cin,Jugl_Cin,Jugl cine,Juglans cinerea,Butnut,Butternut,Butternut leading,,,TRUE,Deciduous,,,CedrMplOther,,,,JUGL_CIN,NOC,1701,
 ,,Jugl_nig,Jugl_Nig,Jugl nigr,Juglans nigra,Bl walnut,Black walnut,Black walnut leading,,,TRUE,Deciduous,,,CedrMplOther,,,,JUGL_NIG,NON,1702,
-,,Juni_sco,,Juni scop,Juniperus scopulorum,RM jun,Rocky Mountain juniper,Rocky Mountain juniper leading,,,FALSE,Conifer,,,CedrMplOther,,,,JUNI_SCO,,,
+,,Juni_sco,,Juni scop,Juniperus scopulorum,RM jun,Rocky Mountain juniper,Rocky Mountain juniper leading,,,FALSE,Conifer,,,CedrMplOther,,,,JUNI_SCO,,801,eastern redcedar code
 ,,Juni_vir,Juni_Vir,,Juniperus virginiana,E redced,Eastern redcedar,Eastern redcedar leading,,,FALSE,Conifer,Eastern redcedar,,CedrMplOther,,,,JUNI_VIR,,801,
 ,,Lari_dec,,Lari deci,Larix decidua,Eu larch,European larch,European larch leading,,,FALSE,Conifer,,,CedrMplOther,,,,LARI_DEC,MEU,601,
 ,,Lari_kae,Lari_Kae,Lari kaem,Larix kaempferi,Jp larch,Japanese larch,Japanese larch leading,,,FALSE,Conifer,,,CedrMplOther,,,,LARI_KAE,,605,
@@ -141,8 +141,8 @@ poputrem,POPU.TRE,Popu_tre,Popu_Tre,Popu trem,Populus tremuloides,Tr aspen,Tremb
 ,,Prun_pen,Prun_Pen,Prun pens,Prunus pensylvanica,Pin cherry,Pin cherry,Pin cherry leading,,,TRUE,Deciduous,,,CedrMplOther,,,,PRUN_PEN,PRP,2802,
 ,,Prun_ser,Prun_Ser,Prun sero,Prunus serotina,black cherry,black cherry,black cherry leading,,,TRUE,Deciduous,black cherry,,CedrMplOther,,,,PRUN_SER,CET,2801,
 ,,Prun_sp,,Prun spp,Prunus spp.,Cherry,Cherry,Cherry leading,,,TRUE,Deciduous,,,CedrMplOther,,,,PRUN_SP,,2801,black cherry code
-,,Prun_vir,Prun_Vir,Prun virg,Prunus virginiana,Chk cherry,Chokecherry,Chokecherry leading,,,TRUE,Deciduous,,,CedrMplOther,,,,PRUN_VIR,PRV,2801,
-pseumenz,PSEU.MEN,Pseu_men,Pseu_Men_Gla,Pseu meng,Pseudotsuga menziesii var. glauca,Int doug-fir,Interior douglas-fir,Interior douglas-fir leading,,,FALSE,Conifer,douglas-fir,C7,DgFrPoPine,Fdi,,,PSEU_MEN,,2804,
+,,Prun_vir,Prun_Vir,Prun virg,Prunus virginiana,Chk cherry,Chokecherry,Chokecherry leading,,,TRUE,Deciduous,,,CedrMplOther,,,,PRUN_VIR,PRV,2804,
+pseumenz,PSEU.MEN,Pseu_men,Pseu_Men_Gla,Pseu meng,Pseudotsuga menziesii var. glauca,Int doug-fir,Interior douglas-fir,Interior douglas-fir leading,,,FALSE,Conifer,douglas-fir,C7,DgFrPoPine,Fdi,,,PSEU_MEN,,500,
 pseumenz,PSEU.MEN,Pseu_men,Pseu_Men_Men,Pseu menm,Pseudotsuga menziesii var. menziesii,Co doug-fir,Coastal douglas-fir,Coastal douglas-fir leading,,,FALSE,Conifer,douglas-fir,,CedrMplOther,Fdc,,,PSEU_MEN,,500,
 pseumenz,PSEU.MEN,Pseu_men,Pseu_Men,Pseu menz,Pseudotsuga menziesii,Doug-fir,Douglas-fir,Douglas-fir leading,,,FALSE,Conifer,douglas-fir,,DgFrPoPine,Fd,Fd,,PSEU_MEN,,500,
 ,,Pyru_com,,Pyru comm,Pyrus communis,Pear,Common pear,Common pear leading,,,TRUE,Deciduous,,,CedrMplOther,,,,PYRU_COM,,1500,other hardwood code
@@ -159,8 +159,8 @@ querrubr,QUER.RUB,Quer_rub,Quer_Rub,Quer rubr,Quercus rubra,N rd oak,Northern re
 ,,Quer_sp,Quer_Spp,Quer spp,Quercus spp.,Oak,Oak,Oak leading,,,TRUE,Deciduous,,,CedrMplOther,Q,,,QUER_SP,,2100,
 ,,Quer_vel,,Quer velu,Quercus velutina,Bl Oak,Black oak,Black oak leading,,,TRUE,Deciduous,,,CedrMplOther,,,,QUER_VEL,,2100,generic oak code
 ,,Rham_pur,,Rham purs,Rhamnus purshianus,Cascara,Cascara,Cascara leading,Also known as Frangula purshiana,,TRUE,Deciduous,,,CedrMplOther,,,,RHAM_PUR,,1500,other hardwood code
-,,Robi_pse,Robi_Pse,Robi pseu,Robinia pseudoacacia,Bl locust,Black locust,Black locust leading,,,TRUE,Deciduous,,,CedrMplOther,,,,ROBI_PSE,ROP,1500,other hardwood code
-,,Robi_sp,,Robi spp,Robinia spp.,Locust,Locust,Locust leading,,,TRUE,Deciduous,,,CedrMplOther,,,,ROBI_SP,,2901,
+,,Robi_pse,Robi_Pse,Robi pseu,Robinia pseudoacacia,Bl locust,Black locust,Black locust leading,,,TRUE,Deciduous,,,CedrMplOther,,,,ROBI_PSE,ROP,2901,
+,,Robi_sp,,Robi spp,Robinia spp.,Locust,Locust,Locust leading,,,TRUE,Deciduous,,,CedrMplOther,,,,ROBI_SP,,2901,black locust code
 ,,Sali_amy,,Sali amyg,Salix amygdaloides,Al leaf willow,Almond leaf willow,Almond leaf willow leading,,,TRUE,Deciduous,,,CedrMplOther,,,,SALI_AMY,,3500,generic willow code
 ,,Sali_beb,Sali_Beb,Sali bebb,Salix bebbiana,Bebb's willow,Bebb's willow,Bebb's willow leading,,,TRUE,Deciduous,,,CedrMplOther,Wb,,,SALI_BEB,,3506,
 ,,Sali_dis,,Sali disc,Salix discolor,Am p willow,American pussy willow,American pussy willow leading,,,TRUE,Deciduous,,,CedrMplOther,Wd,,,SALI_DIS,,3508,
@@ -187,7 +187,7 @@ tiliamer,,Tili_ame,Tili_Ame,Tili amer,Tilia americana,Am linden,American basswoo
 tsugcana,TSUG.CAN,Tsug_can,Tsug_Can,Tsug cana,Tsuga canadensis,E hemlock,Eastern hemlock,Eastern hemlock leading,,Tsug_Can,FALSE,Conifer,eastern hemlock,,CedrMplOther,,,,TSUG_CAN,PRU,401,
 tsughete,TSUG.HET,Tsug_het,Tsug_Het,Tsug hete,Tsuga heterophylla,W hemlock,Western hemlock,Western hemlock leading,,,FALSE,Conifer,western hemlock,,CedrMplOther,Hw,,,TSUG_HET,,402,
 ,,Tsug_mer,Tsug_Mer_Het,Tsug merx,Tsuga mertensiana,Mtn hemlock,Mountain hemlock,Mountain hemlock leading,,,FALSE,Conifer,mountain hemlock,,CedrMplOther,Hm,,,TSUG_MER,,403,
-tsugmert,TSUG.MER,Tsug_mer,Tsug_Mer,Tsug mert,Tsuga mertensiana x heterophylla,WxMtn hemlock,Western x mountain hemlock,Western x mountain hemlock leading,,,FALSE,Conifer,mountain hemlock,,CedrMplOther,Hxm,,,TSUG_MER,,403,
+tsugmert,TSUG.MER,Tsug_mer,Tsug_Mer,Tsug mert,Tsuga mertensiana x heterophylla,WxMtn hemlock,Western x mountain hemlock,Western x mountain hemlock leading,,,FALSE,Conifer,mountain hemlock,,CedrMplOther,Hxm,,,TSUG_MER,,404,
 ,,Tsug_sp,Tsug_Spp,Tsug spp,Tsuga spp.,Hemlock,Hemlock,Hemlock leading,,Tsug_Spp,FALSE,Conifer,,,CedrMplOther,H,,,TSUG_SP,,400,
 ,,Ulmu_ame,Ulmu_Ame,Ulmu amer,Ulmus americana,Am elm,American elm,American elm leading,,,TRUE,Deciduous,white elm,,CedrMplOther,,,EL,ULMU_AME,ORA,2201,
 ,,Ulmu_pum,Ulmu_Rub,Ulmu pumi,Ulmus pumila,Sib elm,Siberian elm,Siberian elm leading,,,TRUE,Deciduous,,,CedrMplOther,,,,ULMU_PUM,,2200,generic elm code
