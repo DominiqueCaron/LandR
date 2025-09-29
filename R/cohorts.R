@@ -2156,6 +2156,15 @@ adjustAgeToLongevity <- function(pixelCohortData, longevity, adjustmentFactor){
   return(correctedPixelCohortData)
 }
 
+#' Reduces the age of cohorts that exceed their longevity x adjustmentFactort
+#'
+#' @param pixelCohortData A `cohortData` object
+#' @param longevity A data.table with the longevity of each species.
+#' @param adjustmentFactor A numeric controlling the proportion of species longevity
+#' that cohort ages cannot exceed.
+#'
+#' @returns A `cohortData` object with corrected ages.
+#' @export
 adjustAgeToLongevity2 <- function(pixelCohortData, longevity, adjustment){
   # Check inputs requirements
   if(!all(c("longevity", "speciesCode") %in% colnames(longevity))){
