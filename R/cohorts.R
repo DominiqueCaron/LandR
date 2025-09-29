@@ -2155,3 +2155,18 @@ adjustAgeToLongevity <- function(pixelCohortData, longevity, adjustmentFactor){
   correctedPixelCohortData[, maxAge := NULL]
   return(correctedPixelCohortData)
 }
+
+adjustAgeToLongevity2 <- function(pixelCohortData, longevity, adjustment){
+  # Check inputs requirements
+  if(!all(c("longevity", "speciesCode") %in% colnames(longevity))){
+    stop("longevity data.frame needs the columns longevity and speciesCode")
+  }
+
+  # Calculate the maximum age accepted for each species
+  maxAges <- longevity[,.(speciesCode, maxAge = round(longevity - adjustment))]
+  # Correct the age for cohorts that exceed that limit
+  correctedPixelCohortData <- pixelCohortData[maxAges, on = .(speciesCode)]
+  correctedPixelCohortData[age > maxAge, age := maxAge]
+  correctedPixelCohortData[, maxAge := NULL]
+  return(correctedPixelCohortData)
+}
